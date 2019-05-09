@@ -11,6 +11,6 @@ uses
 begin
 	Application.Initialize;
 	Application.CreateForm(TForm1, Form1);
-	Form1.Newclick(Form1.New);
+	Form1.NewClick(Form1.New);
 	Application.Run;
 end.

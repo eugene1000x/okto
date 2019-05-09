@@ -659,7 +659,7 @@ object Form1: TForm1
     ReadOnly = True
     TabOrder = 2
   end
-  object StatusBar1: TStatusBar
+  object Statusbar1: TStatusBar
     Left = 0
     Top = 301
     Width = 412
@@ -679,7 +679,7 @@ object Form1: TForm1
       end>
     SimplePanel = False
   end
-  object ProgressBar1: TProgressBar
+  object Progressbar1: TProgressBar
     Left = 288
     Top = 216
     Width = 110

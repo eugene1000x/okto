@@ -1,5 +1,5 @@
 
-unit reversi;
+unit Reversi;
 
 
 interface
@@ -13,19 +13,19 @@ const
 	Side = 8;
 
 type
-	TPlayerID = 1..2;
+	TPlayerId = 1..2;
 	TState = 0..2;
 	TNextMove = 0..2;
 	TSide = 1..Side;
 	TField = array [TSide, TSide] of TState;
 	
 	TMove = record
-		i, j: TSide;
+		I, J: TSide;
 	end;
 	
 	TPlayer = record
 		Name: string;
-		GetMove: procedure(var Move: TMove; Field: TField; Piece: TPlayerID);
+		GetMove: procedure(var Move: TMove; Field: TField; Piece: TPlayerId);
 	end;
 	
 	TPlayers = array [1..2] of TPlayer;
@@ -46,12 +46,12 @@ type
 	end;
 	
 	TValue = record
-		WinLossDraw, LoE, MoE: boolean;
-		Pieces: integer;
+		WinLossDraw, LOE, MOE: Boolean;
+		Pieces: Integer;
 	end;
 	
 	TTransPos = array [1..2, 1..15] of record
-		NumberOfPos: word;		//MoveID, Depth
+		NumberOfPos: Word;		//MoveId, Depth
 		Positions: array of record
 			Field: TField;
 			Value: TValue;
@@ -61,7 +61,7 @@ type
 	TProtocol = record
 		Fields: array [TNumberOfSquares] of record
 			Field: TField;
-			PlayerID: TPlayerID;
+			PlayerId: TPlayerId;
 		end;
 		NumberOfMoves, Current: TNumberOfSquares;
 	end;
@@ -76,7 +76,7 @@ type
 		Edit2: TEdit;
 		Label1: TLabel;
 		Label2: TLabel;
-		StatusBar1: TStatusBar;
+		Statusbar1: TStatusBar;
 		Label3: TLabel;
 		Label4: TLabel;
 		Label5: TLabel;
@@ -86,7 +86,7 @@ type
 		Label9: TLabel;
 		Label10: TLabel;
 		Label11: TLabel;
-		ProgressBar1: TProgressBar;
+		Progressbar1: TProgressBar;
 		Order: TMenuItem;
 		PP: TMenuItem;
 		PC: TMenuItem;
@@ -138,12 +138,12 @@ type
 		Players: TPlayers;
 		
 		Values: record
-			last, best: TMove;
+			Last, Best: TMove;
 			V: array [1..8, 1..8] of string;
 		end;
 		
 		Protocol: TProtocol;
-		setup, break: boolean;
+		Setup, Break: Boolean;
 	end;
 
 var
@@ -154,138 +154,138 @@ implementation
 {$R *.dfm}
 
 
-procedure clear(var field: TField);
+procedure Clear(var Field: TField);
 var
-	i, j: byte;
+	I, J: Byte;
 begin
-	for i := 1 to 8 do
-		for j := 1 to 8 do
-			field[i, j] := 0;
+	for I := 1 to 8 do
+		for J := 1 to 8 do
+			Field[I, J] := 0;
 end;
 
-procedure setfield(var field: TField);
+procedure SetField(var Field: TField);
 begin
-	field[4, 4] := 2;
-	field[5, 4] := 1;
-	field[4, 5] := 1;
-	field[5, 5] := 2;
+	Field[4, 4] := 2;
+	Field[5, 4] := 1;
+	Field[4, 5] := 1;
+	Field[5, 5] := 2;
 end;
 
 procedure GetPosition(Field: TField; NextMove: TNextMove; var Position: TPosition);
 var
-	i, j: TSide;
-	revcount: TNumberOfSquares;
-	k, l: byte;
-	vx, vy: -1..1;
+	I, J: TSide;
+	RevCount: TNumberOfSquares;
+	K, L: Byte;
+	Vx, Vy: -1..1;
 begin
 	Position.NumberOfMoves := 0;
 	Position.Field := Field;
 	Position.NextMove := 0;
 	
-	for i := 1 to 8 do
-		for j := 1 to 8 do
+	for I := 1 to 8 do
+		for J := 1 to 8 do
 		begin
-			revcount := 0;
+			RevCount := 0;
 			Position.BranchPositions[Position.NumberOfMoves + 1].Field := Field;
 			
-			for vx := -1 to 1 do
-				for vy := -1 to 1 do
-					if (Field[i, j] = 0) and (not ((vx = 0) and (vy = 0))) then
-						if (i + vx in [1..8]) and (j + vy in [1..8]) and (Field[i + vx, j + vy] = 3 - NextMove) then
+			for Vx := -1 to 1 do
+				for Vy := -1 to 1 do
+					if (Field[I, J] = 0) and (not ((Vx = 0) and (Vy = 0))) then
+						if (I + Vx in [1..8]) and (J + Vy in [1..8]) and (Field[I + Vx, J + Vy] = 3 - NextMove) then
 						begin
-							k := 2;
+							K := 2;
 							
-							while (i + k * vx in [1..8]) and (j + k * vy in [1..8]) and (Field[i + k * vx, j + k * vy] = 3 - NextMove) do
-								inc(k);
+							while (I + K * Vx in [1..8]) and (J + K * Vy in [1..8]) and (Field[I + K * Vx, J + K * Vy] = 3 - NextMove) do
+								Inc(K);
 								
-							if (i + k * vx in [1..8]) and (j + k * vy in [1..8]) and (Field[i + k * vx, j + k * vy] = NextMove) then
+							if (I + K * Vx in [1..8]) and (J + K * Vy in [1..8]) and (Field[I + K * Vx, J + K * Vy] = NextMove) then
 							begin
-								for l := 0 to k - 1 do
-									Position.BranchPositions[Position.NumberOfMoves + 1].field[i + l * vx, j + l * vy] := NextMove;
+								for L := 0 to K - 1 do
+									Position.BranchPositions[Position.NumberOfMoves + 1].Field[I + L * Vx, J + L * Vy] := NextMove;
 									
-								inc(revcount, k - 1);
+								Inc(RevCount, K - 1);
 							end;
 						end;
-			if revcount > 0 then
+			if RevCount > 0 then
 			begin
-				inc(Position.NumberOfMoves);
-				Position.BranchPositions[Position.NumberOfMoves].Move.i := i;
-				Position.BranchPositions[Position.NumberOfMoves].Move.j := j;
+				Inc(Position.NumberOfMoves);
+				Position.BranchPositions[Position.NumberOfMoves].Move.I := I;
+				Position.BranchPositions[Position.NumberOfMoves].Move.J := J;
 				Position.NextMove := NextMove;
 			end;
 		end;
 end;
 
-function Pieces(Field: tfield; piece: byte): byte;
+function Pieces(Field: TField; Piece: Byte): Byte;
 var
-	i, j: TSide;
+	I, J: TSide;
 begin
-	result := 0;
-	for i := 1 to Side do
-		for j := 1 to Side do
-			if field[i, j] = piece then
-				inc(result);
+	Result := 0;
+	for I := 1 to Side do
+		for J := 1 to Side do
+			if Field[I, J] = Piece then
+				Inc(Result);
 end;
 
-function midgame(field: tfield): boolean;
+function Midgame(Field: TField): Boolean;
 begin
-	result := pieces(field, 1) + pieces(field, 2) < 56;
+	Result := Pieces(Field, 1) + Pieces(Field, 2) < 56;
 end;
 
 function StaticValue(Field: TField; Piece: TPlayerId): TValue;
 const
-	g: array [1..4] of array [1..2] of 1..8 = ((1, 1), (1, 8), (8, 1), (8, 8));
+	G: array [1..4] of array [1..2] of 1..8 = ((1, 1), (1, 8), (8, 1), (8, 8));
 const
-	k: array [1..4] of array [1..2] of 1..8 = ((2, 2), (2, 7), (7, 2), (7, 7));
+	K: array [1..4] of array [1..2] of 1..8 = ((2, 2), (2, 7), (7, 2), (7, 7));
 var
-	i: byte;
+	I: Byte;
 	Positions: array [1..2] of TPosition;
 begin
-	result.Pieces := 0;
-	result.WinLossDraw := false;
-	result.LoE := false;
-	result.MoE := false;
+	Result.Pieces := 0;
+	Result.WinLossDraw := False;
+	Result.LOE := False;
+	Result.MOE := False;
 	
-	GetPosition(Field, Piece, Positions[piece]);
-	GetPosition(Field, 3 - Piece, Positions[3 - piece]);
+	GetPosition(Field, Piece, Positions[Piece]);
+	GetPosition(Field, 3 - Piece, Positions[3 - Piece]);
 	
-	if (Positions[piece].NumberOfMoves = 0) and (Positions[3 - piece].NumberOfMoves = 0) then
+	if (Positions[Piece].NumberOfMoves = 0) and (Positions[3 - Piece].NumberOfMoves = 0) then
 	begin
-		result.WinLossDraw := true;
-		result.Pieces := pieces(Field, piece) - pieces(Field, 3 - piece);
-		exit;
+		Result.WinLossDraw := True;
+		Result.Pieces := Pieces(Field, Piece) - Pieces(Field, 3 - Piece);
+		Exit;
 	end;
 	
-	if midgame(Field) then
-		result.Pieces := pieces(Field, 3 - piece) - pieces(Field, piece)
+	if Midgame(Field) then
+		Result.Pieces := Pieces(Field, 3 - Piece) - Pieces(Field, Piece)
 	else
-		result.Pieces := pieces(Field, piece) - pieces(Field, 3 - piece);
+		Result.Pieces := Pieces(Field, Piece) - Pieces(Field, 3 - Piece);
 	
-	result.Pieces := result.Pieces + Positions[piece].NumberOfMoves;
-	result.Pieces := result.Pieces - Positions[3 - piece].NumberOfMoves;
+	Result.Pieces := Result.Pieces + Positions[Piece].NumberOfMoves;
+	Result.Pieces := Result.Pieces - Positions[3 - Piece].NumberOfMoves;
 	
-	for i := 1 to 4 do
-		if (Field[g[i][1], g[i][2]] = piece) or ((Field[k[i][1], k[i][2]] = 3 - piece) and (Field[g[i][1], g[i][2]] = 0)) then
-			result.Pieces := result.Pieces + 100
+	for I := 1 to 4 do
+		if (Field[G[I][1], G[I][2]] = Piece) or ((Field[K[I][1], K[I][2]] = 3 - Piece) and (Field[G[I][1], G[I][2]] = 0)) then
+			Result.Pieces := Result.Pieces + 100
 		else
-			if (Field[g[i][1], g[i][2]] = 3 - piece) or ((Field[k[i][1], k[i][2]] = piece) and (Field[g[i][1], g[i][2]] = 0)) then
-				result.Pieces := result.Pieces - 100;
+			if (Field[G[I][1], G[I][2]] = 3 - Piece) or ((Field[K[I][1], K[I][2]] = Piece) and (Field[G[I][1], G[I][2]] = 0)) then
+				Result.Pieces := Result.Pieces - 100;
 end;
 
-function BetterOrEqual(Value1, Value2: TValue; Equal: boolean): boolean;
+function BetterOrEqual(Value1, Value2: TValue; Equal: Boolean): Boolean;
 begin
 	if Value1.WinLossDraw = Value2.WinLossDraw then
-		BetterOrEqual := (value1.pieces > Value2.pieces) or ((value1.Pieces = value2.Pieces) and (Equal or ((Value1.MoE) and (Value2.MoE = false))))
+		BetterOrEqual := (Value1.Pieces > Value2.Pieces) or ((Value1.Pieces = Value2.Pieces) and (Equal or ((Value1.MOE) and (Value2.MOE = False))))
 	else
 		if Value1.WinLossDraw then
-			BetterOrEqual := Value1.pieces >= 0
+			BetterOrEqual := Value1.Pieces >= 0
 		else
-			BetterOrEqual := value2.pieces < 0;
+			BetterOrEqual := Value2.Pieces < 0;
 end;
 
 function StrValue1(Value: TValue): string;
 begin
-	StrValue1 := inttostr(abs(Value.Pieces));
+	StrValue1 := IntToStr(Abs(Value.Pieces));
 	
 	if Value.WinLossDraw then
 		if Value.Pieces > 0 then
@@ -295,19 +295,19 @@ begin
 		else
 			StrValue1 := 'Draw'
 	else
-		StrValue1 := inttostr(Value.Pieces);
+		StrValue1 := IntToStr(Value.Pieces);
 end;
 
 function StrValue2(Value: TValue): string;
 begin
-	StrValue2 := inttostr(Value.Pieces);
+	StrValue2 := IntToStr(Value.Pieces);
 	
 	if Value.WinLossDraw then
 		StrValue2 := Result +'p';
 		
-	if Value.LoE then
+	if Value.LOE then
 		StrValue2 := '<='+ Result
-	else if Value.MoE then
+	else if Value.MOE then
 		StrValue2 := '>='+ Result;
 end;
 
@@ -315,14 +315,14 @@ function Opposite(Value: TValue): TValue;
 begin
 	Opposite := Value;
 	Opposite.Pieces := -Value.Pieces;
-	Opposite.MoE := Value.LoE;
-	Opposite.LoE := Value.MoE;
+	Opposite.MOE := Value.LOE;
+	Opposite.LOE := Value.MOE;
 end;
 
 procedure CompMove(var Move: TMove; Field: TField; Piece: TPlayerID);
 var
-	i, depth, maxdepth: TNumberOfSquares;
-	max, res, MinValue, MaxValue: TValue;
+	I, Depth, MaxDepth: TNumberOfSquares;
+	Max, Res, MinValue, MaxValue: TValue;
 	CompPosition, Pi: TPosition;
 	Sorting: Boolean;
 label
@@ -330,14 +330,14 @@ label
 
 	function Value(Position: TPosition; Alpha, Beta: TValue): TValue;
 	var
-		i: TNumberOfSquares;
+		I: TNumberOfSquares;
 		Pi: TPosition;
 		Max: TValue;
 	label
 		done;
 	begin
-		application.processmessages;
-		inc(Depth);
+		Application.ProcessMessages;
+		Inc(Depth);
 		
 		if Depth = MaxDepth then
 		begin
@@ -347,35 +347,35 @@ label
 		
 		Max := MinValue;
 		
-		for i := 1 to Position.NumberOfMoves do
+		for I := 1 to Position.NumberOfMoves do
 		begin
-			GetPosition(Position.BranchPositions[i].Field, 3 - Position.NextMove, Pi);
+			GetPosition(Position.BranchPositions[I].Field, 3 - Position.NextMove, Pi);
 		
 			if Pi.NumberOfMoves > 0 then
 				Result := Opposite(Value(Pi, Opposite(Beta), Opposite(Alpha)))		// (Alpha >= Max) => (-Alpha <= -Max) => (Beta <= -Max)
 			else
 			begin
-				GetPosition(Position.BranchPositions[i].Field, Position.NextMove, Pi);
+				GetPosition(Position.BranchPositions[I].Field, Position.NextMove, Pi);
 				
 				if Pi.NumberOfMoves > 0 then
 					Result := Value(Pi, Alpha, Beta)
 				else
-					Result := StaticValue(Position.BranchPositions[i].Field, Position.NextMove);
+					Result := StaticValue(Position.BranchPositions[I].Field, Position.NextMove);
 			end;
 			
-			if BetterOrEqual(Max, Alpha, true) then
+			if BetterOrEqual(Max, Alpha, True) then
 				Alpha := Max;
 			
-			if BetterOrEqual(result, max, false) then
+			if BetterOrEqual(Result, Max, False) then
 			begin
-				max := result;
+				Max := Result;
 				
-				if (not Max.LoE) and (Max.MoE or BetterOrEqual(Max, Beta, true)) then
+				if (not Max.LOE) and (Max.MOE or BetterOrEqual(Max, Beta, True)) then
 				begin
 					if Position.NumberOfMoves > 1 then
 					begin
-						Max.LoE := false;
-						max.MoE := true;
+						Max.LOE := False;
+						Max.MOE := True;
 					end;
 					
 					goto done;
@@ -387,158 +387,158 @@ label
 		
 		Result := Max;
 		
-		if BetterOrEqual(Result, MaxValue, true) then
-			Result.MoE := false;
+		if BetterOrEqual(Result, MaxValue, True) then
+			Result.MOE := False;
 			
-		dec(depth);
+		Dec(Depth);
 	end;
 
 begin
-	form1.statusbar1.panels[0].Text := 'Thinking...';
+	Form1.Statusbar1.Panels[0].Text := 'Thinking...';
 	
-	form1.ProgressBar1.Max := form1.positions[piece].NumberOfMoves;
-	form1.ProgressBar1.Position := 0;
+	Form1.Progressbar1.Max := Form1.Positions[Piece].NumberOfMoves;
+	Form1.Progressbar1.Position := 0;
 	
-	Move.i := 1;
-	Move.j := 1;
+	Move.I := 1;
+	Move.J := 1;
 	
-	//for depth := 1 to 15 do
-	//	TransPos[depth].NumberOfPos := 0;
+	//for Depth := 1 to 15 do
+	//	TransPos[Depth].NumberOfPos := 0;
 	
-	for depth := 1 to 8 do
-		for maxdepth := 1 to 8 do
-			form1.values.V[depth, maxdepth] := '';
+	for Depth := 1 to 8 do
+		for MaxDepth := 1 to 8 do
+			Form1.Values.V[Depth, MaxDepth] := '';
 	
-	if 64 - pieces(field, 1) - pieces(field, 2) <= strtoint(form1.labelededit2.text) then
-		maxdepth := strtoint(form1.labelededit2.text)
+	if 64 - Pieces(Field, 1) - Pieces(Field, 2) <= StrToInt(Form1.LabeledEdit2.Text) then
+		MaxDepth := StrToInt(Form1.LabeledEdit2.Text)
 	else
-		maxdepth := strtoint(form1.labelededit1.text);
+		MaxDepth := StrToInt(Form1.LabeledEdit1.Text);
 	
-	form1.statusbar1.panels[3].text := 'Depth='+ inttostr(maxdepth);
+	Form1.Statusbar1.Panels[3].Text := 'Depth='+ IntToStr(MaxDepth);
 	
-	res.WinLossDraw := false;
-	form1.bsetup.Enabled := false;
+	Res.WinLossDraw := False;
+	Form1.BSetup.Enabled := False;
 	
-	form1.updown1.Enabled := false;
-	form1.UpDown2.Enabled := false;
+	Form1.UpDown1.Enabled := False;
+	Form1.UpDown2.Enabled := False;
 	
-	form1.DrawGrid1.Repaint;
-	depth := 0;
+	Form1.DrawGrid1.Repaint;
+	Depth := 0;
 	
-	GetPosition(field, piece, CompPosition);
+	GetPosition(Field, Piece, CompPosition);
 	
-	if compPosition.NumberOfMoves = 1 then
+	if CompPosition.NumberOfMoves = 1 then
 	begin
-		Move := compPosition.BranchPositions[1].Move;
+		Move := CompPosition.BranchPositions[1].Move;
 		goto done;
 	end;
 	
-	MinValue.WinLossDraw := true;
-	MinValue.LoE := false;
-	MinValue.MoE := false;
+	MinValue.WinLossDraw := True;
+	MinValue.LOE := False;
+	MinValue.MOE := False;
 	MinValue.Pieces := -64;
 	
-	MaxValue.WinLossDraw := true;
-	MaxValue.LoE := false;
-	MaxValue.MoE := false;
+	MaxValue.WinLossDraw := True;
+	MaxValue.LOE := False;
+	MaxValue.MOE := False;
 	MaxValue.Pieces := 64;
 	
 	Max := MinValue;
 	
-	for i := 1 to compPosition.NumberOfMoves do
+	for I := 1 to CompPosition.NumberOfMoves do
 	begin
-		GetPosition(CompPosition.BranchPositions[i].Field, 3 - Piece, Pi);
+		GetPosition(CompPosition.BranchPositions[I].Field, 3 - Piece, Pi);
 		
 		if Pi.NumberOfMoves > 0 then
-			if i < CompPosition.NumberOfMoves then
-				Res := Opposite(Value(Pi, Opposite(MaxValue), Opposite(max)))
+			if I < CompPosition.NumberOfMoves then
+				Res := Opposite(Value(Pi, Opposite(MaxValue), Opposite(Max)))
 			else
 				Res := Opposite(Value(Pi, Opposite(Max), Opposite(Max)))
 		else
 		begin
-			GetPosition(CompPosition.BranchPositions[i].Field, Piece, Pi);
+			GetPosition(CompPosition.BranchPositions[I].Field, Piece, Pi);
 			
 			if Pi.NumberOfMoves > 0 then
-				if i < compPosition.NumberOfMoves then
+				if I < CompPosition.NumberOfMoves then
 					Res := Value(Pi, Max, MaxValue)
 				else
 					Res := Value(Pi, Max, Max)
 			else
-				Res := StaticValue(CompPosition.BranchPositions[i].Field, Piece);
+				Res := StaticValue(CompPosition.BranchPositions[I].Field, Piece);
 		end;
 		
-		if (not Res.LoE) and (Res.MoE or BetterOrEqual(Res, Max, true)) then
+		if (not Res.LOE) and (Res.MOE or BetterOrEqual(Res, Max, True)) then
 		begin
-			Move := compPosition.BranchPositions[i].Move;
-			max := res;
-			form1.values.best := Move;
-			form1.statusbar1.panels[1].Text := StrValue1(res);
+			Move := CompPosition.BranchPositions[I].Move;
+			Max := Res;
+			Form1.Values.Best := Move;
+			Form1.Statusbar1.Panels[1].Text := StrValue1(Res);
 		end;
 		
-		form1.Values.V[compPosition.BranchPositions[i].Move.i, compPosition.BranchPositions[i].Move.j] := StrValue2(res);
-		form1.DrawGrid1.Repaint;
-		form1.ProgressBar1.Position := form1.ProgressBar1.Position + 1;
+		Form1.Values.V[CompPosition.BranchPositions[I].Move.I, CompPosition.BranchPositions[I].Move.J] := StrValue2(Res);
+		Form1.DrawGrid1.Repaint;
+		Form1.Progressbar1.Position := Form1.Progressbar1.Position + 1;
 		
-		if BetterOrEqual(max, MaxValue, true) then
+		if BetterOrEqual(Max, MaxValue, True) then
 			goto done;
 	end;
 	
 	done:
 	
-	form1.statusbar1.panels[0].Text := 'Ready';
-	form1.bsetup.Enabled := true;
+	Form1.Statusbar1.Panels[0].Text := 'Ready';
+	Form1.BSetup.Enabled := True;
 	
-	form1.updown1.Enabled := true;
-	form1.UpDown2.Enabled := true;
+	Form1.UpDown1.Enabled := True;
+	Form1.UpDown2.Enabled := True;
 end;
 
-function legalmove(i, j: TSide; Position: TPosition; var number: byte): boolean;
+function LegalMove(I, J: TSide; Position: TPosition; var Number: Byte): Boolean;
 var
-	k: byte;
+	K: Byte;
 begin
-	result := false;
+	Result := False;
 	
-	for k := 1 to Position.NumberOfMoves do
-		if (Position.BranchPositions[k].Move.i = i) and (Position.BranchPositions[k].Move.j = j) then
+	for K := 1 to Position.NumberOfMoves do
+		if (Position.BranchPositions[K].Move.I = I) and (Position.BranchPositions[K].Move.J = J) then
 		begin
-			result := true;
-			number := k;
-			break;
+			Result := True;
+			Number := K;
+			Break;
 		end;
 end;
 
 procedure PlayerMove(var Move: TMove; Field: TField; Piece: TPlayerID);
 var
-	c: byte;
+	C: Byte;
 begin
 	repeat
-		application.ProcessMessages;
+		Application.ProcessMessages;
 		
-		if form1.break then
-			exit;
-	until legalmove(form1.drawgrid1.Col + 1, form1.drawgrid1.Row + 1, form1.Positions[piece], c);
+		if Form1.Break then
+			Exit;
+	until LegalMove(Form1.DrawGrid1.Col + 1, Form1.DrawGrid1.Row + 1, Form1.Positions[Piece], C);
 	
-	Move.i := form1.drawgrid1.col + 1;
-	Move.j := form1.drawgrid1.row + 1;
+	Move.I := Form1.DrawGrid1.Col + 1;
+	Move.J := Form1.DrawGrid1.Row + 1;
 end;
 
 procedure TForm1.DrawGrid1DrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
 var
-	text: string;
+	Text: string;
 begin
-	drawgrid1.Canvas.Brush.Color := clwhite;
-	drawgrid1.Canvas.FillRect(rect);
+	DrawGrid1.Canvas.Brush.Color := clWhite;
+	DrawGrid1.Canvas.FillRect(Rect);
 	
-	case field[acol + 1, arow + 1] of
+	case Field[ACol + 1, ARow + 1] of
 		1:
-			drawgrid1.Canvas.StretchDraw(rect, Player1.Picture.Bitmap);
+			DrawGrid1.Canvas.StretchDraw(Rect, Player1.Picture.Bitmap);
 		2:
-			drawgrid1.Canvas.StretchDraw(rect, Player2.Picture.Bitmap);
+			DrawGrid1.Canvas.StretchDraw(Rect, Player2.Picture.Bitmap);
 	end;
 	
-	if (Values.Last.i = acol + 1) and (Values.Last.j = arow + 1) and (field[acol + 1, arow + 1] > 0) then
+	if (Values.Last.I = ACol + 1) and (Values.Last.J = ARow + 1) and (Field[ACol + 1, ARow + 1] > 0) then
 	begin
-		DrawGrid1.Canvas.Pen.Color := clred;
+		DrawGrid1.Canvas.Pen.Color := clRed;
 		DrawGrid1.Canvas.MoveTo(Rect.Left, Rect.Top);
 		DrawGrid1.Canvas.LineTo(Rect.Right, Rect.Top);
 		DrawGrid1.Canvas.LineTo(Rect.Right, Rect.Bottom);
@@ -546,210 +546,210 @@ begin
 		DrawGrid1.Canvas.LineTo(Rect.Left, Rect.Top);
 	end;
 	
-	if (acol + 1 = values.best.i) and (arow + 1 = values.best.j) then
-		DrawGrid1.Canvas.Font.Color := clred
+	if (ACol + 1 = Values.Best.I) and (ARow + 1 = Values.Best.J) then
+		DrawGrid1.Canvas.Font.Color := clRed
 	else
-		DrawGrid1.Canvas.Font.Color := clblack;
+		DrawGrid1.Canvas.Font.Color := clBlack;
 		
-	text := values.v[acol + 1, arow + 1];
+	Text := Values.V[ACol + 1, ARow + 1];
 	
-	if copy(text, 1, 2) = '<=' then
-		with drawgrid1.Canvas do
+	if Copy(Text, 1, 2) = '<=' then
+		with DrawGrid1.Canvas do
 		begin
-			delete(text, 1, 2);
-			pen.Color := clblack;
-			draw(rect.Left, rect.Top, image1.Picture.Graphic);
-			TextOut(Rect.Left + 8, Rect.Top, text);
+			Delete(Text, 1, 2);
+			Pen.Color := clBlack;
+			Draw(Rect.Left, Rect.Top, Image1.Picture.Graphic);
+			TextOut(Rect.Left + 8, Rect.Top, Text);
 		end
 	else
-		if copy(text, 1, 2) = '>=' then
-			with drawgrid1.Canvas do
+		if Copy(Text, 1, 2) = '>=' then
+			with DrawGrid1.Canvas do
 			begin
-				delete(text, 1, 2);
-				pen.Color := clblack;
-				draw(rect.Left, rect.Top, image2.Picture.Graphic);
-				TextOut(Rect.Left + 8, Rect.Top, text);
+				Delete(Text, 1, 2);
+				Pen.Color := clBlack;
+				Draw(Rect.Left, Rect.Top, Image2.Picture.Graphic);
+				TextOut(Rect.Left + 8, Rect.Top, Text);
 			end
 		else
-			DrawGrid1.Canvas.TextOut(Rect.Left, Rect.Top, text);
+			DrawGrid1.Canvas.TextOut(Rect.Left, Rect.Top, Text);
 end;
 
-procedure game(Players: TPlayers);
+procedure Game(Players: TPlayers);
 var
 	Move: TMove;
-	c1, c2: byte;
-	moveid: byte;
-	gameend: boolean;
+	C1, C2: Byte;
+	MoveId: Byte;
+	GameEnd: Boolean;
 begin
-	form1.BSetup.Enabled := true;
+	Form1.BSetup.Enabled := True;
 	
-	Form1.Values.Last.i := 1;
-	Form1.Values.Last.j := 1;
+	Form1.Values.Last.I := 1;
+	Form1.Values.Last.J := 1;
 	
-	Form1.Edit1.Text := inttostr(pieces(form1.field, 1));
-	Form1.Edit2.Text := inttostr(pieces(form1.field, 2));
+	Form1.Edit1.Text := IntToStr(Pieces(Form1.Field, 1));
+	Form1.Edit2.Text := IntToStr(Pieces(Form1.Field, 2));
 	
 	GetPosition(Form1.Field, 1, Form1.Positions[1]);
 	GetPosition(Form1.Field, 2, Form1.Positions[2]);
 	
-	for c1 := 1 to 8 do
-		for c2 := 1 to 8 do
-			form1.Values.V[c1, c2] := '';
+	for C1 := 1 to 8 do
+		for C2 := 1 to 8 do
+			Form1.Values.V[C1, C2] := '';
 			
-	form1.DrawGrid1.Repaint;
+	Form1.DrawGrid1.Repaint;
 	
-	form1.StatusBar1.Panels[2].Text := Form1.Player1.Hint +' '+ inttostr(form1.Positions[1].NumberOfMoves) +' moves  '+
-			Form1.Player2.Hint +' '+ inttostr(Form1.Positions[2].NumberOfMoves) +' moves';
+	Form1.Statusbar1.Panels[2].Text := Form1.Player1.Hint +' '+ IntToStr(Form1.Positions[1].NumberOfMoves) +' moves  '+
+			Form1.Player2.Hint +' '+ IntToStr(Form1.Positions[2].NumberOfMoves) +' moves';
 		
-	gameend := false;
-	moveid := 1;
+	GameEnd := False;
+	MoveId := 1;
 	
-	if form1.Positions[1].NumberOfMoves = 0 then
-		if form1.Positions[2].NumberOfMoves = 0 then
-			gameend := true;
+	if Form1.Positions[1].NumberOfMoves = 0 then
+		if Form1.Positions[2].NumberOfMoves = 0 then
+			GameEnd := True;
 		
-	while not gameend do
+	while not GameEnd do
 	begin
-		if form1.break then
-			exit;
+		if Form1.Break then
+			Exit;
 		
-		form1.drawgrid1.Selection := TGridRect(form1.drawgrid1.cellrect(-1, -1));
+		Form1.DrawGrid1.Selection := TGridRect(Form1.DrawGrid1.CellRect(-1, -1));
 		
 		GetPosition(Form1.Field, 1, Form1.Positions[1]);
 		GetPosition(Form1.Field, 2, Form1.Positions[2]);
 		
-		if form1.Positions[moveid].NumberOfMoves = 0 then
-			if form1.Positions[3 - moveid].NumberOfMoves = 0 then
-				gameend := true
+		if Form1.Positions[MoveId].NumberOfMoves = 0 then
+			if Form1.Positions[3 - MoveId].NumberOfMoves = 0 then
+				GameEnd := True
 			else
 			begin
-				if Players[MoveID].Name = 'human' then
-					showmessage('pass move');
-				moveID := 3 - MoveID;
+				if Players[MoveId].Name = 'human' then
+					ShowMessage('pass move');
+				MoveId := 3 - MoveId;
 			end;
 			
-		if not gameend then
-			Players[MoveID].GetMove(Move, form1.field, MoveID);
+		if not GameEnd then
+			Players[MoveId].GetMove(Move, Form1.Field, MoveId);
 			
-		if legalmove(Move.i, Move.j, form1.Positions[moveid], c1) then
+		if LegalMove(Move.I, Move.J, Form1.Positions[MoveId], C1) then
 		begin
-			form1.field := form1.Positions[moveid].BranchPositions[c1].field;
+			Form1.Field := Form1.Positions[MoveId].BranchPositions[C1].Field;
 			Form1.Values.Last := Move;
-			form1.Protocol.NumberOfMoves := form1.Protocol.NumberOfMoves + 1;
-			form1.Protocol.Current := form1.Protocol.Current + 1;
-			Form1.UpDown3.Position := Form1.protocol.current;
-			form1.Protocol.Fields[form1.Protocol.NumberOfMoves].Field := Form1.Field;
-			form1.Protocol.Fields[form1.Protocol.NumberOfMoves].PlayerID := MoveID;
-			form1.DrawGrid1.Repaint;
+			Form1.Protocol.NumberOfMoves := Form1.Protocol.NumberOfMoves + 1;
+			Form1.Protocol.Current := Form1.Protocol.Current + 1;
+			Form1.UpDown3.Position := Form1.Protocol.Current;
+			Form1.Protocol.Fields[Form1.Protocol.NumberOfMoves].Field := Form1.Field;
+			Form1.Protocol.Fields[Form1.Protocol.NumberOfMoves].PlayerID := MoveId;
+			Form1.DrawGrid1.Repaint;
 		end;
 		
-		moveID := 3 - MoveID;
+		MoveId := 3 - MoveId;
 		
 		GetPosition(Form1.Field, 1, Form1.Positions[1]);
 		GetPosition(Form1.Field, 2, Form1.Positions[2]);
 		
-		form1.StatusBar1.Panels[2].Text := Form1.Player1.Hint +' '+ inttostr(form1.Positions[1].NumberOfMoves) +' moves  '+
-				Form1.Player2.Hint +' '+ inttostr(form1.Positions[2].NumberOfMoves) +' moves';
+		Form1.Statusbar1.Panels[2].Text := Form1.Player1.Hint +' '+ IntToStr(Form1.Positions[1].NumberOfMoves) +' moves  '+
+				Form1.Player2.Hint +' '+ IntToStr(Form1.Positions[2].NumberOfMoves) +' moves';
 		
-		Form1.Edit1.Text := inttostr(pieces(form1.field, 1));
-		Form1.Edit2.Text := inttostr(pieces(form1.field, 2));
+		Form1.Edit1.Text := IntToStr(Pieces(Form1.Field, 1));
+		Form1.Edit2.Text := IntToStr(Pieces(Form1.Field, 2));
 	end;
 	
-	c1 := pieces(form1.field, 1);
-	c2 := pieces(form1.field, 2);
+	C1 := Pieces(Form1.Field, 1);
+	C2 := Pieces(Form1.Field, 2);
 	
-	if c1 > c2 then
-		showmessage('Winner is '+ players[1].name)
-	else if c2 > c1 then
-		showmessage('Winner is '+ players[2].name)
+	if C1 > C2 then
+		ShowMessage('Winner is '+ Players[1].name)
+	else if C2 > C1 then
+		ShowMessage('Winner is '+ Players[2].name)
 	else
-		showmessage('Draw');
+		ShowMessage('Draw');
 			
-	form1.BSetup.Enabled := true;
+	Form1.BSetup.Enabled := True;
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-	PC.Checked := true;
-	CC.Checked := false;
-	CP.Checked := false;
-	PP.Checked := false;
+	PC.Checked := True;
+	CC.Checked := False;
+	CP.Checked := False;
+	PP.Checked := False;
 	
-	if n2.Checked then
+	if N2.Checked then
 	begin
 		Player1.Picture := Blue.Picture;
 		Player1.Hint := 'Blue';
 	end;
 	
-	if n3.Checked then
+	if N3.Checked then
 	begin
 		Player1.Picture := Green.Picture;
 		Player1.Hint := 'Green';
 	end;
 	
-	if n4.Checked then
+	if N4.Checked then
 	begin
 		Player1.Picture := Red.Picture;
 		Player1.Hint := 'Red';
 	end;
 	
-	if n5.Checked then
+	if N5.Checked then
 	begin
 		Player1.Picture := Yellow.Picture;
 		Player1.Hint := 'Yellow';
 	end;
 	
-	if n6.Checked then
+	if N6.Checked then
 	begin
 		Player2.Picture := Blue.Picture;
 		Player2.Hint := 'Blue';
 	end;
 	
-	if n7.Checked then
+	if N7.Checked then
 	begin
 		Player2.Picture := Green.Picture;
 		Player2.Hint := 'Green';
 	end;
 	
-	if n8.Checked then
+	if N8.Checked then
 	begin
 		Player2.Picture := Red.Picture;
 		Player2.Hint := 'Red';
 	end;
 	
-	if n9.Checked then
+	if N9.Checked then
 	begin
 		Player2.Picture := Yellow.Picture;
 		Player2.Hint := 'Yellow';
 	end;
 	
-	break := false;
-	setup := false;
+	Break := False;
+	Setup := False;
 	
-	label3.Top := 0;
-	label4.Left := 5;
-	label5.Left := 5;
-	label6.Left := 5;
-	label7.Left := 5;
-	label8.Left := 5;
-	label9.Left := 5;
-	label10.Left := 5;
-	label11.Left := 5;
+	Label3.Top := 0;
+	Label4.Left := 5;
+	Label5.Left := 5;
+	Label6.Left := 5;
+	Label7.Left := 5;
+	Label8.Left := 5;
+	Label9.Left := 5;
+	Label10.Left := 5;
+	Label11.Left := 5;
 	
-	drawgrid1.Height := drawgrid1.GridLineWidth + drawgrid1.rowcount * (drawgrid1.DefaultRowHeight + drawgrid1.GridLineWidth) + 2;
-	drawgrid1.Width := drawgrid1.GridLineWidth + drawgrid1.colcount * (drawgrid1.DefaultColWidth + drawgrid1.GridLineWidth) + 2;
-	drawgrid1.top := label3.Height + label3.Top;
-	drawgrid1.Left := label4.Left + label4.Width + 5;
+	DrawGrid1.Height := DrawGrid1.GridLineWidth + DrawGrid1.RowCount * (DrawGrid1.DefaultRowHeight + DrawGrid1.GridLineWidth) + 2;
+	DrawGrid1.Width := DrawGrid1.GridLineWidth + DrawGrid1.ColCount * (DrawGrid1.DefaultColWidth + DrawGrid1.GridLineWidth) + 2;
+	DrawGrid1.Top := Label3.Height + Label3.Top;
+	DrawGrid1.Left := Label4.Left + Label4.Width + 5;
 	
-	Label3.Left := Drawgrid1.Left;
-	label4.Top := Drawgrid1.Top + 1 + 15 - 6;
-	label5.Top := label4.Top + 31;
-	label6.Top := label5.Top + 31;
-	label7.Top := label6.Top + 31;
-	label8.Top := label7.Top + 31;
-	label9.Top := label8.Top + 31;
-	label10.Top := label9.Top + 31;
-	label11.Top := label10.Top + 31;
+	Label3.Left := DrawGrid1.Left;
+	Label4.Top := DrawGrid1.Top + 1 + 15 - 6;
+	Label5.Top := Label4.Top + 31;
+	Label6.Top := Label5.Top + 31;
+	Label7.Top := Label6.Top + 31;
+	Label8.Top := Label7.Top + 31;
+	Label9.Top := Label8.Top + 31;
+	Label10.Top := Label9.Top + 31;
+	Label11.Top := Label10.Top + 31;
 	
 	Player1.Left := DrawGrid1.Left + DrawGrid1.Width + 60;
 	Player1.Top := 10;
@@ -770,43 +770,43 @@ begin
 	Edit2.Top := Player2.Top + Player2.Height - Edit2.Height;
 	
 	Label1.Left := Edit1.Left - 3;
-	Label1.Top := Player1.top;
+	Label1.Top := Player1.Top;
 	Label2.Left := Edit2.Left - 3;
 	Label2.Top := Player2.Top;
 	
-	form1.Clientheight := Drawgrid1.Height + statusbar1.Height + label3.Height + UpDown3.Height;
-	form1.ClientWidth := drawgrid1.Width + label4.Width + 110 + 5 + 5;
+	Form1.ClientHeight := DrawGrid1.Height + Statusbar1.Height + Label3.Height + UpDown3.Height;
+	Form1.ClientWidth := DrawGrid1.Width + Label4.Width + 110 + 5 + 5;
 	
-	progressbar1.Left := drawgrid1.Left + drawgrid1.Width + 5;
-	progressbar1.Width := form1.ClientWidth - drawgrid1.Width - label4.Width - 20;
+	Progressbar1.Left := DrawGrid1.Left + DrawGrid1.Width + 5;
+	Progressbar1.Width := Form1.ClientWidth - DrawGrid1.Width - Label4.Width - 20;
 	
-	labelededit1.Left := ProgressBar1.Left;
-	labelededit2.Left := labelededit1.left;
+	LabeledEdit1.Left := Progressbar1.Left;
+	LabeledEdit2.Left := LabeledEdit1.left;
 	
-	Updown3.Top := drawgrid1.Top + drawgrid1.Height;
+	UpDown3.Top := DrawGrid1.Top + DrawGrid1.Height;
 	
-	form1.Show;
-	//newclick(sender);
+	Form1.Show;
+	//NewClick(Sender);
 end;
 
 procedure TForm1.NewClick(Sender: TObject);
 begin
-	clear(field);
-	setfield(field);
-	clear(form1.protocol.fields[1].field);
-	setfield(form1.protocol.fields[1].field);
+	Clear(Field);
+	SetField(Field);
+	Clear(Form1.Protocol.Fields[1].Field);
+	SetField(Form1.Protocol.Fields[1].Field);
 	
 	Protocol.NumberOfMoves := 1;
 	Protocol.Current := 1;
 	
-	UpDown3.Position := protocol.current;
+	UpDown3.Position := Protocol.Current;
 	
-	drawgrid1.DefaultDrawing := false;
+	DrawGrid1.DefaultDrawing := False;
 	
-	form1.statusbar1.panels[0].Text := '';
-	form1.statusbar1.panels[1].Text := '';
+	Form1.Statusbar1.Panels[0].Text := '';
+	Form1.Statusbar1.Panels[1].Text := '';
 	
-	if CC.Checked or cp.Checked then
+	if CC.Checked or CP.Checked then
 	begin
 		Players[1].GetMove := CompMove;
 		Players[1].Name := 'CPU';
@@ -817,7 +817,7 @@ begin
 		Players[1].Name := 'human';
 	end;
 	
-	if pp.Checked or cp.Checked then
+	if PP.Checked or CP.Checked then
 	begin
 		Players[2].GetMove := PlayerMove;
 		Players[2].Name := 'human';
@@ -828,27 +828,27 @@ begin
 		Players[2].Name := 'CPU';
 	end;
 	
-	label1.caption := Players[1].Name;
-	label2.caption := Players[2].Name;
-	game(players);
-	drawgrid1.Repaint;
+	Label1.Caption := Players[1].Name;
+	Label2.Caption := Players[2].Name;
+	Game(Players);
+	DrawGrid1.Repaint;
 end;
 
 procedure TForm1.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-	halt;
+	Halt;
 end;
 
 procedure TForm1.MoveClick(Sender: TObject);
 begin
-	PC.Checked := false;
-	CC.Checked := false;
-	CP.Checked := false;
-	PP.Checked := false;
+	PC.Checked := False;
+	CC.Checked := False;
+	CP.Checked := False;
+	PP.Checked := False;
 	
-	(sender as TMenuItem).Checked := true;
+	(Sender as TMenuItem).Checked := True;
 	
-	if CC.Checked or cp.Checked then
+	if CC.Checked or CP.Checked then
 	begin
 		Players[1].GetMove := CompMove;
 		Players[1].Name := 'CPU';
@@ -859,7 +859,7 @@ begin
 		Players[1].Name := 'human';
 	end;
 	
-	if pp.Checked or cp.Checked then
+	if PP.Checked or CP.Checked then
 	begin
 		Players[2].GetMove := PlayerMove;
 		Players[2].Name := 'human';
@@ -870,136 +870,136 @@ begin
 		Players[2].Name := 'CPU';
 	end;
 	
-	label1.caption := Players[1].Name;
-	label2.caption := Players[2].Name;
+	Label1.Caption := Players[1].Name;
+	Label2.Caption := Players[2].Name;
 end;
 	
 procedure TForm1.Color1Click(Sender: TObject);
 begin
-	N2.Checked := false;
-	N3.Checked := false;
-	N4.Checked := false;
-	N5.Checked := false;
+	N2.Checked := False;
+	N3.Checked := False;
+	N4.Checked := False;
+	N5.Checked := False;
 	
-	(Sender as TMenuItem).Checked := true;
+	(Sender as TMenuItem).Checked := True;
 	
-	if n2.Checked then
+	if N2.Checked then
 	begin
 		Player1.Picture := Blue.Picture;
 		Player1.Hint := 'Blue';
 	end;
 	
-	if n3.Checked then
+	if N3.Checked then
 	begin
 		Player1.Picture := Green.Picture;
 		Player1.Hint := 'Green';
 	end;
 	
-	if n4.Checked then
+	if N4.Checked then
 	begin
 		Player1.Picture := Red.Picture;
 		Player1.Hint := 'Red';
 	end;
 	
-	if n5.Checked then
+	if N5.Checked then
 	begin
 		Player1.Picture := Yellow.Picture;
 		Player1.Hint := 'Yellow';
 	end;
 	
-	form1.StatusBar1.Panels[2].Text := Form1.Player1.Hint +' '+ inttostr(form1.Positions[1].NumberOfMoves) +' moves  '+
-			Form1.Player2.Hint +' '+ inttostr(Form1.Positions[2].NumberOfMoves) +' moves';
+	Form1.Statusbar1.Panels[2].Text := Form1.Player1.Hint +' '+ IntToStr(Form1.Positions[1].NumberOfMoves) +' moves  '+
+			Form1.Player2.Hint +' '+ IntToStr(Form1.Positions[2].NumberOfMoves) +' moves';
 	
-	drawgrid1.Repaint;
+	DrawGrid1.Repaint;
 end;
 
 procedure TForm1.Color2Click(Sender: TObject);
 begin
-	N6.Checked := false;
-	N7.Checked := false;
-	N8.Checked := false;
-	N9.Checked := false;
+	N6.Checked := False;
+	N7.Checked := False;
+	N8.Checked := False;
+	N9.Checked := False;
 	
-	(Sender as TMenuItem).Checked := true;
+	(Sender as TMenuItem).Checked := True;
 	
-	if n6.Checked then
+	if N6.Checked then
 	begin
 		Player2.Picture := Blue.Picture;
 		Player2.Hint := 'Blue';
 	end;
 	
-	if n7.Checked then
+	if N7.Checked then
 	begin
 		Player2.Picture := Green.Picture;
 		Player2.Hint := 'Green';
 	end;
 	
-	if n8.Checked then
+	if N8.Checked then
 	begin
 		Player2.Picture := Red.Picture;
 		Player2.Hint := 'Red';
 	end;
 	
-	if n9.Checked then
+	if N9.Checked then
 	begin
 		Player2.Picture := Yellow.Picture;
 		Player2.Hint := 'Yellow';
 	end;
 	
-	form1.StatusBar1.Panels[2].Text := Form1.Player1.Hint +' '+ inttostr(form1.Positions[1].NumberOfMoves) +' moves  '+
-			Form1.Player2.Hint +' '+ inttostr(Form1.Positions[2].NumberOfMoves) +' moves';
+	Form1.Statusbar1.Panels[2].Text := Form1.Player1.Hint +' '+ IntToStr(Form1.Positions[1].NumberOfMoves) +' moves  '+
+			Form1.Player2.Hint +' '+ IntToStr(Form1.Positions[2].NumberOfMoves) +' moves';
 	
-	drawgrid1.Repaint;
+	DrawGrid1.Repaint;
 end;
 
 procedure TForm1.BSetupClick(Sender: TObject);
 begin
-	bsetup.Enabled := false;
-	continue.Enabled := true;
-	break := true;
-	setup := true;
+	BSetup.Enabled := False;
+	Continue.Enabled := True;
+	Break := True;
+	Setup := True;
 end;
 
 procedure TForm1.ContinueClick(Sender: TObject);
 begin
-	bsetup.Enabled := true;
-	continue.Enabled := false;
-	break := false;
-	setup := false;
-	drawgrid1.Selection := TGridRect(drawgrid1.cellrect(-1, -1));
-	protocol.fields[1].field := field;
+	BSetup.Enabled := True;
+	Continue.Enabled := False;
+	Break := False;
+	Setup := False;
+	DrawGrid1.Selection := TGridRect(DrawGrid1.CellRect(-1, -1));
+	Protocol.Fields[1].Field := Field;
 	Protocol.NumberOfMoves := 1;
 	Protocol.Current := 1;
-	UpDown3.Position := protocol.current;
-	game(players);
+	UpDown3.Position := Protocol.Current;
+	Game(Players);
 end;
 
 procedure TForm1.DrawGrid1Click(Sender: TObject);
 begin
-	if not setup then
-		exit;
+	if not Setup then
+		Exit;
 		
 	repeat
-		field[drawgrid1.Col + 1, drawgrid1.Row + 1] := (field[drawgrid1.Col + 1, drawgrid1.Row + 1] + 1) mod 3;
-	until not ((field[drawgrid1.col + 1, drawgrid1.row + 1] = 0) and (drawgrid1.col + 1 in [4, 5]) and (drawgrid1.row + 1 in [4, 5]));
+		Field[DrawGrid1.Col + 1, DrawGrid1.Row + 1] := (Field[DrawGrid1.Col + 1, DrawGrid1.Row + 1] + 1) mod 3;
+	until not ((Field[DrawGrid1.Col + 1, DrawGrid1.Row + 1] = 0) and (DrawGrid1.Col + 1 in [4, 5]) and (DrawGrid1.Row + 1 in [4, 5]));
 	
-	drawgrid1.Repaint;
+	DrawGrid1.Repaint;
 end;
 
 procedure TForm1.UpDown3Click(Sender: TObject; Button: TUDBtnType);
 begin
-	if button = btnext then
-		if protocol.current + 1 <= protocol.NumberOfMoves then
-			inc(protocol.current);
+	if Button = btNext then
+		if Protocol.Current + 1 <= Protocol.NumberOfMoves then
+			Inc(Protocol.Current);
 	
-	if button = btprev then
-		if protocol.current - 1 >= 1 then
-			dec(protocol.current);
+	if Button = btPrev then
+		if Protocol.Current - 1 >= 1 then
+			Dec(Protocol.Current);
 	
-	UpDown3.Position := protocol.current;
-	field := protocol.fields[protocol.current].Field;
+	UpDown3.Position := Protocol.Current;
+	Field := Protocol.Fields[Protocol.Current].Field;
 	
-	drawgrid1.Repaint;
+	DrawGrid1.Repaint;
 end;
 
 end.
