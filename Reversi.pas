@@ -336,7 +336,7 @@ label
 	label
 		done;
 	begin
-		Application.ProcessMessages;
+		Application.ProcessMessages;		//without this window becomes unresponsive
 		Inc(Depth);
 		
 		if Depth = MaxDepth then
@@ -512,7 +512,7 @@ var
 	C: Byte;
 begin
 	repeat
-		Application.ProcessMessages;
+		Application.ProcessMessages;		//without this window becomes unresponsive
 		
 		if Form1.Break then
 			Exit;
