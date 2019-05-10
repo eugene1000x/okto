@@ -741,7 +741,7 @@ begin
 	Self.m__BackForwardButtons.Top := Self.m__DrawGrid.Top + Self.m__DrawGrid.Height;
 	
 	Self.Show;
-	//NewClick(Sender);
+	Self.OnClick_MenuItem__new_game(Self.m__MenuItem__new_game);
 end;
 
 procedure TMainWindow.OnClose_MainWindow(Sender: TObject; var Action: TCloseAction);
