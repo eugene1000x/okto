@@ -68,15 +68,39 @@ type
 	
 	TMainWindow = class(TForm)
 		m__DrawGrid: TDrawGrid;
+		m__Statusbar: TStatusBar;
+		m__Progressbar: TProgressBar;
+		m__BackForwardButtons: TUpDown;
+
 		m__MainMenu: TMainMenu;
 		m__MenuItem__new_game: TMenuItem;
-		m__Player2Piece: TImage;
+		m__MenuItem_position: TMenuItem;
+		m__MenuItem_position_modify: TMenuItem;
+		m__MenuItem_position_continue: TMenuItem;
+		m__MenuItem_players: TMenuItem;
+		m__MenuItem__players__2_players: TMenuItem;
+		m__MenuItem__players__human_vs_cpu: TMenuItem;
+		m__MenuItem__players__cpu_vs_human: TMenuItem;
+		m__MenuItem__players__cpu_vs_cpu: TMenuItem;
+		m__MenuItem_colour: TMenuItem;
+		m__MenuItem__colour__1st_player: TMenuItem;
+		m__MenuItem__colour__1st_player__blue: TMenuItem;
+		m__MenuItem__colour__1st_player__green: TMenuItem;
+		m__MenuItem__colour__1st_player__red: TMenuItem;
+		m__MenuItem__colour__1st_player__yellow: TMenuItem;
+		m__MenuItem__colour__2nd_player: TMenuItem;
+		m__MenuItem__colour__2nd_player__blue: TMenuItem;
+		m__MenuItem__colour__2nd_player__green: TMenuItem;
+		m__MenuItem__colour__2nd_player__red: TMenuItem;
+		m__MenuItem__colour__2nd_player__yellow: TMenuItem;
+
 		m__Player1Piece: TImage;
+		m__Player2Piece: TImage;
 		m__Player1PieceCountEdit: TEdit;
 		m__Player2PieceCountEdit: TEdit;
 		m__Player1Label: TLabel;
 		m__Player2Label: TLabel;
-		m__Statusbar: TStatusBar;
+
 		m__ColumnLabel: TLabel;
 		m__Row1Label: TLabel;
 		m__Row2Label: TLabel;
@@ -86,50 +110,33 @@ type
 		m__Row6Label: TLabel;
 		m__Row7Label: TLabel;
 		m__Row8Label: TLabel;
-		m__Progressbar: TProgressBar;
-		m__MenuItem_players: TMenuItem;
-		m__MenuItem__players__2_players: TMenuItem;
-		m__MenuItem__players__human_vs_cpu: TMenuItem;
-		m__MenuItem__players__cpu_vs_human: TMenuItem;
-		m__MenuItem__players__cpu_vs_cpu: TMenuItem;
+
 		m__LessOrEqual: TImage;
+		m__GreaterOrEqual: TImage;
+
 		m__MidgameDepthUpDown: TUpDown;
 		m__EndgameDepthUpDown: TUpDown;
 		m__MidgameDepthLabeledEdit: TLabeledEdit;
 		m__EndgameDepthLabeledEdit: TLabeledEdit;
-		m__GreaterOrEqual: TImage;
-		m__MenuItem_colour: TMenuItem;
-		m__MenuItem__colour__1st_player: TMenuItem;
-		m__MenuItem__colour__2nd_player: TMenuItem;
-		m__MenuItem__colour__1st_player__blue: TMenuItem;
-		m__MenuItem__colour__1st_player__green: TMenuItem;
-		m__MenuItem__colour__1st_player__yellow: TMenuItem;
-		m__MenuItem__colour__1st_player__red: TMenuItem;
-		m__MenuItem__colour__2nd_player__blue: TMenuItem;
-		m__MenuItem__colour__2nd_player__green: TMenuItem;
-		m__MenuItem__colour__2nd_player__red: TMenuItem;
-		m__MenuItem__colour__2nd_player__yellow: TMenuItem;
+
 		m__GreenPiece: TImage;
 		m__BluePiece: TImage;
 		m__YellowPiece: TImage;
 		m__RedPiece: TImage;
-		m__MenuItem_position: TMenuItem;
-		m__MenuItem_position_modify: TMenuItem;
-		m__MenuItem_position_continue: TMenuItem;
-		m__BackForwardButtons: TUpDown;
 		
 		
 		procedure OnCreate_MainWindow(Sender: TObject);
-		procedure OnDrawCell_DrawGrid(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
-		procedure OnClick_MenuItem__new_game(Sender: TObject);
 		procedure OnClose_MainWindow(Sender: TObject; var Action: TCloseAction);
+		procedure OnDrawCell_DrawGrid(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
+		procedure OnClick_DrawGrid(Sender: TObject);
+		procedure OnClick_BackForwardButtons(Sender: TObject; Button: TUDBtnType);
+
+		procedure OnClick_MenuItem__new_game(Sender: TObject);
+		procedure OnClick_MenuItem_position_modify(Sender: TObject);
+		procedure OnClick_MenuItem_position_continue(Sender: TObject);
 		procedure OnClick_MenuItem__players__any_submenu(Sender: TObject);
 		procedure OnClick_MenuItem__colour__1st_player__any_submenu(Sender: TObject);
 		procedure OnClick_MenuItem__colour__2nd_player__any_submenu(Sender: TObject);
-		procedure OnClick_MenuItem_position_modify(Sender: TObject);
-		procedure OnClick_MenuItem_position_continue(Sender: TObject);
-		procedure OnClick_DrawGrid(Sender: TObject);
-		procedure OnClick_BackForwardButtons(Sender: TObject; Button: TUDBtnType);
 	private
 		// nothing
 	public
@@ -522,58 +529,6 @@ begin
 	Move.J := MainWindow.m__DrawGrid.Row + 1;
 end;
 
-procedure TMainWindow.OnDrawCell_DrawGrid(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
-var
-	Text: string;
-begin
-	m__DrawGrid.Canvas.Brush.Color := clWhite;
-	m__DrawGrid.Canvas.FillRect(Rect);
-	
-	case Field[ACol + 1, ARow + 1] of
-		1:
-			m__DrawGrid.Canvas.StretchDraw(Rect, m__Player1Piece.Picture.Bitmap);
-		2:
-			m__DrawGrid.Canvas.StretchDraw(Rect, m__Player2Piece.Picture.Bitmap);
-	end;
-	
-	if (Values.Last.I = ACol + 1) and (Values.Last.J = ARow + 1) and (Field[ACol + 1, ARow + 1] > 0) then
-	begin
-		m__DrawGrid.Canvas.Pen.Color := clRed;
-		m__DrawGrid.Canvas.MoveTo(Rect.Left, Rect.Top);
-		m__DrawGrid.Canvas.LineTo(Rect.Right, Rect.Top);
-		m__DrawGrid.Canvas.LineTo(Rect.Right, Rect.Bottom);
-		m__DrawGrid.Canvas.LineTo(Rect.Left, Rect.Bottom);
-		m__DrawGrid.Canvas.LineTo(Rect.Left, Rect.Top);
-	end;
-	
-	if (ACol + 1 = Values.Best.I) and (ARow + 1 = Values.Best.J) then
-		m__DrawGrid.Canvas.Font.Color := clRed
-	else
-		m__DrawGrid.Canvas.Font.Color := clBlack;
-		
-	Text := Values.V[ACol + 1, ARow + 1];
-	
-	if Copy(Text, 1, 2) = '<=' then
-		with m__DrawGrid.Canvas do
-		begin
-			Delete(Text, 1, 2);
-			Pen.Color := clBlack;
-			Draw(Rect.Left, Rect.Top, m__LessOrEqual.Picture.Graphic);
-			TextOut(Rect.Left + 8, Rect.Top, Text);
-		end
-	else
-		if Copy(Text, 1, 2) = '>=' then
-			with m__DrawGrid.Canvas do
-			begin
-				Delete(Text, 1, 2);
-				Pen.Color := clBlack;
-				Draw(Rect.Left, Rect.Top, m__GreaterOrEqual.Picture.Graphic);
-				TextOut(Rect.Left + 8, Rect.Top, Text);
-			end
-		else
-			m__DrawGrid.Canvas.TextOut(Rect.Left, Rect.Top, Text);
-end;
-
 procedure Game(Players: TPlayers);
 var
 	Move: TMove;
@@ -789,6 +744,91 @@ begin
 	//NewClick(Sender);
 end;
 
+procedure TMainWindow.OnClose_MainWindow(Sender: TObject; var Action: TCloseAction);
+begin
+	Halt;
+end;
+
+procedure TMainWindow.OnDrawCell_DrawGrid(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
+var
+	Text: string;
+begin
+	m__DrawGrid.Canvas.Brush.Color := clWhite;
+	m__DrawGrid.Canvas.FillRect(Rect);
+	
+	case Field[ACol + 1, ARow + 1] of
+		1:
+			m__DrawGrid.Canvas.StretchDraw(Rect, m__Player1Piece.Picture.Bitmap);
+		2:
+			m__DrawGrid.Canvas.StretchDraw(Rect, m__Player2Piece.Picture.Bitmap);
+	end;
+	
+	if (Values.Last.I = ACol + 1) and (Values.Last.J = ARow + 1) and (Field[ACol + 1, ARow + 1] > 0) then
+	begin
+		m__DrawGrid.Canvas.Pen.Color := clRed;
+		m__DrawGrid.Canvas.MoveTo(Rect.Left, Rect.Top);
+		m__DrawGrid.Canvas.LineTo(Rect.Right, Rect.Top);
+		m__DrawGrid.Canvas.LineTo(Rect.Right, Rect.Bottom);
+		m__DrawGrid.Canvas.LineTo(Rect.Left, Rect.Bottom);
+		m__DrawGrid.Canvas.LineTo(Rect.Left, Rect.Top);
+	end;
+	
+	if (ACol + 1 = Values.Best.I) and (ARow + 1 = Values.Best.J) then
+		m__DrawGrid.Canvas.Font.Color := clRed
+	else
+		m__DrawGrid.Canvas.Font.Color := clBlack;
+		
+	Text := Values.V[ACol + 1, ARow + 1];
+	
+	if Copy(Text, 1, 2) = '<=' then
+		with m__DrawGrid.Canvas do
+		begin
+			Delete(Text, 1, 2);
+			Pen.Color := clBlack;
+			Draw(Rect.Left, Rect.Top, m__LessOrEqual.Picture.Graphic);
+			TextOut(Rect.Left + 8, Rect.Top, Text);
+		end
+	else
+		if Copy(Text, 1, 2) = '>=' then
+			with m__DrawGrid.Canvas do
+			begin
+				Delete(Text, 1, 2);
+				Pen.Color := clBlack;
+				Draw(Rect.Left, Rect.Top, m__GreaterOrEqual.Picture.Graphic);
+				TextOut(Rect.Left + 8, Rect.Top, Text);
+			end
+		else
+			m__DrawGrid.Canvas.TextOut(Rect.Left, Rect.Top, Text);
+end;
+
+procedure TMainWindow.OnClick_DrawGrid(Sender: TObject);
+begin
+	if not Setup then
+		Exit;
+		
+	repeat
+		Field[m__DrawGrid.Col + 1, m__DrawGrid.Row + 1] := (Field[m__DrawGrid.Col + 1, m__DrawGrid.Row + 1] + 1) mod 3;
+	until not ((Field[m__DrawGrid.Col + 1, m__DrawGrid.Row + 1] = 0) and (m__DrawGrid.Col + 1 in [4, 5]) and (m__DrawGrid.Row + 1 in [4, 5]));
+	
+	m__DrawGrid.Repaint;
+end;
+
+procedure TMainWindow.OnClick_BackForwardButtons(Sender: TObject; Button: TUDBtnType);
+begin
+	if Button = btNext then
+		if Protocol.Current + 1 <= Protocol.NumberOfMoves then
+			Inc(Protocol.Current);
+	
+	if Button = btPrev then
+		if Protocol.Current - 1 >= 1 then
+			Dec(Protocol.Current);
+	
+	m__BackForwardButtons.Position := Protocol.Current;
+	Field := Protocol.Fields[Protocol.Current].Field;
+	
+	m__DrawGrid.Repaint;
+end;
+
 procedure TMainWindow.OnClick_MenuItem__new_game(Sender: TObject);
 begin
 	Clear(Field);
@@ -834,9 +874,26 @@ begin
 	m__DrawGrid.Repaint;
 end;
 
-procedure TMainWindow.OnClose_MainWindow(Sender: TObject; var Action: TCloseAction);
+procedure TMainWindow.OnClick_MenuItem_position_modify(Sender: TObject);
 begin
-	Halt;
+	m__MenuItem_position_modify.Enabled := False;
+	m__MenuItem_position_continue.Enabled := True;
+	Break := True;
+	Setup := True;
+end;
+
+procedure TMainWindow.OnClick_MenuItem_position_continue(Sender: TObject);
+begin
+	m__MenuItem_position_modify.Enabled := True;
+	m__MenuItem_position_continue.Enabled := False;
+	Break := False;
+	Setup := False;
+	m__DrawGrid.Selection := TGridRect(m__DrawGrid.CellRect(-1, -1));
+	Protocol.Fields[1].Field := Field;
+	Protocol.NumberOfMoves := 1;
+	Protocol.Current := 1;
+	m__BackForwardButtons.Position := Protocol.Current;
+	Game(Players);
 end;
 
 procedure TMainWindow.OnClick_MenuItem__players__any_submenu(Sender: TObject);
@@ -948,56 +1005,6 @@ begin
 	
 	MainWindow.m__Statusbar.Panels[2].Text := MainWindow.m__Player1Piece.Hint +' '+ IntToStr(MainWindow.Positions[1].NumberOfMoves) +' moves  '+
 			MainWindow.m__Player2Piece.Hint +' '+ IntToStr(MainWindow.Positions[2].NumberOfMoves) +' moves';
-	
-	m__DrawGrid.Repaint;
-end;
-
-procedure TMainWindow.OnClick_MenuItem_position_modify(Sender: TObject);
-begin
-	m__MenuItem_position_modify.Enabled := False;
-	m__MenuItem_position_continue.Enabled := True;
-	Break := True;
-	Setup := True;
-end;
-
-procedure TMainWindow.OnClick_MenuItem_position_continue(Sender: TObject);
-begin
-	m__MenuItem_position_modify.Enabled := True;
-	m__MenuItem_position_continue.Enabled := False;
-	Break := False;
-	Setup := False;
-	m__DrawGrid.Selection := TGridRect(m__DrawGrid.CellRect(-1, -1));
-	Protocol.Fields[1].Field := Field;
-	Protocol.NumberOfMoves := 1;
-	Protocol.Current := 1;
-	m__BackForwardButtons.Position := Protocol.Current;
-	Game(Players);
-end;
-
-procedure TMainWindow.OnClick_DrawGrid(Sender: TObject);
-begin
-	if not Setup then
-		Exit;
-		
-	repeat
-		Field[m__DrawGrid.Col + 1, m__DrawGrid.Row + 1] := (Field[m__DrawGrid.Col + 1, m__DrawGrid.Row + 1] + 1) mod 3;
-	until not ((Field[m__DrawGrid.Col + 1, m__DrawGrid.Row + 1] = 0) and (m__DrawGrid.Col + 1 in [4, 5]) and (m__DrawGrid.Row + 1 in [4, 5]));
-	
-	m__DrawGrid.Repaint;
-end;
-
-procedure TMainWindow.OnClick_BackForwardButtons(Sender: TObject; Button: TUDBtnType);
-begin
-	if Button = btNext then
-		if Protocol.Current + 1 <= Protocol.NumberOfMoves then
-			Inc(Protocol.Current);
-	
-	if Button = btPrev then
-		if Protocol.Current - 1 >= 1 then
-			Dec(Protocol.Current);
-	
-	m__BackForwardButtons.Position := Protocol.Current;
-	Field := Protocol.Fields[Protocol.Current].Field;
 	
 	m__DrawGrid.Repaint;
 end;
