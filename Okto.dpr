@@ -1,10 +1,10 @@
 
-program Othello;
+program Okto;
 
 
 uses
 	Forms,
-	Reversi in 'Reversi.pas';
+	Impl in 'Impl.pas';
 
 {$R *.res}
 
