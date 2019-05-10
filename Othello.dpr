@@ -10,7 +10,7 @@ uses
 
 begin
 	Application.Initialize;
-	Application.CreateForm(TForm1, Form1);
-	Form1.NewClick(Form1.New);
+	Application.CreateForm(TMainWindow, MainWindow);
+	MainWindow.OnClick_MenuItem__new_game(MainWindow.m__MenuItem__new_game);
 	Application.Run;
 end.

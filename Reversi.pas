@@ -66,70 +66,70 @@ type
 		NumberOfMoves, Current: TNumberOfSquares;
 	end;
 	
-	TForm1 = class(TForm)
-		DrawGrid1: TDrawGrid;
-		MainMenu1: TMainMenu;
-		New: TMenuItem;
-		Player2: TImage;
-		Player1: TImage;
-		Edit1: TEdit;
-		Edit2: TEdit;
-		Label1: TLabel;
-		Label2: TLabel;
-		Statusbar1: TStatusBar;
-		Label3: TLabel;
-		Label4: TLabel;
-		Label5: TLabel;
-		Label6: TLabel;
-		Label7: TLabel;
-		Label8: TLabel;
-		Label9: TLabel;
-		Label10: TLabel;
-		Label11: TLabel;
-		Progressbar1: TProgressBar;
-		Order: TMenuItem;
-		PP: TMenuItem;
-		PC: TMenuItem;
-		CP: TMenuItem;
-		CC: TMenuItem;
-		Image1: TImage;
-		UpDown1: TUpDown;
-		UpDown2: TUpDown;
-		LabeledEdit1: TLabeledEdit;
-		LabeledEdit2: TLabeledEdit;
-		Image2: TImage;
-		N1: TMenuItem;
-		N11: TMenuItem;
-		N21: TMenuItem;
-		N2: TMenuItem;
-		N3: TMenuItem;
-		N5: TMenuItem;
-		N4: TMenuItem;
-		N6: TMenuItem;
-		N7: TMenuItem;
-		N8: TMenuItem;
-		N9: TMenuItem;
-		Green: TImage;
-		Blue: TImage;
-		Yellow: TImage;
-		Red: TImage;
-		N10: TMenuItem;
-		BSetup: TMenuItem;
-		Continue: TMenuItem;
-		UpDown3: TUpDown;
+	TMainWindow = class(TForm)
+		m__DrawGrid: TDrawGrid;
+		m__MainMenu: TMainMenu;
+		m__MenuItem__new_game: TMenuItem;
+		m__Player2Piece: TImage;
+		m__Player1Piece: TImage;
+		m__Player1PieceCountEdit: TEdit;
+		m__Player2PieceCountEdit: TEdit;
+		m__Player1Label: TLabel;
+		m__Player2Label: TLabel;
+		m__Statusbar: TStatusBar;
+		m__ColumnLabel: TLabel;
+		m__Row1Label: TLabel;
+		m__Row2Label: TLabel;
+		m__Row3Label: TLabel;
+		m__Row4Label: TLabel;
+		m__Row5Label: TLabel;
+		m__Row6Label: TLabel;
+		m__Row7Label: TLabel;
+		m__Row8Label: TLabel;
+		m__Progressbar: TProgressBar;
+		m__MenuItem_players: TMenuItem;
+		m__MenuItem__players__2_players: TMenuItem;
+		m__MenuItem__players__human_vs_cpu: TMenuItem;
+		m__MenuItem__players__cpu_vs_human: TMenuItem;
+		m__MenuItem__players__cpu_vs_cpu: TMenuItem;
+		m__LessOrEqual: TImage;
+		m__MidgameDepthUpDown: TUpDown;
+		m__EndgameDepthUpDown: TUpDown;
+		m__MidgameDepthLabeledEdit: TLabeledEdit;
+		m__EndgameDepthLabeledEdit: TLabeledEdit;
+		m__GreaterOrEqual: TImage;
+		m__MenuItem_colour: TMenuItem;
+		m__MenuItem__colour__1st_player: TMenuItem;
+		m__MenuItem__colour__2nd_player: TMenuItem;
+		m__MenuItem__colour__1st_player__blue: TMenuItem;
+		m__MenuItem__colour__1st_player__green: TMenuItem;
+		m__MenuItem__colour__1st_player__yellow: TMenuItem;
+		m__MenuItem__colour__1st_player__red: TMenuItem;
+		m__MenuItem__colour__2nd_player__blue: TMenuItem;
+		m__MenuItem__colour__2nd_player__green: TMenuItem;
+		m__MenuItem__colour__2nd_player__red: TMenuItem;
+		m__MenuItem__colour__2nd_player__yellow: TMenuItem;
+		m__GreenPiece: TImage;
+		m__BluePiece: TImage;
+		m__YellowPiece: TImage;
+		m__RedPiece: TImage;
+		m__MenuItem_position: TMenuItem;
+		m__MenuItem_position_modify: TMenuItem;
+		m__MenuItem_position_continue: TMenuItem;
+		m__BackForwardButtons: TUpDown;
 		
 		
-		procedure FormCreate(Sender: TObject);
-		procedure DrawGrid1DrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
-		procedure NewClick(Sender: TObject);
-		procedure FormClose(Sender: TObject; var Action: TCloseAction);
-		procedure MoveClick(Sender: TObject);
-		procedure Color1Click(Sender: TObject);
-		procedure Color2Click(Sender: TObject);
-		procedure BSetupClick(Sender: TObject);
-		procedure ContinueClick(Sender: TObject);
-		procedure DrawGrid1Click(Sender: TObject);
-		procedure UpDown3Click(Sender: TObject; Button: TUDBtnType);
+		procedure OnCreate_MainWindow(Sender: TObject);
+		procedure OnDrawCell_DrawGrid(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
+		procedure OnClick_MenuItem__new_game(Sender: TObject);
+		procedure OnClose_MainWindow(Sender: TObject; var Action: TCloseAction);
+		procedure OnClick_MenuItem__players__any_submenu(Sender: TObject);
+		procedure OnClick_MenuItem__colour__1st_player__any_submenu(Sender: TObject);
+		procedure OnClick_MenuItem__colour__2nd_player__any_submenu(Sender: TObject);
+		procedure OnClick_MenuItem_position_modify(Sender: TObject);
+		procedure OnClick_MenuItem_position_continue(Sender: TObject);
+		procedure OnClick_DrawGrid(Sender: TObject);
+		procedure OnClick_BackForwardButtons(Sender: TObject; Button: TUDBtnType);
 	private
 		// nothing
 	public
@@ -147,7 +147,7 @@ type
 	end;
 
 var
-	Form1: TForm1;
+	MainWindow: TMainWindow;
 
 
 implementation
@@ -394,10 +394,10 @@ label
 	end;
 
 begin
-	Form1.Statusbar1.Panels[0].Text := 'Thinking...';
+	MainWindow.m__Statusbar.Panels[0].Text := 'Thinking...';
 	
-	Form1.Progressbar1.Max := Form1.Positions[Piece].NumberOfMoves;
-	Form1.Progressbar1.Position := 0;
+	MainWindow.m__Progressbar.Max := MainWindow.Positions[Piece].NumberOfMoves;
+	MainWindow.m__Progressbar.Position := 0;
 	
 	Move.I := 1;
 	Move.J := 1;
@@ -407,22 +407,22 @@ begin
 	
 	for Depth := 1 to 8 do
 		for MaxDepth := 1 to 8 do
-			Form1.Values.V[Depth, MaxDepth] := '';
+			MainWindow.Values.V[Depth, MaxDepth] := '';
 	
-	if 64 - Pieces(Field, 1) - Pieces(Field, 2) <= StrToInt(Form1.LabeledEdit2.Text) then
-		MaxDepth := StrToInt(Form1.LabeledEdit2.Text)
+	if 64 - Pieces(Field, 1) - Pieces(Field, 2) <= StrToInt(MainWindow.m__EndgameDepthLabeledEdit.Text) then
+		MaxDepth := StrToInt(MainWindow.m__EndgameDepthLabeledEdit.Text)
 	else
-		MaxDepth := StrToInt(Form1.LabeledEdit1.Text);
+		MaxDepth := StrToInt(MainWindow.m__MidgameDepthLabeledEdit.Text);
 	
-	Form1.Statusbar1.Panels[3].Text := 'Depth='+ IntToStr(MaxDepth);
+	MainWindow.m__Statusbar.Panels[3].Text := 'Depth='+ IntToStr(MaxDepth);
 	
 	Res.WinLossDraw := False;
-	Form1.BSetup.Enabled := False;
+	MainWindow.m__MenuItem_position_modify.Enabled := False;
 	
-	Form1.UpDown1.Enabled := False;
-	Form1.UpDown2.Enabled := False;
+	MainWindow.m__MidgameDepthUpDown.Enabled := False;
+	MainWindow.m__EndgameDepthUpDown.Enabled := False;
 	
-	Form1.DrawGrid1.Repaint;
+	MainWindow.m__DrawGrid.Repaint;
 	Depth := 0;
 	
 	GetPosition(Field, Piece, CompPosition);
@@ -471,13 +471,13 @@ begin
 		begin
 			Move := CompPosition.BranchPositions[I].Move;
 			Max := Res;
-			Form1.Values.Best := Move;
-			Form1.Statusbar1.Panels[1].Text := StrValue1(Res);
+			MainWindow.Values.Best := Move;
+			MainWindow.m__Statusbar.Panels[1].Text := StrValue1(Res);
 		end;
 		
-		Form1.Values.V[CompPosition.BranchPositions[I].Move.I, CompPosition.BranchPositions[I].Move.J] := StrValue2(Res);
-		Form1.DrawGrid1.Repaint;
-		Form1.Progressbar1.Position := Form1.Progressbar1.Position + 1;
+		MainWindow.Values.V[CompPosition.BranchPositions[I].Move.I, CompPosition.BranchPositions[I].Move.J] := StrValue2(Res);
+		MainWindow.m__DrawGrid.Repaint;
+		MainWindow.m__Progressbar.Position := MainWindow.m__Progressbar.Position + 1;
 		
 		if BetterOrEqual(Max, MaxValue, True) then
 			goto done;
@@ -485,11 +485,11 @@ begin
 	
 	done:
 	
-	Form1.Statusbar1.Panels[0].Text := 'Ready';
-	Form1.BSetup.Enabled := True;
+	MainWindow.m__Statusbar.Panels[0].Text := 'Ready';
+	MainWindow.m__MenuItem_position_modify.Enabled := True;
 	
-	Form1.UpDown1.Enabled := True;
-	Form1.UpDown2.Enabled := True;
+	MainWindow.m__MidgameDepthUpDown.Enabled := True;
+	MainWindow.m__EndgameDepthUpDown.Enabled := True;
 end;
 
 function LegalMove(I, J: TSide; Position: TPosition; var Number: Byte): Boolean;
@@ -514,64 +514,64 @@ begin
 	repeat
 		Application.ProcessMessages;		//without this window becomes unresponsive
 		
-		if Form1.Break then
+		if MainWindow.Break then
 			Exit;
-	until LegalMove(Form1.DrawGrid1.Col + 1, Form1.DrawGrid1.Row + 1, Form1.Positions[Piece], C);
+	until LegalMove(MainWindow.m__DrawGrid.Col + 1, MainWindow.m__DrawGrid.Row + 1, MainWindow.Positions[Piece], C);
 	
-	Move.I := Form1.DrawGrid1.Col + 1;
-	Move.J := Form1.DrawGrid1.Row + 1;
+	Move.I := MainWindow.m__DrawGrid.Col + 1;
+	Move.J := MainWindow.m__DrawGrid.Row + 1;
 end;
 
-procedure TForm1.DrawGrid1DrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
+procedure TMainWindow.OnDrawCell_DrawGrid(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
 var
 	Text: string;
 begin
-	DrawGrid1.Canvas.Brush.Color := clWhite;
-	DrawGrid1.Canvas.FillRect(Rect);
+	m__DrawGrid.Canvas.Brush.Color := clWhite;
+	m__DrawGrid.Canvas.FillRect(Rect);
 	
 	case Field[ACol + 1, ARow + 1] of
 		1:
-			DrawGrid1.Canvas.StretchDraw(Rect, Player1.Picture.Bitmap);
+			m__DrawGrid.Canvas.StretchDraw(Rect, m__Player1Piece.Picture.Bitmap);
 		2:
-			DrawGrid1.Canvas.StretchDraw(Rect, Player2.Picture.Bitmap);
+			m__DrawGrid.Canvas.StretchDraw(Rect, m__Player2Piece.Picture.Bitmap);
 	end;
 	
 	if (Values.Last.I = ACol + 1) and (Values.Last.J = ARow + 1) and (Field[ACol + 1, ARow + 1] > 0) then
 	begin
-		DrawGrid1.Canvas.Pen.Color := clRed;
-		DrawGrid1.Canvas.MoveTo(Rect.Left, Rect.Top);
-		DrawGrid1.Canvas.LineTo(Rect.Right, Rect.Top);
-		DrawGrid1.Canvas.LineTo(Rect.Right, Rect.Bottom);
-		DrawGrid1.Canvas.LineTo(Rect.Left, Rect.Bottom);
-		DrawGrid1.Canvas.LineTo(Rect.Left, Rect.Top);
+		m__DrawGrid.Canvas.Pen.Color := clRed;
+		m__DrawGrid.Canvas.MoveTo(Rect.Left, Rect.Top);
+		m__DrawGrid.Canvas.LineTo(Rect.Right, Rect.Top);
+		m__DrawGrid.Canvas.LineTo(Rect.Right, Rect.Bottom);
+		m__DrawGrid.Canvas.LineTo(Rect.Left, Rect.Bottom);
+		m__DrawGrid.Canvas.LineTo(Rect.Left, Rect.Top);
 	end;
 	
 	if (ACol + 1 = Values.Best.I) and (ARow + 1 = Values.Best.J) then
-		DrawGrid1.Canvas.Font.Color := clRed
+		m__DrawGrid.Canvas.Font.Color := clRed
 	else
-		DrawGrid1.Canvas.Font.Color := clBlack;
+		m__DrawGrid.Canvas.Font.Color := clBlack;
 		
 	Text := Values.V[ACol + 1, ARow + 1];
 	
 	if Copy(Text, 1, 2) = '<=' then
-		with DrawGrid1.Canvas do
+		with m__DrawGrid.Canvas do
 		begin
 			Delete(Text, 1, 2);
 			Pen.Color := clBlack;
-			Draw(Rect.Left, Rect.Top, Image1.Picture.Graphic);
+			Draw(Rect.Left, Rect.Top, m__LessOrEqual.Picture.Graphic);
 			TextOut(Rect.Left + 8, Rect.Top, Text);
 		end
 	else
 		if Copy(Text, 1, 2) = '>=' then
-			with DrawGrid1.Canvas do
+			with m__DrawGrid.Canvas do
 			begin
 				Delete(Text, 1, 2);
 				Pen.Color := clBlack;
-				Draw(Rect.Left, Rect.Top, Image2.Picture.Graphic);
+				Draw(Rect.Left, Rect.Top, m__GreaterOrEqual.Picture.Graphic);
 				TextOut(Rect.Left + 8, Rect.Top, Text);
 			end
 		else
-			DrawGrid1.Canvas.TextOut(Rect.Left, Rect.Top, Text);
+			m__DrawGrid.Canvas.TextOut(Rect.Left, Rect.Top, Text);
 end;
 
 procedure Game(Players: TPlayers);
@@ -581,45 +581,45 @@ var
 	MoveId: Byte;
 	GameEnd: Boolean;
 begin
-	Form1.BSetup.Enabled := True;
+	MainWindow.m__MenuItem_position_modify.Enabled := True;
 	
-	Form1.Values.Last.I := 1;
-	Form1.Values.Last.J := 1;
+	MainWindow.Values.Last.I := 1;
+	MainWindow.Values.Last.J := 1;
 	
-	Form1.Edit1.Text := IntToStr(Pieces(Form1.Field, 1));
-	Form1.Edit2.Text := IntToStr(Pieces(Form1.Field, 2));
+	MainWindow.m__Player1PieceCountEdit.Text := IntToStr(Pieces(MainWindow.Field, 1));
+	MainWindow.m__Player2PieceCountEdit.Text := IntToStr(Pieces(MainWindow.Field, 2));
 	
-	GetPosition(Form1.Field, 1, Form1.Positions[1]);
-	GetPosition(Form1.Field, 2, Form1.Positions[2]);
+	GetPosition(MainWindow.Field, 1, MainWindow.Positions[1]);
+	GetPosition(MainWindow.Field, 2, MainWindow.Positions[2]);
 	
 	for C1 := 1 to 8 do
 		for C2 := 1 to 8 do
-			Form1.Values.V[C1, C2] := '';
+			MainWindow.Values.V[C1, C2] := '';
 			
-	Form1.DrawGrid1.Repaint;
+	MainWindow.m__DrawGrid.Repaint;
 	
-	Form1.Statusbar1.Panels[2].Text := Form1.Player1.Hint +' '+ IntToStr(Form1.Positions[1].NumberOfMoves) +' moves  '+
-			Form1.Player2.Hint +' '+ IntToStr(Form1.Positions[2].NumberOfMoves) +' moves';
+	MainWindow.m__Statusbar.Panels[2].Text := MainWindow.m__Player1Piece.Hint +' '+ IntToStr(MainWindow.Positions[1].NumberOfMoves) +' moves  '+
+			MainWindow.m__Player2Piece.Hint +' '+ IntToStr(MainWindow.Positions[2].NumberOfMoves) +' moves';
 		
 	GameEnd := False;
 	MoveId := 1;
 	
-	if Form1.Positions[1].NumberOfMoves = 0 then
-		if Form1.Positions[2].NumberOfMoves = 0 then
+	if MainWindow.Positions[1].NumberOfMoves = 0 then
+		if MainWindow.Positions[2].NumberOfMoves = 0 then
 			GameEnd := True;
 		
 	while not GameEnd do
 	begin
-		if Form1.Break then
+		if MainWindow.Break then
 			Exit;
 		
-		Form1.DrawGrid1.Selection := TGridRect(Form1.DrawGrid1.CellRect(-1, -1));
+		MainWindow.m__DrawGrid.Selection := TGridRect(MainWindow.m__DrawGrid.CellRect(-1, -1));
 		
-		GetPosition(Form1.Field, 1, Form1.Positions[1]);
-		GetPosition(Form1.Field, 2, Form1.Positions[2]);
+		GetPosition(MainWindow.Field, 1, MainWindow.Positions[1]);
+		GetPosition(MainWindow.Field, 2, MainWindow.Positions[2]);
 		
-		if Form1.Positions[MoveId].NumberOfMoves = 0 then
-			if Form1.Positions[3 - MoveId].NumberOfMoves = 0 then
+		if MainWindow.Positions[MoveId].NumberOfMoves = 0 then
+			if MainWindow.Positions[3 - MoveId].NumberOfMoves = 0 then
 				GameEnd := True
 			else
 			begin
@@ -629,34 +629,34 @@ begin
 			end;
 			
 		if not GameEnd then
-			Players[MoveId].GetMove(Move, Form1.Field, MoveId);
+			Players[MoveId].GetMove(Move, MainWindow.Field, MoveId);
 			
-		if LegalMove(Move.I, Move.J, Form1.Positions[MoveId], C1) then
+		if LegalMove(Move.I, Move.J, MainWindow.Positions[MoveId], C1) then
 		begin
-			Form1.Field := Form1.Positions[MoveId].BranchPositions[C1].Field;
-			Form1.Values.Last := Move;
-			Form1.Protocol.NumberOfMoves := Form1.Protocol.NumberOfMoves + 1;
-			Form1.Protocol.Current := Form1.Protocol.Current + 1;
-			Form1.UpDown3.Position := Form1.Protocol.Current;
-			Form1.Protocol.Fields[Form1.Protocol.NumberOfMoves].Field := Form1.Field;
-			Form1.Protocol.Fields[Form1.Protocol.NumberOfMoves].PlayerID := MoveId;
-			Form1.DrawGrid1.Repaint;
+			MainWindow.Field := MainWindow.Positions[MoveId].BranchPositions[C1].Field;
+			MainWindow.Values.Last := Move;
+			MainWindow.Protocol.NumberOfMoves := MainWindow.Protocol.NumberOfMoves + 1;
+			MainWindow.Protocol.Current := MainWindow.Protocol.Current + 1;
+			MainWindow.m__BackForwardButtons.Position := MainWindow.Protocol.Current;
+			MainWindow.Protocol.Fields[MainWindow.Protocol.NumberOfMoves].Field := MainWindow.Field;
+			MainWindow.Protocol.Fields[MainWindow.Protocol.NumberOfMoves].PlayerID := MoveId;
+			MainWindow.m__DrawGrid.Repaint;
 		end;
 		
 		MoveId := 3 - MoveId;
 		
-		GetPosition(Form1.Field, 1, Form1.Positions[1]);
-		GetPosition(Form1.Field, 2, Form1.Positions[2]);
+		GetPosition(MainWindow.Field, 1, MainWindow.Positions[1]);
+		GetPosition(MainWindow.Field, 2, MainWindow.Positions[2]);
 		
-		Form1.Statusbar1.Panels[2].Text := Form1.Player1.Hint +' '+ IntToStr(Form1.Positions[1].NumberOfMoves) +' moves  '+
-				Form1.Player2.Hint +' '+ IntToStr(Form1.Positions[2].NumberOfMoves) +' moves';
+		MainWindow.m__Statusbar.Panels[2].Text := MainWindow.m__Player1Piece.Hint +' '+ IntToStr(MainWindow.Positions[1].NumberOfMoves) +' moves  '+
+				MainWindow.m__Player2Piece.Hint +' '+ IntToStr(MainWindow.Positions[2].NumberOfMoves) +' moves';
 		
-		Form1.Edit1.Text := IntToStr(Pieces(Form1.Field, 1));
-		Form1.Edit2.Text := IntToStr(Pieces(Form1.Field, 2));
+		MainWindow.m__Player1PieceCountEdit.Text := IntToStr(Pieces(MainWindow.Field, 1));
+		MainWindow.m__Player2PieceCountEdit.Text := IntToStr(Pieces(MainWindow.Field, 2));
 	end;
 	
-	C1 := Pieces(Form1.Field, 1);
-	C2 := Pieces(Form1.Field, 2);
+	C1 := Pieces(MainWindow.Field, 1);
+	C2 := Pieces(MainWindow.Field, 2);
 	
 	if C1 > C2 then
 		ShowMessage('Winner is '+ Players[1].name)
@@ -665,148 +665,148 @@ begin
 	else
 		ShowMessage('Draw');
 			
-	Form1.BSetup.Enabled := True;
+	MainWindow.m__MenuItem_position_modify.Enabled := True;
 end;
 
-procedure TForm1.FormCreate(Sender: TObject);
+procedure TMainWindow.OnCreate_MainWindow(Sender: TObject);
 begin
-	PC.Checked := True;
-	CC.Checked := False;
-	CP.Checked := False;
-	PP.Checked := False;
+	m__MenuItem__players__human_vs_cpu.Checked := True;
+	m__MenuItem__players__cpu_vs_cpu.Checked := False;
+	m__MenuItem__players__cpu_vs_human.Checked := False;
+	m__MenuItem__players__2_players.Checked := False;
 	
-	if N2.Checked then
+	if m__MenuItem__colour__1st_player__blue.Checked then
 	begin
-		Player1.Picture := Blue.Picture;
-		Player1.Hint := 'Blue';
+		m__Player1Piece.Picture := m__BluePiece.Picture;
+		m__Player1Piece.Hint := 'Blue';
 	end;
 	
-	if N3.Checked then
+	if m__MenuItem__colour__1st_player__green.Checked then
 	begin
-		Player1.Picture := Green.Picture;
-		Player1.Hint := 'Green';
+		m__Player1Piece.Picture := m__GreenPiece.Picture;
+		m__Player1Piece.Hint := 'Green';
 	end;
 	
-	if N4.Checked then
+	if m__MenuItem__colour__1st_player__red.Checked then
 	begin
-		Player1.Picture := Red.Picture;
-		Player1.Hint := 'Red';
+		m__Player1Piece.Picture := m__RedPiece.Picture;
+		m__Player1Piece.Hint := 'Red';
 	end;
 	
-	if N5.Checked then
+	if m__MenuItem__colour__1st_player__yellow.Checked then
 	begin
-		Player1.Picture := Yellow.Picture;
-		Player1.Hint := 'Yellow';
+		m__Player1Piece.Picture := m__YellowPiece.Picture;
+		m__Player1Piece.Hint := 'Yellow';
 	end;
 	
-	if N6.Checked then
+	if m__MenuItem__colour__2nd_player__blue.Checked then
 	begin
-		Player2.Picture := Blue.Picture;
-		Player2.Hint := 'Blue';
+		m__Player2Piece.Picture := m__BluePiece.Picture;
+		m__Player2Piece.Hint := 'Blue';
 	end;
 	
-	if N7.Checked then
+	if m__MenuItem__colour__2nd_player__green.Checked then
 	begin
-		Player2.Picture := Green.Picture;
-		Player2.Hint := 'Green';
+		m__Player2Piece.Picture := m__GreenPiece.Picture;
+		m__Player2Piece.Hint := 'Green';
 	end;
 	
-	if N8.Checked then
+	if m__MenuItem__colour__2nd_player__red.Checked then
 	begin
-		Player2.Picture := Red.Picture;
-		Player2.Hint := 'Red';
+		m__Player2Piece.Picture := m__RedPiece.Picture;
+		m__Player2Piece.Hint := 'Red';
 	end;
 	
-	if N9.Checked then
+	if m__MenuItem__colour__2nd_player__yellow.Checked then
 	begin
-		Player2.Picture := Yellow.Picture;
-		Player2.Hint := 'Yellow';
+		m__Player2Piece.Picture := m__YellowPiece.Picture;
+		m__Player2Piece.Hint := 'Yellow';
 	end;
 	
 	Break := False;
 	Setup := False;
 	
-	Label3.Top := 0;
-	Label4.Left := 5;
-	Label5.Left := 5;
-	Label6.Left := 5;
-	Label7.Left := 5;
-	Label8.Left := 5;
-	Label9.Left := 5;
-	Label10.Left := 5;
-	Label11.Left := 5;
+	m__ColumnLabel.Top := 0;
+	m__Row1Label.Left := 5;
+	m__Row2Label.Left := 5;
+	m__Row3Label.Left := 5;
+	m__Row4Label.Left := 5;
+	m__Row5Label.Left := 5;
+	m__Row6Label.Left := 5;
+	m__Row7Label.Left := 5;
+	m__Row8Label.Left := 5;
 	
-	DrawGrid1.Height := DrawGrid1.GridLineWidth + DrawGrid1.RowCount * (DrawGrid1.DefaultRowHeight + DrawGrid1.GridLineWidth) + 2;
-	DrawGrid1.Width := DrawGrid1.GridLineWidth + DrawGrid1.ColCount * (DrawGrid1.DefaultColWidth + DrawGrid1.GridLineWidth) + 2;
-	DrawGrid1.Top := Label3.Height + Label3.Top;
-	DrawGrid1.Left := Label4.Left + Label4.Width + 5;
+	m__DrawGrid.Height := m__DrawGrid.GridLineWidth + m__DrawGrid.RowCount * (m__DrawGrid.DefaultRowHeight + m__DrawGrid.GridLineWidth) + 2;
+	m__DrawGrid.Width := m__DrawGrid.GridLineWidth + m__DrawGrid.ColCount * (m__DrawGrid.DefaultColWidth + m__DrawGrid.GridLineWidth) + 2;
+	m__DrawGrid.Top := m__ColumnLabel.Height + m__ColumnLabel.Top;
+	m__DrawGrid.Left := m__Row1Label.Left + m__Row1Label.Width + 5;
 	
-	Label3.Left := DrawGrid1.Left;
-	Label4.Top := DrawGrid1.Top + 1 + 15 - 6;
-	Label5.Top := Label4.Top + 31;
-	Label6.Top := Label5.Top + 31;
-	Label7.Top := Label6.Top + 31;
-	Label8.Top := Label7.Top + 31;
-	Label9.Top := Label8.Top + 31;
-	Label10.Top := Label9.Top + 31;
-	Label11.Top := Label10.Top + 31;
+	m__ColumnLabel.Left := m__DrawGrid.Left;
+	m__Row1Label.Top := m__DrawGrid.Top + 1 + 15 - 6;
+	m__Row2Label.Top := m__Row1Label.Top + 31;
+	m__Row3Label.Top := m__Row2Label.Top + 31;
+	m__Row4Label.Top := m__Row3Label.Top + 31;
+	m__Row5Label.Top := m__Row4Label.Top + 31;
+	m__Row6Label.Top := m__Row5Label.Top + 31;
+	m__Row7Label.Top := m__Row6Label.Top + 31;
+	m__Row8Label.Top := m__Row7Label.Top + 31;
 	
-	Player1.Left := DrawGrid1.Left + DrawGrid1.Width + 60;
-	Player1.Top := 10;
-	Player1.Width := Player1.Picture.Width;
-	Player1.Height := Player1.Picture.Height;
-	Player2.Left := Player1.Left;
-	Player2.Top := Player1.Top + Player1.Height + 20;
-	Player2.Width := Player1.Picture.Width;
-	Player2.Height := Player1.Picture.Height;
+	m__Player1Piece.Left := m__DrawGrid.Left + m__DrawGrid.Width + 60;
+	m__Player1Piece.Top := 10;
+	m__Player1Piece.Width := m__Player1Piece.Picture.Width;
+	m__Player1Piece.Height := m__Player1Piece.Picture.Height;
+	m__Player2Piece.Left := m__Player1Piece.Left;
+	m__Player2Piece.Top := m__Player1Piece.Top + m__Player1Piece.Height + 20;
+	m__Player2Piece.Width := m__Player1Piece.Picture.Width;
+	m__Player2Piece.Height := m__Player1Piece.Picture.Height;
 	
-	Edit1.Width := 20;
-	Edit2.Width := Edit1.Width;
-	Edit1.Height := 15;
-	Edit2.Height := Edit1.Height;
-	Edit1.Left := Player1.Left - Edit1.Width - 35;
-	Edit1.Top := Player1.Top + Player1.Height - Edit1.Height;
-	Edit2.Left := Edit1.Left;
-	Edit2.Top := Player2.Top + Player2.Height - Edit2.Height;
+	m__Player1PieceCountEdit.Width := 20;
+	m__Player2PieceCountEdit.Width := m__Player1PieceCountEdit.Width;
+	m__Player1PieceCountEdit.Height := 15;
+	m__Player2PieceCountEdit.Height := m__Player1PieceCountEdit.Height;
+	m__Player1PieceCountEdit.Left := m__Player1Piece.Left - m__Player1PieceCountEdit.Width - 35;
+	m__Player1PieceCountEdit.Top := m__Player1Piece.Top + m__Player1Piece.Height - m__Player1PieceCountEdit.Height;
+	m__Player2PieceCountEdit.Left := m__Player1PieceCountEdit.Left;
+	m__Player2PieceCountEdit.Top := m__Player2Piece.Top + m__Player2Piece.Height - m__Player2PieceCountEdit.Height;
 	
-	Label1.Left := Edit1.Left - 3;
-	Label1.Top := Player1.Top;
-	Label2.Left := Edit2.Left - 3;
-	Label2.Top := Player2.Top;
+	m__Player1Label.Left := m__Player1PieceCountEdit.Left - 3;
+	m__Player1Label.Top := m__Player1Piece.Top;
+	m__Player2Label.Left := m__Player2PieceCountEdit.Left - 3;
+	m__Player2Label.Top := m__Player2Piece.Top;
 	
-	Form1.ClientHeight := DrawGrid1.Height + Statusbar1.Height + Label3.Height + UpDown3.Height;
-	Form1.ClientWidth := DrawGrid1.Width + Label4.Width + 110 + 5 + 5;
+	MainWindow.ClientHeight := m__DrawGrid.Height + m__Statusbar.Height + m__ColumnLabel.Height + m__BackForwardButtons.Height;
+	MainWindow.ClientWidth := m__DrawGrid.Width + m__Row1Label.Width + 110 + 5 + 5;
 	
-	Progressbar1.Left := DrawGrid1.Left + DrawGrid1.Width + 5;
-	Progressbar1.Width := Form1.ClientWidth - DrawGrid1.Width - Label4.Width - 20;
+	m__Progressbar.Left := m__DrawGrid.Left + m__DrawGrid.Width + 5;
+	m__Progressbar.Width := MainWindow.ClientWidth - m__DrawGrid.Width - m__Row1Label.Width - 20;
 	
-	LabeledEdit1.Left := Progressbar1.Left;
-	LabeledEdit2.Left := LabeledEdit1.left;
+	m__MidgameDepthLabeledEdit.Left := m__Progressbar.Left;
+	m__EndgameDepthLabeledEdit.Left := m__MidgameDepthLabeledEdit.left;
 	
-	UpDown3.Top := DrawGrid1.Top + DrawGrid1.Height;
+	m__BackForwardButtons.Top := m__DrawGrid.Top + m__DrawGrid.Height;
 	
-	Form1.Show;
+	MainWindow.Show;
 	//NewClick(Sender);
 end;
 
-procedure TForm1.NewClick(Sender: TObject);
+procedure TMainWindow.OnClick_MenuItem__new_game(Sender: TObject);
 begin
 	Clear(Field);
 	SetField(Field);
-	Clear(Form1.Protocol.Fields[1].Field);
-	SetField(Form1.Protocol.Fields[1].Field);
+	Clear(MainWindow.Protocol.Fields[1].Field);
+	SetField(MainWindow.Protocol.Fields[1].Field);
 	
 	Protocol.NumberOfMoves := 1;
 	Protocol.Current := 1;
 	
-	UpDown3.Position := Protocol.Current;
+	m__BackForwardButtons.Position := Protocol.Current;
 	
-	DrawGrid1.DefaultDrawing := False;
+	m__DrawGrid.DefaultDrawing := False;
 	
-	Form1.Statusbar1.Panels[0].Text := '';
-	Form1.Statusbar1.Panels[1].Text := '';
+	MainWindow.m__Statusbar.Panels[0].Text := '';
+	MainWindow.m__Statusbar.Panels[1].Text := '';
 	
-	if CC.Checked or CP.Checked then
+	if m__MenuItem__players__cpu_vs_cpu.Checked or m__MenuItem__players__cpu_vs_human.Checked then
 	begin
 		Players[1].GetMove := CompMove;
 		Players[1].Name := 'CPU';
@@ -817,7 +817,7 @@ begin
 		Players[1].Name := 'human';
 	end;
 	
-	if PP.Checked or CP.Checked then
+	if m__MenuItem__players__2_players.Checked or m__MenuItem__players__cpu_vs_human.Checked then
 	begin
 		Players[2].GetMove := PlayerMove;
 		Players[2].Name := 'human';
@@ -828,27 +828,27 @@ begin
 		Players[2].Name := 'CPU';
 	end;
 	
-	Label1.Caption := Players[1].Name;
-	Label2.Caption := Players[2].Name;
+	m__Player1Label.Caption := Players[1].Name;
+	m__Player2Label.Caption := Players[2].Name;
 	Game(Players);
-	DrawGrid1.Repaint;
+	m__DrawGrid.Repaint;
 end;
 
-procedure TForm1.FormClose(Sender: TObject; var Action: TCloseAction);
+procedure TMainWindow.OnClose_MainWindow(Sender: TObject; var Action: TCloseAction);
 begin
 	Halt;
 end;
 
-procedure TForm1.MoveClick(Sender: TObject);
+procedure TMainWindow.OnClick_MenuItem__players__any_submenu(Sender: TObject);
 begin
-	PC.Checked := False;
-	CC.Checked := False;
-	CP.Checked := False;
-	PP.Checked := False;
+	m__MenuItem__players__human_vs_cpu.Checked := False;
+	m__MenuItem__players__cpu_vs_cpu.Checked := False;
+	m__MenuItem__players__cpu_vs_human.Checked := False;
+	m__MenuItem__players__2_players.Checked := False;
 	
 	(Sender as TMenuItem).Checked := True;
 	
-	if CC.Checked or CP.Checked then
+	if m__MenuItem__players__cpu_vs_cpu.Checked or m__MenuItem__players__cpu_vs_human.Checked then
 	begin
 		Players[1].GetMove := CompMove;
 		Players[1].Name := 'CPU';
@@ -859,7 +859,7 @@ begin
 		Players[1].Name := 'human';
 	end;
 	
-	if PP.Checked or CP.Checked then
+	if m__MenuItem__players__2_players.Checked or m__MenuItem__players__cpu_vs_human.Checked then
 	begin
 		Players[2].GetMove := PlayerMove;
 		Players[2].Name := 'human';
@@ -870,123 +870,123 @@ begin
 		Players[2].Name := 'CPU';
 	end;
 	
-	Label1.Caption := Players[1].Name;
-	Label2.Caption := Players[2].Name;
+	m__Player1Label.Caption := Players[1].Name;
+	m__Player2Label.Caption := Players[2].Name;
 end;
 	
-procedure TForm1.Color1Click(Sender: TObject);
+procedure TMainWindow.OnClick_MenuItem__colour__1st_player__any_submenu(Sender: TObject);
 begin
-	N2.Checked := False;
-	N3.Checked := False;
-	N4.Checked := False;
-	N5.Checked := False;
+	m__MenuItem__colour__1st_player__blue.Checked := False;
+	m__MenuItem__colour__1st_player__green.Checked := False;
+	m__MenuItem__colour__1st_player__red.Checked := False;
+	m__MenuItem__colour__1st_player__yellow.Checked := False;
 	
 	(Sender as TMenuItem).Checked := True;
 	
-	if N2.Checked then
+	if m__MenuItem__colour__1st_player__blue.Checked then
 	begin
-		Player1.Picture := Blue.Picture;
-		Player1.Hint := 'Blue';
+		m__Player1Piece.Picture := m__BluePiece.Picture;
+		m__Player1Piece.Hint := 'Blue';
 	end;
 	
-	if N3.Checked then
+	if m__MenuItem__colour__1st_player__green.Checked then
 	begin
-		Player1.Picture := Green.Picture;
-		Player1.Hint := 'Green';
+		m__Player1Piece.Picture := m__GreenPiece.Picture;
+		m__Player1Piece.Hint := 'Green';
 	end;
 	
-	if N4.Checked then
+	if m__MenuItem__colour__1st_player__red.Checked then
 	begin
-		Player1.Picture := Red.Picture;
-		Player1.Hint := 'Red';
+		m__Player1Piece.Picture := m__RedPiece.Picture;
+		m__Player1Piece.Hint := 'Red';
 	end;
 	
-	if N5.Checked then
+	if m__MenuItem__colour__1st_player__yellow.Checked then
 	begin
-		Player1.Picture := Yellow.Picture;
-		Player1.Hint := 'Yellow';
+		m__Player1Piece.Picture := m__YellowPiece.Picture;
+		m__Player1Piece.Hint := 'Yellow';
 	end;
 	
-	Form1.Statusbar1.Panels[2].Text := Form1.Player1.Hint +' '+ IntToStr(Form1.Positions[1].NumberOfMoves) +' moves  '+
-			Form1.Player2.Hint +' '+ IntToStr(Form1.Positions[2].NumberOfMoves) +' moves';
+	MainWindow.m__Statusbar.Panels[2].Text := MainWindow.m__Player1Piece.Hint +' '+ IntToStr(MainWindow.Positions[1].NumberOfMoves) +' moves  '+
+			MainWindow.m__Player2Piece.Hint +' '+ IntToStr(MainWindow.Positions[2].NumberOfMoves) +' moves';
 	
-	DrawGrid1.Repaint;
+	m__DrawGrid.Repaint;
 end;
 
-procedure TForm1.Color2Click(Sender: TObject);
+procedure TMainWindow.OnClick_MenuItem__colour__2nd_player__any_submenu(Sender: TObject);
 begin
-	N6.Checked := False;
-	N7.Checked := False;
-	N8.Checked := False;
-	N9.Checked := False;
+	m__MenuItem__colour__2nd_player__blue.Checked := False;
+	m__MenuItem__colour__2nd_player__green.Checked := False;
+	m__MenuItem__colour__2nd_player__red.Checked := False;
+	m__MenuItem__colour__2nd_player__yellow.Checked := False;
 	
 	(Sender as TMenuItem).Checked := True;
 	
-	if N6.Checked then
+	if m__MenuItem__colour__2nd_player__blue.Checked then
 	begin
-		Player2.Picture := Blue.Picture;
-		Player2.Hint := 'Blue';
+		m__Player2Piece.Picture := m__BluePiece.Picture;
+		m__Player2Piece.Hint := 'Blue';
 	end;
 	
-	if N7.Checked then
+	if m__MenuItem__colour__2nd_player__green.Checked then
 	begin
-		Player2.Picture := Green.Picture;
-		Player2.Hint := 'Green';
+		m__Player2Piece.Picture := m__GreenPiece.Picture;
+		m__Player2Piece.Hint := 'Green';
 	end;
 	
-	if N8.Checked then
+	if m__MenuItem__colour__2nd_player__red.Checked then
 	begin
-		Player2.Picture := Red.Picture;
-		Player2.Hint := 'Red';
+		m__Player2Piece.Picture := m__RedPiece.Picture;
+		m__Player2Piece.Hint := 'Red';
 	end;
 	
-	if N9.Checked then
+	if m__MenuItem__colour__2nd_player__yellow.Checked then
 	begin
-		Player2.Picture := Yellow.Picture;
-		Player2.Hint := 'Yellow';
+		m__Player2Piece.Picture := m__YellowPiece.Picture;
+		m__Player2Piece.Hint := 'Yellow';
 	end;
 	
-	Form1.Statusbar1.Panels[2].Text := Form1.Player1.Hint +' '+ IntToStr(Form1.Positions[1].NumberOfMoves) +' moves  '+
-			Form1.Player2.Hint +' '+ IntToStr(Form1.Positions[2].NumberOfMoves) +' moves';
+	MainWindow.m__Statusbar.Panels[2].Text := MainWindow.m__Player1Piece.Hint +' '+ IntToStr(MainWindow.Positions[1].NumberOfMoves) +' moves  '+
+			MainWindow.m__Player2Piece.Hint +' '+ IntToStr(MainWindow.Positions[2].NumberOfMoves) +' moves';
 	
-	DrawGrid1.Repaint;
+	m__DrawGrid.Repaint;
 end;
 
-procedure TForm1.BSetupClick(Sender: TObject);
+procedure TMainWindow.OnClick_MenuItem_position_modify(Sender: TObject);
 begin
-	BSetup.Enabled := False;
-	Continue.Enabled := True;
+	m__MenuItem_position_modify.Enabled := False;
+	m__MenuItem_position_continue.Enabled := True;
 	Break := True;
 	Setup := True;
 end;
 
-procedure TForm1.ContinueClick(Sender: TObject);
+procedure TMainWindow.OnClick_MenuItem_position_continue(Sender: TObject);
 begin
-	BSetup.Enabled := True;
-	Continue.Enabled := False;
+	m__MenuItem_position_modify.Enabled := True;
+	m__MenuItem_position_continue.Enabled := False;
 	Break := False;
 	Setup := False;
-	DrawGrid1.Selection := TGridRect(DrawGrid1.CellRect(-1, -1));
+	m__DrawGrid.Selection := TGridRect(m__DrawGrid.CellRect(-1, -1));
 	Protocol.Fields[1].Field := Field;
 	Protocol.NumberOfMoves := 1;
 	Protocol.Current := 1;
-	UpDown3.Position := Protocol.Current;
+	m__BackForwardButtons.Position := Protocol.Current;
 	Game(Players);
 end;
 
-procedure TForm1.DrawGrid1Click(Sender: TObject);
+procedure TMainWindow.OnClick_DrawGrid(Sender: TObject);
 begin
 	if not Setup then
 		Exit;
 		
 	repeat
-		Field[DrawGrid1.Col + 1, DrawGrid1.Row + 1] := (Field[DrawGrid1.Col + 1, DrawGrid1.Row + 1] + 1) mod 3;
-	until not ((Field[DrawGrid1.Col + 1, DrawGrid1.Row + 1] = 0) and (DrawGrid1.Col + 1 in [4, 5]) and (DrawGrid1.Row + 1 in [4, 5]));
+		Field[m__DrawGrid.Col + 1, m__DrawGrid.Row + 1] := (Field[m__DrawGrid.Col + 1, m__DrawGrid.Row + 1] + 1) mod 3;
+	until not ((Field[m__DrawGrid.Col + 1, m__DrawGrid.Row + 1] = 0) and (m__DrawGrid.Col + 1 in [4, 5]) and (m__DrawGrid.Row + 1 in [4, 5]));
 	
-	DrawGrid1.Repaint;
+	m__DrawGrid.Repaint;
 end;
 
-procedure TForm1.UpDown3Click(Sender: TObject; Button: TUDBtnType);
+procedure TMainWindow.OnClick_BackForwardButtons(Sender: TObject; Button: TUDBtnType);
 begin
 	if Button = btNext then
 		if Protocol.Current + 1 <= Protocol.NumberOfMoves then
@@ -996,10 +996,10 @@ begin
 		if Protocol.Current - 1 >= 1 then
 			Dec(Protocol.Current);
 	
-	UpDown3.Position := Protocol.Current;
+	m__BackForwardButtons.Position := Protocol.Current;
 	Field := Protocol.Fields[Protocol.Current].Field;
 	
-	DrawGrid1.Repaint;
+	m__DrawGrid.Repaint;
 end;
 
 end.

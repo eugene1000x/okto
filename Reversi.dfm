@@ -1,4 +1,4 @@
-object Form1: TForm1
+object MainWindow: TMainWindow
   Left = 221
   Top = 116
   BorderIcons = [biSystemMenu, biMinimize]
@@ -12,14 +12,14 @@ object Form1: TForm1
   Font.Height = -11
   Font.Name = 'MS Sans Serif'
   Font.Style = []
-  Menu = MainMenu1
+  Menu = m__MainMenu
   OldCreateOrder = False
   Position = poScreenCenter
-  OnClose = FormClose
-  OnCreate = FormCreate
+  OnClose = OnClose_MainWindow
+  OnCreate = OnCreate_MainWindow
   PixelsPerInch = 96
   TextHeight = 13
-  object Player2: TImage
+  object m__Player2Piece: TImage
     Left = 344
     Top = 40
     Width = 33
@@ -27,7 +27,7 @@ object Form1: TForm1
     ParentShowHint = False
     ShowHint = True
   end
-  object Player1: TImage
+  object m__Player1Piece: TImage
     Left = 344
     Top = 0
     Width = 33
@@ -35,21 +35,21 @@ object Form1: TForm1
     ParentShowHint = False
     ShowHint = True
   end
-  object Label1: TLabel
+  object m__Player1Label: TLabel
     Left = 288
     Top = 48
     Width = 28
     Height = 13
     Caption = 'label2'
   end
-  object Label2: TLabel
+  object m__Player2Label: TLabel
     Left = 288
     Top = 32
     Width = 28
     Height = 13
     Caption = 'label1'
   end
-  object Label3: TLabel
+  object m__ColumnLabel: TLabel
     Left = 16
     Top = 0
     Width = 238
@@ -62,7 +62,7 @@ object Form1: TForm1
     Font.Style = [fsBold]
     ParentFont = False
   end
-  object Label4: TLabel
+  object m__Row1Label: TLabel
     Left = 0
     Top = 24
     Width = 8
@@ -75,7 +75,7 @@ object Form1: TForm1
     Font.Style = [fsBold]
     ParentFont = False
   end
-  object Label5: TLabel
+  object m__Row2Label: TLabel
     Left = 0
     Top = 56
     Width = 8
@@ -88,7 +88,7 @@ object Form1: TForm1
     Font.Style = [fsBold]
     ParentFont = False
   end
-  object Label6: TLabel
+  object m__Row3Label: TLabel
     Left = 0
     Top = 88
     Width = 8
@@ -101,7 +101,7 @@ object Form1: TForm1
     Font.Style = [fsBold]
     ParentFont = False
   end
-  object Label7: TLabel
+  object m__Row4Label: TLabel
     Left = 0
     Top = 120
     Width = 8
@@ -114,7 +114,7 @@ object Form1: TForm1
     Font.Style = [fsBold]
     ParentFont = False
   end
-  object Label8: TLabel
+  object m__Row5Label: TLabel
     Left = 0
     Top = 152
     Width = 8
@@ -127,7 +127,7 @@ object Form1: TForm1
     Font.Style = [fsBold]
     ParentFont = False
   end
-  object Label9: TLabel
+  object m__Row6Label: TLabel
     Left = 0
     Top = 176
     Width = 8
@@ -140,7 +140,7 @@ object Form1: TForm1
     Font.Style = [fsBold]
     ParentFont = False
   end
-  object Label10: TLabel
+  object m__Row7Label: TLabel
     Left = 0
     Top = 208
     Width = 8
@@ -153,7 +153,7 @@ object Form1: TForm1
     Font.Style = [fsBold]
     ParentFont = False
   end
-  object Label11: TLabel
+  object m__Row8Label: TLabel
     Left = 0
     Top = 240
     Width = 8
@@ -166,7 +166,7 @@ object Form1: TForm1
     Font.Style = [fsBold]
     ParentFont = False
   end
-  object Image1: TImage
+  object m__LessOrEqual: TImage
     Left = 368
     Top = 120
     Width = 17
@@ -190,7 +190,7 @@ object Form1: TForm1
       0000}
     Visible = False
   end
-  object Image2: TImage
+  object m__GreaterOrEqual: TImage
     Left = 368
     Top = 144
     Width = 17
@@ -214,7 +214,7 @@ object Form1: TForm1
       0000}
     Visible = False
   end
-  object Green: TImage
+  object m__GreenPiece: TImage
     Left = 56
     Top = 272
     Width = 33
@@ -311,7 +311,7 @@ object Form1: TForm1
       FDFDFDFDFDFDFDFD0000}
     Visible = False
   end
-  object Blue: TImage
+  object m__BluePiece: TImage
     Left = 24
     Top = 272
     Width = 33
@@ -408,7 +408,7 @@ object Form1: TForm1
       FDFDFDFDFDFDFDFD0000}
     Visible = False
   end
-  object Yellow: TImage
+  object m__YellowPiece: TImage
     Left = 120
     Top = 272
     Width = 33
@@ -505,7 +505,7 @@ object Form1: TForm1
       FDFDFDFDFDFDFDFD0000}
     Visible = False
   end
-  object Red: TImage
+  object m__RedPiece: TImage
     Left = 88
     Top = 272
     Width = 33
@@ -602,7 +602,7 @@ object Form1: TForm1
       FDFDFDFDFDFDFDFD0000}
     Visible = False
   end
-  object DrawGrid1: TDrawGrid
+  object m__DrawGrid: TDrawGrid
     Left = 16
     Top = 16
     Width = 257
@@ -617,8 +617,8 @@ object Form1: TForm1
     FixedRows = 0
     ScrollBars = ssNone
     TabOrder = 0
-    OnClick = DrawGrid1Click
-    OnDrawCell = DrawGrid1DrawCell
+    OnClick = OnClick_DrawGrid
+    OnDrawCell = OnDrawCell_DrawGrid
     RowHeights = (
       30
       30
@@ -629,7 +629,7 @@ object Form1: TForm1
       30
       30)
   end
-  object Edit1: TEdit
+  object m__Player1PieceCountEdit: TEdit
     Left = 296
     Top = 64
     Width = 25
@@ -644,7 +644,7 @@ object Form1: TForm1
     ReadOnly = True
     TabOrder = 1
   end
-  object Edit2: TEdit
+  object m__Player2PieceCountEdit: TEdit
     Left = 304
     Top = 88
     Width = 25
@@ -659,7 +659,7 @@ object Form1: TForm1
     ReadOnly = True
     TabOrder = 2
   end
-  object Statusbar1: TStatusBar
+  object m__Statusbar: TStatusBar
     Left = 0
     Top = 301
     Width = 412
@@ -677,44 +677,39 @@ object Form1: TForm1
       item
         Width = 50
       end>
-    SimplePanel = False
   end
-  object Progressbar1: TProgressBar
+  object m__Progressbar: TProgressBar
     Left = 288
     Top = 216
     Width = 110
     Height = 17
-    Min = 0
-    Max = 100
     Smooth = True
     Step = 0
     TabOrder = 4
   end
-  object UpDown1: TUpDown
+  object m__MidgameDepthUpDown: TUpDown
     Left = 337
     Top = 128
     Width = 16
     Height = 21
-    Associate = LabeledEdit1
+    Associate = m__MidgameDepthLabeledEdit
     Min = 1
     Max = 8
     Position = 6
     TabOrder = 6
-    Wrap = False
   end
-  object UpDown2: TUpDown
+  object m__EndgameDepthUpDown: TUpDown
     Left = 337
     Top = 168
     Width = 16
     Height = 21
-    Associate = LabeledEdit2
+    Associate = m__EndgameDepthLabeledEdit
     Min = 1
     Max = 15
     Position = 12
     TabOrder = 7
-    Wrap = False
   end
-  object LabeledEdit1: TLabeledEdit
+  object m__MidgameDepthLabeledEdit: TLabeledEdit
     Left = 288
     Top = 128
     Width = 49
@@ -722,13 +717,11 @@ object Form1: TForm1
     EditLabel.Width = 73
     EditLabel.Height = 13
     EditLabel.Caption = 'Midgame depth'
-    LabelPosition = lpAbove
-    LabelSpacing = 3
     ReadOnly = True
     TabOrder = 5
     Text = '6'
   end
-  object LabeledEdit2: TLabeledEdit
+  object m__EndgameDepthLabeledEdit: TLabeledEdit
     Left = 288
     Top = 168
     Width = 49
@@ -736,13 +729,11 @@ object Form1: TForm1
     EditLabel.Width = 75
     EditLabel.Height = 13
     EditLabel.Caption = 'Endgame depth'
-    LabelPosition = lpAbove
-    LabelSpacing = 3
     ReadOnly = True
     TabOrder = 8
     Text = '12'
   end
-  object UpDown3: TUpDown
+  object m__BackForwardButtons: TUpDown
     Left = 104
     Top = 264
     Width = 81
@@ -752,87 +743,86 @@ object Form1: TForm1
     Orientation = udHorizontal
     Position = 1
     TabOrder = 9
-    Wrap = False
-    OnClick = UpDown3Click
+    OnClick = OnClick_BackForwardButtons
   end
-  object MainMenu1: TMainMenu
+  object m__MainMenu: TMainMenu
     Left = 376
-    Top = 88
-    object New: TMenuItem
+    Top = 80
+    object m__MenuItem__new_game: TMenuItem
       Caption = 'New game'
-      OnClick = NewClick
+      OnClick = OnClick_MenuItem__new_game
     end
-    object N10: TMenuItem
+    object m__MenuItem_position: TMenuItem
       Caption = 'Position'
-      object BSetup: TMenuItem
+      object m__MenuItem_position_modify: TMenuItem
         Caption = 'Modify'
-        OnClick = BSetupClick
+        OnClick = OnClick_MenuItem_position_modify
       end
-      object Continue: TMenuItem
+      object m__MenuItem_position_continue: TMenuItem
         Caption = 'Continue'
         Enabled = False
-        OnClick = ContinueClick
+        OnClick = OnClick_MenuItem_position_continue
       end
     end
-    object Order: TMenuItem
+    object m__MenuItem_players: TMenuItem
       Caption = 'Players'
-      object PP: TMenuItem
+      object m__MenuItem__players__2_players: TMenuItem
         Caption = '2 players'
-        OnClick = MoveClick
+        OnClick = OnClick_MenuItem__players__any_submenu
       end
-      object PC: TMenuItem
+      object m__MenuItem__players__human_vs_cpu: TMenuItem
         Caption = 'Human vs CPU'
-        OnClick = MoveClick
+        OnClick = OnClick_MenuItem__players__any_submenu
       end
-      object CP: TMenuItem
+      object m__MenuItem__players__cpu_vs_human: TMenuItem
         Caption = 'CPU vs Human'
-        OnClick = MoveClick
+        OnClick = OnClick_MenuItem__players__any_submenu
       end
-      object CC: TMenuItem
+      object m__MenuItem__players__cpu_vs_cpu: TMenuItem
         Caption = 'CPU vs CPU'
-        OnClick = MoveClick
+        OnClick = OnClick_MenuItem__players__any_submenu
       end
     end
-    object N1: TMenuItem
+    object m__MenuItem_colour: TMenuItem
       Caption = 'Colour'
-      object N11: TMenuItem
+      object m__MenuItem__colour__1st_player: TMenuItem
         Caption = '1-st player'
-        object N2: TMenuItem
+        object m__MenuItem__colour__1st_player__blue: TMenuItem
           Caption = 'Blue'
           Checked = True
-          OnClick = Color1Click
+          OnClick = OnClick_MenuItem__colour__1st_player__any_submenu
         end
-        object N3: TMenuItem
+        object m__MenuItem__colour__1st_player__green: TMenuItem
           Caption = 'Green'
-          OnClick = Color1Click
+          OnClick = OnClick_MenuItem__colour__1st_player__any_submenu
         end
-        object N4: TMenuItem
+        object m__MenuItem__colour__1st_player__red: TMenuItem
           Caption = 'Red'
-          OnClick = Color1Click
+          OnClick = OnClick_MenuItem__colour__1st_player__any_submenu
         end
-        object N5: TMenuItem
+        object m__MenuItem__colour__1st_player__yellow: TMenuItem
           Caption = 'Yellow'
-          OnClick = Color1Click
+          OnClick = OnClick_MenuItem__colour__1st_player__any_submenu
         end
       end
-      object N21: TMenuItem
+      object m__MenuItem__colour__2nd_player: TMenuItem
         Caption = '2-nd player'
-        object N6: TMenuItem
+        object m__MenuItem__colour__2nd_player__blue: TMenuItem
           Caption = 'Blue'
-          OnClick = Color2Click
+          OnClick = OnClick_MenuItem__colour__2nd_player__any_submenu
         end
-        object N7: TMenuItem
+        object m__MenuItem__colour__2nd_player__green: TMenuItem
           Caption = 'Green'
-          OnClick = Color2Click
+          OnClick = OnClick_MenuItem__colour__2nd_player__any_submenu
         end
-        object N8: TMenuItem
+        object m__MenuItem__colour__2nd_player__red: TMenuItem
           Caption = 'Red'
-          OnClick = Color2Click
+          OnClick = OnClick_MenuItem__colour__2nd_player__any_submenu
         end
-        object N9: TMenuItem
+        object m__MenuItem__colour__2nd_player__yellow: TMenuItem
           Caption = 'Yellow'
           Checked = True
-          OnClick = Color2Click
+          OnClick = OnClick_MenuItem__colour__2nd_player__any_submenu
         end
       end
     end
