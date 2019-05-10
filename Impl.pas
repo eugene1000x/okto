@@ -625,122 +625,122 @@ end;
 
 procedure TMainWindow.OnCreate_MainWindow(Sender: TObject);
 begin
-	m__MenuItem__players__human_vs_cpu.Checked := True;
-	m__MenuItem__players__cpu_vs_cpu.Checked := False;
-	m__MenuItem__players__cpu_vs_human.Checked := False;
-	m__MenuItem__players__2_players.Checked := False;
+	Self.m__MenuItem__players__human_vs_cpu.Checked := True;
+	Self.m__MenuItem__players__cpu_vs_cpu.Checked := False;
+	Self.m__MenuItem__players__cpu_vs_human.Checked := False;
+	Self.m__MenuItem__players__2_players.Checked := False;
 	
-	if m__MenuItem__colour__1st_player__blue.Checked then
+	if Self.m__MenuItem__colour__1st_player__blue.Checked then
 	begin
-		m__Player1Piece.Picture := m__BluePiece.Picture;
-		m__Player1Piece.Hint := 'Blue';
+		Self.m__Player1Piece.Picture := Self.m__BluePiece.Picture;
+		Self.m__Player1Piece.Hint := 'Blue';
 	end;
 	
-	if m__MenuItem__colour__1st_player__green.Checked then
+	if Self.m__MenuItem__colour__1st_player__green.Checked then
 	begin
-		m__Player1Piece.Picture := m__GreenPiece.Picture;
-		m__Player1Piece.Hint := 'Green';
+		Self.m__Player1Piece.Picture := Self.m__GreenPiece.Picture;
+		Self.m__Player1Piece.Hint := 'Green';
 	end;
 	
-	if m__MenuItem__colour__1st_player__red.Checked then
+	if Self.m__MenuItem__colour__1st_player__red.Checked then
 	begin
-		m__Player1Piece.Picture := m__RedPiece.Picture;
-		m__Player1Piece.Hint := 'Red';
+		Self.m__Player1Piece.Picture := Self.m__RedPiece.Picture;
+		Self.m__Player1Piece.Hint := 'Red';
 	end;
 	
-	if m__MenuItem__colour__1st_player__yellow.Checked then
+	if Self.m__MenuItem__colour__1st_player__yellow.Checked then
 	begin
-		m__Player1Piece.Picture := m__YellowPiece.Picture;
-		m__Player1Piece.Hint := 'Yellow';
+		Self.m__Player1Piece.Picture := Self.m__YellowPiece.Picture;
+		Self.m__Player1Piece.Hint := 'Yellow';
 	end;
 	
-	if m__MenuItem__colour__2nd_player__blue.Checked then
+	if Self.m__MenuItem__colour__2nd_player__blue.Checked then
 	begin
-		m__Player2Piece.Picture := m__BluePiece.Picture;
-		m__Player2Piece.Hint := 'Blue';
+		Self.m__Player2Piece.Picture := Self.m__BluePiece.Picture;
+		Self.m__Player2Piece.Hint := 'Blue';
 	end;
 	
-	if m__MenuItem__colour__2nd_player__green.Checked then
+	if Self.m__MenuItem__colour__2nd_player__green.Checked then
 	begin
-		m__Player2Piece.Picture := m__GreenPiece.Picture;
-		m__Player2Piece.Hint := 'Green';
+		Self.m__Player2Piece.Picture := Self.m__GreenPiece.Picture;
+		Self.m__Player2Piece.Hint := 'Green';
 	end;
 	
-	if m__MenuItem__colour__2nd_player__red.Checked then
+	if Self.m__MenuItem__colour__2nd_player__red.Checked then
 	begin
-		m__Player2Piece.Picture := m__RedPiece.Picture;
-		m__Player2Piece.Hint := 'Red';
+		Self.m__Player2Piece.Picture := Self.m__RedPiece.Picture;
+		Self.m__Player2Piece.Hint := 'Red';
 	end;
 	
-	if m__MenuItem__colour__2nd_player__yellow.Checked then
+	if Self.m__MenuItem__colour__2nd_player__yellow.Checked then
 	begin
-		m__Player2Piece.Picture := m__YellowPiece.Picture;
-		m__Player2Piece.Hint := 'Yellow';
+		Self.m__Player2Piece.Picture := Self.m__YellowPiece.Picture;
+		Self.m__Player2Piece.Hint := 'Yellow';
 	end;
 	
-	Break := False;
-	Setup := False;
+	Self.Break := False;
+	Self.Setup := False;
 	
-	m__ColumnLabel.Top := 0;
-	m__Row1Label.Left := 5;
-	m__Row2Label.Left := 5;
-	m__Row3Label.Left := 5;
-	m__Row4Label.Left := 5;
-	m__Row5Label.Left := 5;
-	m__Row6Label.Left := 5;
-	m__Row7Label.Left := 5;
-	m__Row8Label.Left := 5;
+	Self.m__ColumnLabel.Top := 0;
+	Self.m__Row1Label.Left := 5;
+	Self.m__Row2Label.Left := 5;
+	Self.m__Row3Label.Left := 5;
+	Self.m__Row4Label.Left := 5;
+	Self.m__Row5Label.Left := 5;
+	Self.m__Row6Label.Left := 5;
+	Self.m__Row7Label.Left := 5;
+	Self.m__Row8Label.Left := 5;
 	
-	m__DrawGrid.Height := m__DrawGrid.GridLineWidth + m__DrawGrid.RowCount * (m__DrawGrid.DefaultRowHeight + m__DrawGrid.GridLineWidth) + 2;
-	m__DrawGrid.Width := m__DrawGrid.GridLineWidth + m__DrawGrid.ColCount * (m__DrawGrid.DefaultColWidth + m__DrawGrid.GridLineWidth) + 2;
-	m__DrawGrid.Top := m__ColumnLabel.Height + m__ColumnLabel.Top;
-	m__DrawGrid.Left := m__Row1Label.Left + m__Row1Label.Width + 5;
+	Self.m__DrawGrid.Height := Self.m__DrawGrid.GridLineWidth + Self.m__DrawGrid.RowCount * (Self.m__DrawGrid.DefaultRowHeight + Self.m__DrawGrid.GridLineWidth) + 2;
+	Self.m__DrawGrid.Width := Self.m__DrawGrid.GridLineWidth + Self.m__DrawGrid.ColCount * (Self.m__DrawGrid.DefaultColWidth + Self.m__DrawGrid.GridLineWidth) + 2;
+	Self.m__DrawGrid.Top := Self.m__ColumnLabel.Height + Self.m__ColumnLabel.Top;
+	Self.m__DrawGrid.Left := Self.m__Row1Label.Left + Self.m__Row1Label.Width + 5;
 	
-	m__ColumnLabel.Left := m__DrawGrid.Left;
-	m__Row1Label.Top := m__DrawGrid.Top + 1 + 15 - 6;
-	m__Row2Label.Top := m__Row1Label.Top + 31;
-	m__Row3Label.Top := m__Row2Label.Top + 31;
-	m__Row4Label.Top := m__Row3Label.Top + 31;
-	m__Row5Label.Top := m__Row4Label.Top + 31;
-	m__Row6Label.Top := m__Row5Label.Top + 31;
-	m__Row7Label.Top := m__Row6Label.Top + 31;
-	m__Row8Label.Top := m__Row7Label.Top + 31;
+	Self.m__ColumnLabel.Left := Self.m__DrawGrid.Left;
+	Self.m__Row1Label.Top := Self.m__DrawGrid.Top + 1 + 15 - 6;
+	Self.m__Row2Label.Top := Self.m__Row1Label.Top + 31;
+	Self.m__Row3Label.Top := Self.m__Row2Label.Top + 31;
+	Self.m__Row4Label.Top := Self.m__Row3Label.Top + 31;
+	Self.m__Row5Label.Top := Self.m__Row4Label.Top + 31;
+	Self.m__Row6Label.Top := Self.m__Row5Label.Top + 31;
+	Self.m__Row7Label.Top := Self.m__Row6Label.Top + 31;
+	Self.m__Row8Label.Top := Self.m__Row7Label.Top + 31;
 	
-	m__Player1Piece.Left := m__DrawGrid.Left + m__DrawGrid.Width + 60;
-	m__Player1Piece.Top := 10;
-	m__Player1Piece.Width := m__Player1Piece.Picture.Width;
-	m__Player1Piece.Height := m__Player1Piece.Picture.Height;
-	m__Player2Piece.Left := m__Player1Piece.Left;
-	m__Player2Piece.Top := m__Player1Piece.Top + m__Player1Piece.Height + 20;
-	m__Player2Piece.Width := m__Player1Piece.Picture.Width;
-	m__Player2Piece.Height := m__Player1Piece.Picture.Height;
+	Self.m__Player1Piece.Left := Self.m__DrawGrid.Left + Self.m__DrawGrid.Width + 60;
+	Self.m__Player1Piece.Top := 10;
+	Self.m__Player1Piece.Width := Self.m__Player1Piece.Picture.Width;
+	Self.m__Player1Piece.Height := Self.m__Player1Piece.Picture.Height;
+	Self.m__Player2Piece.Left := Self.m__Player1Piece.Left;
+	Self.m__Player2Piece.Top := Self.m__Player1Piece.Top + Self.m__Player1Piece.Height + 20;
+	Self.m__Player2Piece.Width := Self.m__Player1Piece.Picture.Width;
+	Self.m__Player2Piece.Height := Self.m__Player1Piece.Picture.Height;
 	
-	m__Player1PieceCountEdit.Width := 20;
-	m__Player2PieceCountEdit.Width := m__Player1PieceCountEdit.Width;
-	m__Player1PieceCountEdit.Height := 15;
-	m__Player2PieceCountEdit.Height := m__Player1PieceCountEdit.Height;
-	m__Player1PieceCountEdit.Left := m__Player1Piece.Left - m__Player1PieceCountEdit.Width - 35;
-	m__Player1PieceCountEdit.Top := m__Player1Piece.Top + m__Player1Piece.Height - m__Player1PieceCountEdit.Height;
-	m__Player2PieceCountEdit.Left := m__Player1PieceCountEdit.Left;
-	m__Player2PieceCountEdit.Top := m__Player2Piece.Top + m__Player2Piece.Height - m__Player2PieceCountEdit.Height;
+	Self.m__Player1PieceCountEdit.Width := 20;
+	Self.m__Player2PieceCountEdit.Width := Self.m__Player1PieceCountEdit.Width;
+	Self.m__Player1PieceCountEdit.Height := 15;
+	Self.m__Player2PieceCountEdit.Height := Self.m__Player1PieceCountEdit.Height;
+	Self.m__Player1PieceCountEdit.Left := Self.m__Player1Piece.Left - Self.m__Player1PieceCountEdit.Width - 35;
+	Self.m__Player1PieceCountEdit.Top := Self.m__Player1Piece.Top + Self.m__Player1Piece.Height - Self.m__Player1PieceCountEdit.Height;
+	Self.m__Player2PieceCountEdit.Left := Self.m__Player1PieceCountEdit.Left;
+	Self.m__Player2PieceCountEdit.Top := Self.m__Player2Piece.Top + Self.m__Player2Piece.Height - Self.m__Player2PieceCountEdit.Height;
 	
-	m__Player1Label.Left := m__Player1PieceCountEdit.Left - 3;
-	m__Player1Label.Top := m__Player1Piece.Top;
-	m__Player2Label.Left := m__Player2PieceCountEdit.Left - 3;
-	m__Player2Label.Top := m__Player2Piece.Top;
+	Self.m__Player1Label.Left := Self.m__Player1PieceCountEdit.Left - 3;
+	Self.m__Player1Label.Top := Self.m__Player1Piece.Top;
+	Self.m__Player2Label.Left := Self.m__Player2PieceCountEdit.Left - 3;
+	Self.m__Player2Label.Top := Self.m__Player2Piece.Top;
 	
-	MainWindow.ClientHeight := m__DrawGrid.Height + m__Statusbar.Height + m__ColumnLabel.Height + m__BackForwardButtons.Height;
-	MainWindow.ClientWidth := m__DrawGrid.Width + m__Row1Label.Width + 110 + 5 + 5;
+	Self.ClientHeight := Self.m__DrawGrid.Height + Self.m__Statusbar.Height + Self.m__ColumnLabel.Height + Self.m__BackForwardButtons.Height;
+	Self.ClientWidth := Self.m__DrawGrid.Width + Self.m__Row1Label.Width + 110 + 5 + 5;
 	
-	m__Progressbar.Left := m__DrawGrid.Left + m__DrawGrid.Width + 5;
-	m__Progressbar.Width := MainWindow.ClientWidth - m__DrawGrid.Width - m__Row1Label.Width - 20;
+	Self.m__Progressbar.Left := Self.m__DrawGrid.Left + Self.m__DrawGrid.Width + 5;
+	Self.m__Progressbar.Width := Self.ClientWidth - Self.m__DrawGrid.Width - Self.m__Row1Label.Width - 20;
 	
-	m__MidgameDepthLabeledEdit.Left := m__Progressbar.Left;
-	m__EndgameDepthLabeledEdit.Left := m__MidgameDepthLabeledEdit.left;
+	Self.m__MidgameDepthLabeledEdit.Left := Self.m__Progressbar.Left;
+	Self.m__EndgameDepthLabeledEdit.Left := Self.m__MidgameDepthLabeledEdit.left;
 	
-	m__BackForwardButtons.Top := m__DrawGrid.Top + m__DrawGrid.Height;
+	Self.m__BackForwardButtons.Top := Self.m__DrawGrid.Top + Self.m__DrawGrid.Height;
 	
-	MainWindow.Show;
+	Self.Show;
 	//NewClick(Sender);
 end;
 
@@ -753,260 +753,260 @@ procedure TMainWindow.OnDrawCell_DrawGrid(Sender: TObject; ACol, ARow: Integer; 
 var
 	Text: string;
 begin
-	m__DrawGrid.Canvas.Brush.Color := clWhite;
-	m__DrawGrid.Canvas.FillRect(Rect);
+	Self.m__DrawGrid.Canvas.Brush.Color := clWhite;
+	Self.m__DrawGrid.Canvas.FillRect(Rect);
 	
-	case Field[ACol + 1, ARow + 1] of
+	case Self.Field[ACol + 1, ARow + 1] of
 		1:
-			m__DrawGrid.Canvas.StretchDraw(Rect, m__Player1Piece.Picture.Bitmap);
+			Self.m__DrawGrid.Canvas.StretchDraw(Rect, Self.m__Player1Piece.Picture.Bitmap);
 		2:
-			m__DrawGrid.Canvas.StretchDraw(Rect, m__Player2Piece.Picture.Bitmap);
+			Self.m__DrawGrid.Canvas.StretchDraw(Rect, Self.m__Player2Piece.Picture.Bitmap);
 	end;
 	
-	if (Values.Last.I = ACol + 1) and (Values.Last.J = ARow + 1) and (Field[ACol + 1, ARow + 1] > 0) then
+	if (Self.Values.Last.I = ACol + 1) and (Self.Values.Last.J = ARow + 1) and (Self.Field[ACol + 1, ARow + 1] > 0) then
 	begin
-		m__DrawGrid.Canvas.Pen.Color := clRed;
-		m__DrawGrid.Canvas.MoveTo(Rect.Left, Rect.Top);
-		m__DrawGrid.Canvas.LineTo(Rect.Right, Rect.Top);
-		m__DrawGrid.Canvas.LineTo(Rect.Right, Rect.Bottom);
-		m__DrawGrid.Canvas.LineTo(Rect.Left, Rect.Bottom);
-		m__DrawGrid.Canvas.LineTo(Rect.Left, Rect.Top);
+		Self.m__DrawGrid.Canvas.Pen.Color := clRed;
+		Self.m__DrawGrid.Canvas.MoveTo(Rect.Left, Rect.Top);
+		Self.m__DrawGrid.Canvas.LineTo(Rect.Right, Rect.Top);
+		Self.m__DrawGrid.Canvas.LineTo(Rect.Right, Rect.Bottom);
+		Self.m__DrawGrid.Canvas.LineTo(Rect.Left, Rect.Bottom);
+		Self.m__DrawGrid.Canvas.LineTo(Rect.Left, Rect.Top);
 	end;
 	
 	if (ACol + 1 = Values.Best.I) and (ARow + 1 = Values.Best.J) then
-		m__DrawGrid.Canvas.Font.Color := clRed
+		Self.m__DrawGrid.Canvas.Font.Color := clRed
 	else
-		m__DrawGrid.Canvas.Font.Color := clBlack;
+		Self.m__DrawGrid.Canvas.Font.Color := clBlack;
 		
-	Text := Values.V[ACol + 1, ARow + 1];
+	Text := Self.Values.V[ACol + 1, ARow + 1];
 	
 	if Copy(Text, 1, 2) = '<=' then
-		with m__DrawGrid.Canvas do
+		with Self.m__DrawGrid.Canvas do
 		begin
 			Delete(Text, 1, 2);
 			Pen.Color := clBlack;
-			Draw(Rect.Left, Rect.Top, m__LessOrEqual.Picture.Graphic);
+			Draw(Rect.Left, Rect.Top, Self.m__LessOrEqual.Picture.Graphic);
 			TextOut(Rect.Left + 8, Rect.Top, Text);
 		end
 	else
 		if Copy(Text, 1, 2) = '>=' then
-			with m__DrawGrid.Canvas do
+			with Self.m__DrawGrid.Canvas do
 			begin
 				Delete(Text, 1, 2);
 				Pen.Color := clBlack;
-				Draw(Rect.Left, Rect.Top, m__GreaterOrEqual.Picture.Graphic);
+				Draw(Rect.Left, Rect.Top, Self.m__GreaterOrEqual.Picture.Graphic);
 				TextOut(Rect.Left + 8, Rect.Top, Text);
 			end
 		else
-			m__DrawGrid.Canvas.TextOut(Rect.Left, Rect.Top, Text);
+			Self.m__DrawGrid.Canvas.TextOut(Rect.Left, Rect.Top, Text);
 end;
 
 procedure TMainWindow.OnClick_DrawGrid(Sender: TObject);
 begin
-	if not Setup then
+	if not Self.Setup then
 		Exit;
 		
 	repeat
-		Field[m__DrawGrid.Col + 1, m__DrawGrid.Row + 1] := (Field[m__DrawGrid.Col + 1, m__DrawGrid.Row + 1] + 1) mod 3;
-	until not ((Field[m__DrawGrid.Col + 1, m__DrawGrid.Row + 1] = 0) and (m__DrawGrid.Col + 1 in [4, 5]) and (m__DrawGrid.Row + 1 in [4, 5]));
+		Self.Field[Self.m__DrawGrid.Col + 1, Self.m__DrawGrid.Row + 1] := (Self.Field[Self.m__DrawGrid.Col + 1, Self.m__DrawGrid.Row + 1] + 1) mod 3;
+	until not ((Self.Field[Self.m__DrawGrid.Col + 1, Self.m__DrawGrid.Row + 1] = 0) and (Self.m__DrawGrid.Col + 1 in [4, 5]) and (Self.m__DrawGrid.Row + 1 in [4, 5]));
 	
-	m__DrawGrid.Repaint;
+	Self.m__DrawGrid.Repaint;
 end;
 
 procedure TMainWindow.OnClick_BackForwardButtons(Sender: TObject; Button: TUDBtnType);
 begin
 	if Button = btNext then
-		if Protocol.Current + 1 <= Protocol.NumberOfMoves then
-			Inc(Protocol.Current);
+		if Self.Protocol.Current + 1 <= Self.Protocol.NumberOfMoves then
+			Inc(Self.Protocol.Current);
 	
 	if Button = btPrev then
-		if Protocol.Current - 1 >= 1 then
-			Dec(Protocol.Current);
+		if Self.Protocol.Current - 1 >= 1 then
+			Dec(Self.Protocol.Current);
 	
-	m__BackForwardButtons.Position := Protocol.Current;
-	Field := Protocol.Fields[Protocol.Current].Field;
+	Self.m__BackForwardButtons.Position := Self.Protocol.Current;
+	Self.Field := Self.Protocol.Fields[Self.Protocol.Current].Field;
 	
-	m__DrawGrid.Repaint;
+	Self.m__DrawGrid.Repaint;
 end;
 
 procedure TMainWindow.OnClick_MenuItem__new_game(Sender: TObject);
 begin
-	Clear(Field);
-	SetField(Field);
-	Clear(MainWindow.Protocol.Fields[1].Field);
-	SetField(MainWindow.Protocol.Fields[1].Field);
+	Clear(Self.Field);
+	SetField(Self.Field);
+	Clear(Self.Protocol.Fields[1].Field);
+	SetField(Self.Protocol.Fields[1].Field);
 	
-	Protocol.NumberOfMoves := 1;
-	Protocol.Current := 1;
+	Self.Protocol.NumberOfMoves := 1;
+	Self.Protocol.Current := 1;
 	
-	m__BackForwardButtons.Position := Protocol.Current;
+	Self.m__BackForwardButtons.Position := Self.Protocol.Current;
 	
-	m__DrawGrid.DefaultDrawing := False;
+	Self.m__DrawGrid.DefaultDrawing := False;
 	
-	MainWindow.m__Statusbar.Panels[0].Text := '';
-	MainWindow.m__Statusbar.Panels[1].Text := '';
+	Self.m__Statusbar.Panels[0].Text := '';
+	Self.m__Statusbar.Panels[1].Text := '';
 	
-	if m__MenuItem__players__cpu_vs_cpu.Checked or m__MenuItem__players__cpu_vs_human.Checked then
+	if Self.m__MenuItem__players__cpu_vs_cpu.Checked or Self.m__MenuItem__players__cpu_vs_human.Checked then
 	begin
-		Players[1].GetMove := CompMove;
-		Players[1].Name := 'CPU';
+		Self.Players[1].GetMove := CompMove;
+		Self.Players[1].Name := 'CPU';
 	end
 	else
 	begin
-		Players[1].GetMove := PlayerMove;
-		Players[1].Name := 'human';
+		Self.Players[1].GetMove := PlayerMove;
+		Self.Players[1].Name := 'human';
 	end;
 	
-	if m__MenuItem__players__2_players.Checked or m__MenuItem__players__cpu_vs_human.Checked then
+	if Self.m__MenuItem__players__2_players.Checked or Self.m__MenuItem__players__cpu_vs_human.Checked then
 	begin
-		Players[2].GetMove := PlayerMove;
-		Players[2].Name := 'human';
+		Self.Players[2].GetMove := PlayerMove;
+		Self.Players[2].Name := 'human';
 	end
 	else
 	begin
-		Players[2].GetMove := CompMove;
-		Players[2].Name := 'CPU';
+		Self.Players[2].GetMove := CompMove;
+		Self.Players[2].Name := 'CPU';
 	end;
 	
-	m__Player1Label.Caption := Players[1].Name;
-	m__Player2Label.Caption := Players[2].Name;
-	Game(Players);
-	m__DrawGrid.Repaint;
+	Self.m__Player1Label.Caption := Self.Players[1].Name;
+	Self.m__Player2Label.Caption := Self.Players[2].Name;
+	Game(Self.Players);
+	Self.m__DrawGrid.Repaint;
 end;
 
 procedure TMainWindow.OnClick_MenuItem_position_modify(Sender: TObject);
 begin
-	m__MenuItem_position_modify.Enabled := False;
-	m__MenuItem_position_continue.Enabled := True;
-	Break := True;
-	Setup := True;
+	Self.m__MenuItem_position_modify.Enabled := False;
+	Self.m__MenuItem_position_continue.Enabled := True;
+	Self.Break := True;
+	Self.Setup := True;
 end;
 
 procedure TMainWindow.OnClick_MenuItem_position_continue(Sender: TObject);
 begin
-	m__MenuItem_position_modify.Enabled := True;
-	m__MenuItem_position_continue.Enabled := False;
-	Break := False;
-	Setup := False;
-	m__DrawGrid.Selection := TGridRect(m__DrawGrid.CellRect(-1, -1));
-	Protocol.Fields[1].Field := Field;
-	Protocol.NumberOfMoves := 1;
-	Protocol.Current := 1;
-	m__BackForwardButtons.Position := Protocol.Current;
-	Game(Players);
+	Self.m__MenuItem_position_modify.Enabled := True;
+	Self.m__MenuItem_position_continue.Enabled := False;
+	Self.Break := False;
+	Self.Setup := False;
+	Self.m__DrawGrid.Selection := TGridRect(Self.m__DrawGrid.CellRect(-1, -1));
+	Self.Protocol.Fields[1].Field := Self.Field;
+	Self.Protocol.NumberOfMoves := 1;
+	Self.Protocol.Current := 1;
+	Self.m__BackForwardButtons.Position := Self.Protocol.Current;
+	Game(Self.Players);
 end;
 
 procedure TMainWindow.OnClick_MenuItem__players__any_submenu(Sender: TObject);
 begin
-	m__MenuItem__players__human_vs_cpu.Checked := False;
-	m__MenuItem__players__cpu_vs_cpu.Checked := False;
-	m__MenuItem__players__cpu_vs_human.Checked := False;
-	m__MenuItem__players__2_players.Checked := False;
+	Self.m__MenuItem__players__human_vs_cpu.Checked := False;
+	Self.m__MenuItem__players__cpu_vs_cpu.Checked := False;
+	Self.m__MenuItem__players__cpu_vs_human.Checked := False;
+	Self.m__MenuItem__players__2_players.Checked := False;
 	
 	(Sender as TMenuItem).Checked := True;
 	
-	if m__MenuItem__players__cpu_vs_cpu.Checked or m__MenuItem__players__cpu_vs_human.Checked then
+	if Self.m__MenuItem__players__cpu_vs_cpu.Checked or Self.m__MenuItem__players__cpu_vs_human.Checked then
 	begin
-		Players[1].GetMove := CompMove;
-		Players[1].Name := 'CPU';
+		Self.Players[1].GetMove := CompMove;
+		Self.Players[1].Name := 'CPU';
 	end
 	else
 	begin
-		Players[1].GetMove := PlayerMove;
-		Players[1].Name := 'human';
+		Self.Players[1].GetMove := PlayerMove;
+		Self.Players[1].Name := 'human';
 	end;
 	
-	if m__MenuItem__players__2_players.Checked or m__MenuItem__players__cpu_vs_human.Checked then
+	if Self.m__MenuItem__players__2_players.Checked or Self.m__MenuItem__players__cpu_vs_human.Checked then
 	begin
-		Players[2].GetMove := PlayerMove;
-		Players[2].Name := 'human';
+		Self.Players[2].GetMove := PlayerMove;
+		Self.Players[2].Name := 'human';
 	end
 	else
 	begin
-		Players[2].GetMove := CompMove;
-		Players[2].Name := 'CPU';
+		Self.Players[2].GetMove := CompMove;
+		Self.Players[2].Name := 'CPU';
 	end;
 	
-	m__Player1Label.Caption := Players[1].Name;
-	m__Player2Label.Caption := Players[2].Name;
+	Self.m__Player1Label.Caption := Self.Players[1].Name;
+	Self.m__Player2Label.Caption := Self.Players[2].Name;
 end;
 	
 procedure TMainWindow.OnClick_MenuItem__colour__1st_player__any_submenu(Sender: TObject);
 begin
-	m__MenuItem__colour__1st_player__blue.Checked := False;
-	m__MenuItem__colour__1st_player__green.Checked := False;
-	m__MenuItem__colour__1st_player__red.Checked := False;
-	m__MenuItem__colour__1st_player__yellow.Checked := False;
+	Self.m__MenuItem__colour__1st_player__blue.Checked := False;
+	Self.m__MenuItem__colour__1st_player__green.Checked := False;
+	Self.m__MenuItem__colour__1st_player__red.Checked := False;
+	Self.m__MenuItem__colour__1st_player__yellow.Checked := False;
 	
 	(Sender as TMenuItem).Checked := True;
 	
-	if m__MenuItem__colour__1st_player__blue.Checked then
+	if Self.m__MenuItem__colour__1st_player__blue.Checked then
 	begin
-		m__Player1Piece.Picture := m__BluePiece.Picture;
-		m__Player1Piece.Hint := 'Blue';
+		Self.m__Player1Piece.Picture := Self.m__BluePiece.Picture;
+		Self.m__Player1Piece.Hint := 'Blue';
 	end;
 	
-	if m__MenuItem__colour__1st_player__green.Checked then
+	if Self.m__MenuItem__colour__1st_player__green.Checked then
 	begin
-		m__Player1Piece.Picture := m__GreenPiece.Picture;
-		m__Player1Piece.Hint := 'Green';
+		Self.m__Player1Piece.Picture := Self.m__GreenPiece.Picture;
+		Self.m__Player1Piece.Hint := 'Green';
 	end;
 	
-	if m__MenuItem__colour__1st_player__red.Checked then
+	if Self.m__MenuItem__colour__1st_player__red.Checked then
 	begin
-		m__Player1Piece.Picture := m__RedPiece.Picture;
-		m__Player1Piece.Hint := 'Red';
+		Self.m__Player1Piece.Picture := Self.m__RedPiece.Picture;
+		Self.m__Player1Piece.Hint := 'Red';
 	end;
 	
-	if m__MenuItem__colour__1st_player__yellow.Checked then
+	if Self.m__MenuItem__colour__1st_player__yellow.Checked then
 	begin
-		m__Player1Piece.Picture := m__YellowPiece.Picture;
-		m__Player1Piece.Hint := 'Yellow';
+		Self.m__Player1Piece.Picture := Self.m__YellowPiece.Picture;
+		Self.m__Player1Piece.Hint := 'Yellow';
 	end;
 	
-	MainWindow.m__Statusbar.Panels[2].Text := MainWindow.m__Player1Piece.Hint +' '+ IntToStr(MainWindow.Positions[1].NumberOfMoves) +' moves  '+
-			MainWindow.m__Player2Piece.Hint +' '+ IntToStr(MainWindow.Positions[2].NumberOfMoves) +' moves';
+	Self.m__Statusbar.Panels[2].Text := Self.m__Player1Piece.Hint +' '+ IntToStr(Self.Positions[1].NumberOfMoves) +' moves  '+
+			Self.m__Player2Piece.Hint +' '+ IntToStr(Self.Positions[2].NumberOfMoves) +' moves';
 	
-	m__DrawGrid.Repaint;
+	Self.m__DrawGrid.Repaint;
 end;
 
 procedure TMainWindow.OnClick_MenuItem__colour__2nd_player__any_submenu(Sender: TObject);
 begin
-	m__MenuItem__colour__2nd_player__blue.Checked := False;
-	m__MenuItem__colour__2nd_player__green.Checked := False;
-	m__MenuItem__colour__2nd_player__red.Checked := False;
-	m__MenuItem__colour__2nd_player__yellow.Checked := False;
+	Self.m__MenuItem__colour__2nd_player__blue.Checked := False;
+	Self.m__MenuItem__colour__2nd_player__green.Checked := False;
+	Self.m__MenuItem__colour__2nd_player__red.Checked := False;
+	Self.m__MenuItem__colour__2nd_player__yellow.Checked := False;
 	
 	(Sender as TMenuItem).Checked := True;
 	
-	if m__MenuItem__colour__2nd_player__blue.Checked then
+	if Self.m__MenuItem__colour__2nd_player__blue.Checked then
 	begin
-		m__Player2Piece.Picture := m__BluePiece.Picture;
-		m__Player2Piece.Hint := 'Blue';
+		Self.m__Player2Piece.Picture := Self.m__BluePiece.Picture;
+		Self.m__Player2Piece.Hint := 'Blue';
 	end;
 	
-	if m__MenuItem__colour__2nd_player__green.Checked then
+	if Self.m__MenuItem__colour__2nd_player__green.Checked then
 	begin
-		m__Player2Piece.Picture := m__GreenPiece.Picture;
-		m__Player2Piece.Hint := 'Green';
+		Self.m__Player2Piece.Picture := Self.m__GreenPiece.Picture;
+		Self.m__Player2Piece.Hint := 'Green';
 	end;
 	
-	if m__MenuItem__colour__2nd_player__red.Checked then
+	if Self.m__MenuItem__colour__2nd_player__red.Checked then
 	begin
-		m__Player2Piece.Picture := m__RedPiece.Picture;
-		m__Player2Piece.Hint := 'Red';
+		Self.m__Player2Piece.Picture := Self.m__RedPiece.Picture;
+		Self.m__Player2Piece.Hint := 'Red';
 	end;
 	
-	if m__MenuItem__colour__2nd_player__yellow.Checked then
+	if Self.m__MenuItem__colour__2nd_player__yellow.Checked then
 	begin
-		m__Player2Piece.Picture := m__YellowPiece.Picture;
-		m__Player2Piece.Hint := 'Yellow';
+		Self.m__Player2Piece.Picture := Self.m__YellowPiece.Picture;
+		Self.m__Player2Piece.Hint := 'Yellow';
 	end;
 	
-	MainWindow.m__Statusbar.Panels[2].Text := MainWindow.m__Player1Piece.Hint +' '+ IntToStr(MainWindow.Positions[1].NumberOfMoves) +' moves  '+
-			MainWindow.m__Player2Piece.Hint +' '+ IntToStr(MainWindow.Positions[2].NumberOfMoves) +' moves';
+	Self.m__Statusbar.Panels[2].Text := Self.m__Player1Piece.Hint +' '+ IntToStr(Self.Positions[1].NumberOfMoves) +' moves  '+
+			Self.m__Player2Piece.Hint +' '+ IntToStr(Self.Positions[2].NumberOfMoves) +' moves';
 	
-	m__DrawGrid.Repaint;
+	Self.m__DrawGrid.Repaint;
 end;
 
 end.
