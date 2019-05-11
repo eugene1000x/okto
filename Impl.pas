@@ -283,48 +283,48 @@ end;
 function IsGreaterOrEqual(Evaluation1, Evaluation2: TEvaluation; Equal: Boolean): Boolean;
 begin
 	if Evaluation1.IsNotHeuristical = Evaluation2.IsNotHeuristical then
-		IsGreaterOrEqual := (Evaluation1.PieceCount > Evaluation2.PieceCount) or ((Evaluation1.PieceCount = Evaluation2.PieceCount) and (Equal or ((Evaluation1.IsGreaterOrEqual) and (Evaluation2.IsGreaterOrEqual = False))))
+		Result := (Evaluation1.PieceCount > Evaluation2.PieceCount) or ((Evaluation1.PieceCount = Evaluation2.PieceCount) and (Equal or ((Evaluation1.IsGreaterOrEqual) and (Evaluation2.IsGreaterOrEqual = False))))
 	else
 		if Evaluation1.IsNotHeuristical then
-			IsGreaterOrEqual := Evaluation1.PieceCount >= 0
+			Result := Evaluation1.PieceCount >= 0
 		else
-			IsGreaterOrEqual := Evaluation2.PieceCount < 0;
+			Result := Evaluation2.PieceCount < 0;
 end;
 
 function EvaluationToStr_Long(Evaluation: TEvaluation): string;
 begin
-	EvaluationToStr_Long := IntToStr(Abs(Evaluation.PieceCount));
+	Result := IntToStr(Abs(Evaluation.PieceCount));
 	
 	if Evaluation.IsNotHeuristical then
 		if Evaluation.PieceCount > 0 then
-			EvaluationToStr_Long := 'Win by '+ Result
+			Result := 'Win by '+ Result
 		else if Evaluation.PieceCount < 0 then
-			EvaluationToStr_Long := 'Loss by '+ Result
+			Result := 'Loss by '+ Result
 		else
-			EvaluationToStr_Long := 'Draw'
+			Result := 'Draw'
 	else
-		EvaluationToStr_Long := IntToStr(Evaluation.PieceCount);
+		Result := IntToStr(Evaluation.PieceCount);
 end;
 
 function EvaluationToStr_Short(Evaluation: TEvaluation): string;
 begin
-	EvaluationToStr_Short := IntToStr(Evaluation.PieceCount);
+	Result := IntToStr(Evaluation.PieceCount);
 	
 	if Evaluation.IsNotHeuristical then
-		EvaluationToStr_Short := Result +'p';
+		Result := Result +'p';
 		
 	if Evaluation.IsLessOrEqual then
-		EvaluationToStr_Short := '<='+ Result
+		Result := '<='+ Result
 	else if Evaluation.IsGreaterOrEqual then
-		EvaluationToStr_Short := '>='+ Result;
+		Result := '>='+ Result;
 end;
 
 function NegateEvaluation(Evaluation: TEvaluation): TEvaluation;
 begin
-	NegateEvaluation := Evaluation;
-	NegateEvaluation.PieceCount := -Evaluation.PieceCount;
-	NegateEvaluation.IsGreaterOrEqual := Evaluation.IsLessOrEqual;
-	NegateEvaluation.IsLessOrEqual := Evaluation.IsGreaterOrEqual;
+	Result := Evaluation;
+	Result.PieceCount := -Evaluation.PieceCount;
+	Result.IsGreaterOrEqual := Evaluation.IsLessOrEqual;
+	Result.IsLessOrEqual := Evaluation.IsGreaterOrEqual;
 end;
 
 procedure GetEngineMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TPlayerNumber);
