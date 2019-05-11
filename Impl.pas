@@ -773,7 +773,7 @@ begin
 		Self.m__DrawGrid.Canvas.LineTo(Rect.Left, Rect.Top);
 	end;
 	
-	if (Column + 1 = m__Evaluations.Best.Column) and (Row + 1 = m__Evaluations.Best.Row) then
+	if (Column + 1 = Self.m__Evaluations.Best.Column) and (Row + 1 = Self.m__Evaluations.Best.Row) then
 		Self.m__DrawGrid.Canvas.Font.Color := clRed
 	else
 		Self.m__DrawGrid.Canvas.Font.Color := clBlack;
