@@ -68,90 +68,89 @@ type
 	end;
 	
 	TMainWindow = class(TForm)
-		m__DrawGrid: TDrawGrid;
-		m__Statusbar: TStatusBar;
-		m__Progressbar: TProgressBar;
-		m__BackForwardButtons: TUpDown;
+		published m__DrawGrid: TDrawGrid;
+		published m__Statusbar: TStatusBar;
+		published m__Progressbar: TProgressBar;
+		published m__BackForwardButtons: TUpDown;
 
-		m__MainMenu: TMainMenu;
-		m__MenuItem__new_game: TMenuItem;
-		m__MenuItem_position: TMenuItem;
-		m__MenuItem_position_modify: TMenuItem;
-		m__MenuItem_position_continue: TMenuItem;
-		m__MenuItem_players: TMenuItem;
-		m__MenuItem__players__2_players: TMenuItem;
-		m__MenuItem__players__human_vs_cpu: TMenuItem;
-		m__MenuItem__players__cpu_vs_human: TMenuItem;
-		m__MenuItem__players__cpu_vs_cpu: TMenuItem;
-		m__MenuItem_colour: TMenuItem;
-		m__MenuItem__colour__1st_player: TMenuItem;
-		m__MenuItem__colour__1st_player__blue: TMenuItem;
-		m__MenuItem__colour__1st_player__green: TMenuItem;
-		m__MenuItem__colour__1st_player__red: TMenuItem;
-		m__MenuItem__colour__1st_player__yellow: TMenuItem;
-		m__MenuItem__colour__2nd_player: TMenuItem;
-		m__MenuItem__colour__2nd_player__blue: TMenuItem;
-		m__MenuItem__colour__2nd_player__green: TMenuItem;
-		m__MenuItem__colour__2nd_player__red: TMenuItem;
-		m__MenuItem__colour__2nd_player__yellow: TMenuItem;
+		published m__MainMenu: TMainMenu;
+		published m__MenuItem__new_game: TMenuItem;
+		published m__MenuItem_position: TMenuItem;
+		published m__MenuItem_position_modify: TMenuItem;
+		published m__MenuItem_position_continue: TMenuItem;
+		published m__MenuItem_players: TMenuItem;
+		published m__MenuItem__players__2_players: TMenuItem;
+		published m__MenuItem__players__human_vs_cpu: TMenuItem;
+		published m__MenuItem__players__cpu_vs_human: TMenuItem;
+		published m__MenuItem__players__cpu_vs_cpu: TMenuItem;
+		published m__MenuItem_colour: TMenuItem;
+		published m__MenuItem__colour__1st_player: TMenuItem;
+		published m__MenuItem__colour__1st_player__blue: TMenuItem;
+		published m__MenuItem__colour__1st_player__green: TMenuItem;
+		published m__MenuItem__colour__1st_player__red: TMenuItem;
+		published m__MenuItem__colour__1st_player__yellow: TMenuItem;
+		published m__MenuItem__colour__2nd_player: TMenuItem;
+		published m__MenuItem__colour__2nd_player__blue: TMenuItem;
+		published m__MenuItem__colour__2nd_player__green: TMenuItem;
+		published m__MenuItem__colour__2nd_player__red: TMenuItem;
+		published m__MenuItem__colour__2nd_player__yellow: TMenuItem;
 
-		m__Player1Piece: TImage;
-		m__Player2Piece: TImage;
-		m__Player1PieceCountEdit: TEdit;
-		m__Player2PieceCountEdit: TEdit;
-		m__Player1Label: TLabel;
-		m__Player2Label: TLabel;
+		published m__Player1Piece: TImage;
+		published m__Player2Piece: TImage;
+		published m__Player1PieceCountEdit: TEdit;
+		published m__Player2PieceCountEdit: TEdit;
+		published m__Player1Label: TLabel;
+		published m__Player2Label: TLabel;
 
-		m__ColumnLabel: TLabel;
-		m__Row1Label: TLabel;
-		m__Row2Label: TLabel;
-		m__Row3Label: TLabel;
-		m__Row4Label: TLabel;
-		m__Row5Label: TLabel;
-		m__Row6Label: TLabel;
-		m__Row7Label: TLabel;
-		m__Row8Label: TLabel;
+		published m__ColumnLabel: TLabel;
+		published m__Row1Label: TLabel;
+		published m__Row2Label: TLabel;
+		published m__Row3Label: TLabel;
+		published m__Row4Label: TLabel;
+		published m__Row5Label: TLabel;
+		published m__Row6Label: TLabel;
+		published m__Row7Label: TLabel;
+		published m__Row8Label: TLabel;
 
-		m__LessOrEqual: TImage;
-		m__GreaterOrEqual: TImage;
+		published m__LessOrEqual: TImage;
+		published m__GreaterOrEqual: TImage;
 
-		m__MidgameDepthUpDown: TUpDown;
-		m__EndgameDepthUpDown: TUpDown;
-		m__MidgameDepthLabeledEdit: TLabeledEdit;
-		m__EndgameDepthLabeledEdit: TLabeledEdit;
+		published m__MidgameDepthUpDown: TUpDown;
+		published m__EndgameDepthUpDown: TUpDown;
+		published m__MidgameDepthLabeledEdit: TLabeledEdit;
+		published m__EndgameDepthLabeledEdit: TLabeledEdit;
 
-		m__GreenPiece: TImage;
-		m__BluePiece: TImage;
-		m__YellowPiece: TImage;
-		m__RedPiece: TImage;
+		published m__GreenPiece: TImage;
+		published m__BluePiece: TImage;
+		published m__YellowPiece: TImage;
+		published m__RedPiece: TImage;
 		
 		
-		procedure OnCreate_MainWindow(Sender: TObject);
-		procedure OnClose_MainWindow(Sender: TObject; var Action: TCloseAction);
-		procedure OnDrawCell_DrawGrid(Sender: TObject; Column, Row: Integer; Rect: TRect; State: TGridDrawState);
-		procedure OnClick_DrawGrid(Sender: TObject);
-		procedure OnClick_BackForwardButtons(Sender: TObject; Button: TUDBtnType);
+		published procedure OnCreate_MainWindow(Sender: TObject);
+		published procedure OnClose_MainWindow(Sender: TObject; var Action: TCloseAction);
+		published procedure OnDrawCell_DrawGrid(Sender: TObject; Column, Row: Integer; Rect: TRect; State: TGridDrawState);
+		published procedure OnClick_DrawGrid(Sender: TObject);
+		published procedure OnClick_BackForwardButtons(Sender: TObject; Button: TUDBtnType);
 
-		procedure OnClick_MenuItem__new_game(Sender: TObject);
-		procedure OnClick_MenuItem_position_modify(Sender: TObject);
-		procedure OnClick_MenuItem_position_continue(Sender: TObject);
-		procedure OnClick_MenuItem__players__any_submenu(Sender: TObject);
-		procedure OnClick_MenuItem__colour__1st_player__any_submenu(Sender: TObject);
-		procedure OnClick_MenuItem__colour__2nd_player__any_submenu(Sender: TObject);
-	private
-		// nothing
-	public
-		m__BoardState: TBoardState;
-		m__Positions: array [1..2] of TPosition;
-		m__Players: TPlayerArray;
+		published procedure OnClick_MenuItem__new_game(Sender: TObject);
+		published procedure OnClick_MenuItem_position_modify(Sender: TObject);
+		published procedure OnClick_MenuItem_position_continue(Sender: TObject);
+		published procedure OnClick_MenuItem__players__any_submenu(Sender: TObject);
+		published procedure OnClick_MenuItem__colour__1st_player__any_submenu(Sender: TObject);
+		published procedure OnClick_MenuItem__colour__2nd_player__any_submenu(Sender: TObject);
+
+
+		public m__BoardState: TBoardState;
+		public m__Positions: array [1..2] of TPosition;
+		public m__Players: TPlayerArray;
 		
-		m__Evaluations: record
+		public m__Evaluations: record
 			Last, Best: TCellAddress;
 			CellEvaluations: array [1..8, 1..8] of string;
 		end;
 		
-		m__GameHistory: TGameHistory;
-		m__IsInModifyMode, m__DoBreakGame: Boolean;
+		public m__GameHistory: TGameHistory;
+		public m__IsInModifyMode, m__DoBreakGame: Boolean;
 	end;
 
 var
