@@ -46,7 +46,7 @@ type
 	end;
 	
 	TEvaluation = record
-		IsNotHeuristical, IsLessOrEqual, IsGreaterOrEqual: Boolean;
+		IsHeuristical, IsLessOrEqual, IsGreaterOrEqual: Boolean;
 		PieceCount: Integer;
 	end;
 	
@@ -250,7 +250,7 @@ var
 	Positions: array [1..2] of TPosition;
 begin
 	Result.PieceCount := 0;
-	Result.IsNotHeuristical := False;
+	Result.IsHeuristical := True;
 	Result.IsLessOrEqual := False;
 	Result.IsGreaterOrEqual := False;
 	
@@ -259,7 +259,7 @@ begin
 	
 	if (Positions[PlayerNumber].PossibleMoveCount = 0) and (Positions[3 - PlayerNumber].PossibleMoveCount = 0) then
 	begin
-		Result.IsNotHeuristical := True;
+		Result.IsHeuristical := False;
 		Result.PieceCount := CountCellsWithState(BoardState, PlayerNumber) - CountCellsWithState(BoardState, 3 - PlayerNumber);
 		Exit;
 	end;
@@ -282,10 +282,10 @@ end;
 
 function IsGreaterOrEqual(Evaluation1, Evaluation2: TEvaluation; Equal: Boolean): Boolean;
 begin
-	if Evaluation1.IsNotHeuristical = Evaluation2.IsNotHeuristical then
+	if Evaluation1.IsHeuristical = Evaluation2.IsHeuristical then
 		Result := (Evaluation1.PieceCount > Evaluation2.PieceCount) or ((Evaluation1.PieceCount = Evaluation2.PieceCount) and (Equal or ((Evaluation1.IsGreaterOrEqual) and (Evaluation2.IsGreaterOrEqual = False))))
 	else
-		if Evaluation1.IsNotHeuristical then
+		if not Evaluation1.IsHeuristical then
 			Result := Evaluation1.PieceCount >= 0
 		else
 			Result := Evaluation2.PieceCount < 0;
@@ -295,7 +295,7 @@ function EvaluationToStr_Long(Evaluation: TEvaluation): string;
 begin
 	Result := IntToStr(Abs(Evaluation.PieceCount));
 	
-	if Evaluation.IsNotHeuristical then
+	if not Evaluation.IsHeuristical then
 		if Evaluation.PieceCount > 0 then
 			Result := 'Win by '+ Result
 		else if Evaluation.PieceCount < 0 then
@@ -310,7 +310,7 @@ function EvaluationToStr_Short(Evaluation: TEvaluation): string;
 begin
 	Result := IntToStr(Evaluation.PieceCount);
 	
-	if Evaluation.IsNotHeuristical then
+	if not Evaluation.IsHeuristical then
 		Result := Result +'p';
 		
 	if Evaluation.IsLessOrEqual then
@@ -424,7 +424,7 @@ begin
 	
 	MainWindow.m__Statusbar.Panels[3].Text := 'Depth='+ IntToStr(MaxDepth);
 	
-	Res.IsNotHeuristical := False;
+	Res.IsHeuristical := True;
 	MainWindow.m__MenuItem_position_modify.Enabled := False;
 	
 	MainWindow.m__MidgameDepthUpDown.Enabled := False;
@@ -441,12 +441,12 @@ begin
 		goto done;
 	end;
 	
-	MinValue.IsNotHeuristical := True;
+	MinValue.IsHeuristical := False;
 	MinValue.IsLessOrEqual := False;
 	MinValue.IsGreaterOrEqual := False;
 	MinValue.PieceCount := -64;
 	
-	MaxValue.IsNotHeuristical := True;
+	MaxValue.IsHeuristical := False;
 	MaxValue.IsLessOrEqual := False;
 	MaxValue.IsGreaterOrEqual := False;
 	MaxValue.PieceCount := 64;
