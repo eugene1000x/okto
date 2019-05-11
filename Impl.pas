@@ -50,13 +50,14 @@ type
 		PieceCount: Integer;
 	end;
 	
-	TTranspositionTable = array [1..2, 1..15] of record
+	//unfinished
+	{TTranspositionTable = array [1..2, 1..15] of record
 		PositionCount: Word;		//i__WhoseTurn, Depth
 		Positions: array of record
 			BoardState: TBoardState;
 			Evaluation: TEvaluation;
 		end;
-	end;
+	end;}
 	
 	TGameHistory = record
 		Positions: array [TNumberOfSquares] of record
