@@ -67,19 +67,47 @@ type
 		MoveCount, CurrentMoveNumber: TNumberOfSquares;
 	end;
 	
+	(**
+	 * Interface that GameContext uses to get parameters for the game, to
+	 * notify GUI about evaluation start, game progress, etc.
+	 *)
 	IGameDriver = interface
+		procedure OnPositionEvaluationStarted;
 		
+		(**
+		 * Called when engine's evaluation of the current position changed while engine is
+		 * searching for the best move.
+		 *)
+		procedure OnPositionEvaluationChanged;
+		
+		(**
+		 * Called when evaluation of one more move is completed while engine is
+		 * searching for the best move.
+		 *)
+		procedure OnMoveEvaluationCompleted;
+		
+		procedure OnPositionEvaluationCompleted;
+		
+		function GetMidgameMaxDepth: TNumberOfSquares;
+		function GetEndgameMaxDepth: TNumberOfSquares;
 	end;
 
+	(**
+	 * Class that contains logic related to the game (algorithms, game state, etc.) and that runs the game.
+	 *)
 	TGameContext = class
 		public m__BoardState: TBoardState;
 		public m__Positions: array [1..2] of TPosition;
 		public m__Players: TPlayerArray;
+		private m_i__WhoseTurn: Byte;
+		private m__MidgameMaxDepth, m__EndgameMaxDepth, m__MaxDepth: TNumberOfSquares;
 		
 		public m__Evaluations: record
 			Last, Best: TCellAddress;
 			CellEvaluations: array [1..8, 1..8] of string;
 		end;
+		
+		public m__BestEngineMoveEvaluation: TEvaluation;
 		
 		public m__GameHistory: TGameHistory;
 		public m__IsInModifyMode, m__DoBreakGame: Boolean;
@@ -89,6 +117,23 @@ type
 
 		public constructor Create; overload;		//disallowing to invoke TObject.Create()
         public constructor Create(GameDriver: IGameDriver); overload;
+        
+        (**
+         * Init (re-read) algorithm parameters for each CPU's move.
+         * These may be changed during the game.
+         *)
+        private procedure InitParameters;
+
+		(**
+		 * Current used max evaluation depth.
+		 *)
+		public function GetMaxDepth: TNumberOfSquares;
+		
+		(**
+		 * Number of possible moves for player whose turn now is.
+		 *)
+		public function GetPossibleMoveCount: Byte;
+		
 		public procedure GetEngineMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TPlayerNumber);
 		public procedure GetPlayerMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TPlayerNumber);
 		public procedure RunGame(Players: TPlayerArray);
@@ -158,12 +203,20 @@ type
 		public constructor Create(Owner: TComponent); override;
 		public destructor Destroy; override;
 		
+		//IGameDriver
+		public procedure OnPositionEvaluationStarted;
+		public procedure OnPositionEvaluationChanged;
+		public procedure OnMoveEvaluationCompleted;
+		public procedure OnPositionEvaluationCompleted;
+		public function GetMidgameMaxDepth: TNumberOfSquares;
+		public function GetEndgameMaxDepth: TNumberOfSquares;
+
+		//graphical component events		
 		published procedure OnCreate_MainWindow(Sender: TObject);
 		published procedure OnClose_MainWindow(Sender: TObject; var Action: TCloseAction);
 		published procedure OnDrawCell_DrawGrid(Sender: TObject; Column, Row: Integer; Rect: TRect; State: TGridDrawState);
 		published procedure OnClick_DrawGrid(Sender: TObject);
 		published procedure OnClick_BackForwardButtons(Sender: TObject; Button: TUDBtnType);
-
 		published procedure OnClick_MenuItem__new_game(Sender: TObject);
 		published procedure OnClick_MenuItem_position_modify(Sender: TObject);
 		published procedure OnClick_MenuItem_position_continue(Sender: TObject);
@@ -354,13 +407,33 @@ begin
 	Result.IsLessOrEqual := Evaluation.IsGreaterOrEqual;
 end;
 
+procedure TGameContext.InitParameters;
+begin
+	Self.m__MidgameMaxDepth := Self.m__GameDriver.GetMidgameMaxDepth;
+	Self.m__EndgameMaxDepth := Self.m__GameDriver.GetEndgameMaxDepth;
+
+	if 64 - CountCellsWithState(Self.m__BoardState, 1) - CountCellsWithState(Self.m__BoardState, 2) <= Self.m__EndgameMaxDepth then
+		Self.m__MaxDepth := Self.m__EndgameMaxDepth
+	else
+		Self.m__MaxDepth := Self.m__MidgameMaxDepth;
+end;
+
+function TGameContext.GetMaxDepth: TNumberOfSquares;
+begin
+	Result := Self.m__MaxDepth;
+end;
+
+function TGameContext.GetPossibleMoveCount: Byte;
+begin
+	Result := Self.m__Positions[Self.m_i__WhoseTurn].PossibleMoveCount;
+end;
+
 procedure TGameContext.GetEngineMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TPlayerNumber);
 var
-	I, Depth, MaxDepth: TNumberOfSquares;
-	Max, Res, MinValue, MaxValue: TEvaluation;
+	I, Column, Row, Depth: TNumberOfSquares;
+	Res, MinValue, MaxValue: TEvaluation;
 	EnginePosition, ChildPosition: TPosition;
 	DoSort: Boolean;
-	MainWindow: TMainWindow;
 label
 	done;
 
@@ -375,7 +448,7 @@ label
 		Application.ProcessMessages;		//without this window becomes unresponsive
 		Inc(Depth);
 		
-		if Depth = MaxDepth then
+		if Depth = Self.m__MaxDepth then
 		begin
 			Max := GetHeuristicalEvaluation(Position.BoardState, Position.i__WhoseTurn);
 			goto done;
@@ -430,12 +503,13 @@ label
 	end;
 
 begin
-	MainWindow := TMainWindow(Self.m__GameDriver);
-
-	MainWindow.m__Statusbar.Panels[0].Text := 'Thinking...';
+	Self.InitParameters;
 	
-	MainWindow.m__Progressbar.Max := Self.m__Positions[PlayerNumber].PossibleMoveCount;
-	MainWindow.m__Progressbar.Position := 0;
+	for Column := 1 to 8 do
+		for Row := 1 to 8 do
+			Self.m__Evaluations.CellEvaluations[Column, Row] := '';
+	
+	Self.m__GameDriver.OnPositionEvaluationStarted;
 	
 	Move.Column := 1;
 	Move.Row := 1;
@@ -443,24 +517,7 @@ begin
 	//for Depth := 1 to 15 do
 	//	TranspositionTable[Depth].PositionCount := 0;
 	
-	for Depth := 1 to 8 do
-		for MaxDepth := 1 to 8 do
-			Self.m__Evaluations.CellEvaluations[Depth, MaxDepth] := '';
-	
-	if 64 - CountCellsWithState(BoardState, 1) - CountCellsWithState(BoardState, 2) <= StrToInt(MainWindow.m__EndgameDepthLabeledEdit.Text) then
-		MaxDepth := StrToInt(MainWindow.m__EndgameDepthLabeledEdit.Text)
-	else
-		MaxDepth := StrToInt(MainWindow.m__MidgameDepthLabeledEdit.Text);
-	
-	MainWindow.m__Statusbar.Panels[3].Text := 'Depth='+ IntToStr(MaxDepth);
-	
 	Res.IsHeuristical := True;
-	MainWindow.m__MenuItem_position_modify.Enabled := False;
-	
-	MainWindow.m__MidgameDepthUpDown.Enabled := False;
-	MainWindow.m__EndgameDepthUpDown.Enabled := False;
-	
-	MainWindow.m__DrawGrid.Repaint;
 	Depth := 0;
 	
 	AnalyzePosition(BoardState, PlayerNumber, EnginePosition);
@@ -481,7 +538,7 @@ begin
 	MaxValue.IsGreaterOrEqual := False;
 	MaxValue.PieceCount := 64;
 	
-	Max := MinValue;
+	Self.m__BestEngineMoveEvaluation := MinValue;
 	
 	for I := 1 to EnginePosition.PossibleMoveCount do
 	begin
@@ -489,45 +546,42 @@ begin
 		
 		if ChildPosition.PossibleMoveCount > 0 then
 			if I < EnginePosition.PossibleMoveCount then
-				Res := NegateEvaluation(Evaluate(ChildPosition, NegateEvaluation(MaxValue), NegateEvaluation(Max)))
+				Res := NegateEvaluation(Evaluate(ChildPosition, NegateEvaluation(MaxValue), NegateEvaluation(Self.m__BestEngineMoveEvaluation)))
 			else
-				Res := NegateEvaluation(Evaluate(ChildPosition, NegateEvaluation(Max), NegateEvaluation(Max)))
+				Res := NegateEvaluation(Evaluate(ChildPosition, NegateEvaluation(Self.m__BestEngineMoveEvaluation), NegateEvaluation(Self.m__BestEngineMoveEvaluation)))
 		else
 		begin
 			AnalyzePosition(EnginePosition.ChildPositions[I].BoardState, PlayerNumber, ChildPosition);
 			
 			if ChildPosition.PossibleMoveCount > 0 then
 				if I < EnginePosition.PossibleMoveCount then
-					Res := Evaluate(ChildPosition, Max, MaxValue)
+					Res := Evaluate(ChildPosition, Self.m__BestEngineMoveEvaluation, MaxValue)
 				else
-					Res := Evaluate(ChildPosition, Max, Max)
+					Res := Evaluate(ChildPosition, Self.m__BestEngineMoveEvaluation, Self.m__BestEngineMoveEvaluation)
 			else
 				Res := GetHeuristicalEvaluation(EnginePosition.ChildPositions[I].BoardState, PlayerNumber);
 		end;
 		
-		if (not Res.IsLessOrEqual) and (Res.IsGreaterOrEqual or IsGreaterOrEqual(Res, Max, True)) then
+		if (not Res.IsLessOrEqual) and (Res.IsGreaterOrEqual or IsGreaterOrEqual(Res, Self.m__BestEngineMoveEvaluation, True)) then
 		begin
 			Move := EnginePosition.ChildPositions[I].Move;
-			Max := Res;
+			Self.m__BestEngineMoveEvaluation := Res;
 			Self.m__Evaluations.Best := Move;
-			MainWindow.m__Statusbar.Panels[1].Text := EvaluationToStr_Long(Res);
+			
+			Self.m__GameDriver.OnPositionEvaluationChanged;
 		end;
 		
 		Self.m__Evaluations.CellEvaluations[EnginePosition.ChildPositions[I].Move.Column, EnginePosition.ChildPositions[I].Move.Row] := EvaluationToStr_Short(Res);
-		MainWindow.m__DrawGrid.Repaint;
-		MainWindow.m__Progressbar.Position := MainWindow.m__Progressbar.Position + 1;
 		
-		if IsGreaterOrEqual(Max, MaxValue, True) then
+		Self.m__GameDriver.OnMoveEvaluationCompleted;
+		
+		if IsGreaterOrEqual(Self.m__BestEngineMoveEvaluation, MaxValue, True) then
 			goto done;
 	end;
 	
 	done:
 	
-	MainWindow.m__Statusbar.Panels[0].Text := 'Ready';
-	MainWindow.m__MenuItem_position_modify.Enabled := True;
-	
-	MainWindow.m__MidgameDepthUpDown.Enabled := True;
-	MainWindow.m__EndgameDepthUpDown.Enabled := True;
+	Self.m__GameDriver.OnPositionEvaluationCompleted;
 end;
 
 function IsLegalMove(Column, Row: TCellNumber; Position: TPosition; var MoveNumber: Byte): Boolean;
@@ -621,7 +675,10 @@ begin
 			end;
 			
 		if not IsGameEnd then
+		begin
 			Players[i__WhoseTurn].GetMove(Move, Self.m__BoardState, i__WhoseTurn);
+			Self.m_i__WhoseTurn := i__WhoseTurn;
+		end;
 			
 		if IsLegalMove(Move.Column, Move.Row, Self.m__Positions[i__WhoseTurn], C1) then
 		begin
@@ -658,6 +715,57 @@ begin
 		ShowMessage('Draw');
 			
 	MainWindow.m__MenuItem_position_modify.Enabled := True;
+end;
+
+procedure TMainWindow.OnPositionEvaluationStarted;
+var
+	PossibleMoveCount, MaxDepth: TNumberOfSquares;
+begin
+	PossibleMoveCount := Self.m__GameContext.GetPossibleMoveCount;
+	MaxDepth := Self.m__GameContext.GetMaxDepth;
+		
+	Self.m__Statusbar.Panels[0].Text := 'Thinking...';
+	Self.m__Statusbar.Panels[3].Text := 'Depth='+ IntToStr(MaxDepth);
+	
+	Self.m__Progressbar.Max := PossibleMoveCount;
+	Self.m__Progressbar.Position := 0;
+	
+	Self.m__MenuItem_position_modify.Enabled := False;
+	
+	Self.m__MidgameDepthUpDown.Enabled := False;
+	Self.m__EndgameDepthUpDown.Enabled := False;
+	
+	Self.m__DrawGrid.Repaint;
+end;
+
+procedure TMainWindow.OnPositionEvaluationChanged;
+begin
+	Self.m__Statusbar.Panels[1].Text := EvaluationToStr_Long(Self.m__GameContext.m__BestEngineMoveEvaluation);
+end;
+
+procedure TMainWindow.OnMoveEvaluationCompleted;
+begin
+	Self.m__DrawGrid.Repaint;
+	Self.m__Progressbar.Position := Self.m__Progressbar.Position + 1;
+end;
+
+procedure TMainWindow.OnPositionEvaluationCompleted;
+begin
+	Self.m__Statusbar.Panels[0].Text := 'Ready';
+	Self.m__MenuItem_position_modify.Enabled := True;
+	
+	Self.m__MidgameDepthUpDown.Enabled := True;
+	Self.m__EndgameDepthUpDown.Enabled := True;
+end;
+
+function TMainWindow.GetMidgameMaxDepth: TNumberOfSquares;
+begin
+	Result := StrToInt(Self.m__MidgameDepthLabeledEdit.Text);
+end;
+
+function TMainWindow.GetEndgameMaxDepth: TNumberOfSquares;
+begin
+	Result := StrToInt(Self.m__EndgameDepthLabeledEdit.Text);
 end;
 
 constructor TMainWindow.Create(Owner: TComponent);
