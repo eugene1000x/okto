@@ -12,7 +12,7 @@ var
 {$R *.res}
 
 begin
-	Application.Initialize;
+	Application.Initialize();
 	Application.CreateForm(TMainWindow, MainWindowDummy);
-	Application.Run;
+	Application.Run();
 end.
