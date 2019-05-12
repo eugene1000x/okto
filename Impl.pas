@@ -107,7 +107,7 @@ type
 			CellEvaluations: array [1..8, 1..8] of string;
 		end;
 		
-		public m__BestEngineMoveEvaluation: TEvaluation;
+		private m__BestEngineMoveEvaluation: TEvaluation;
 		
 		public m__GameHistory: TGameHistory;
 		public m__IsInModifyMode, m__DoBreakGame: Boolean;
@@ -133,6 +133,8 @@ type
 		 * Number of possible moves for player whose turn now is.
 		 *)
 		public function GetPossibleMoveCount(): Byte;
+		
+		public function GetBestEngineMoveEvaluation(): TEvaluation;
 		
 		public procedure GetEngineMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TPlayerNumber);
 		public procedure GetPlayerMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TPlayerNumber);
@@ -426,6 +428,11 @@ end;
 function TGameContext.GetPossibleMoveCount(): Byte;
 begin
 	Result := Self.m__Positions[Self.m_i__WhoseTurn].PossibleMoveCount;
+end;
+
+function TGameContext.GetBestEngineMoveEvaluation(): TEvaluation;
+begin
+	Result := Self.m__BestEngineMoveEvaluation;
 end;
 
 procedure TGameContext.GetEngineMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TPlayerNumber);
@@ -740,7 +747,7 @@ end;
 
 procedure TMainWindow.OnPositionEvaluationChanged();
 begin
-	Self.m__Statusbar.Panels[1].Text := EvaluationToStr_Long(Self.m__GameContext.m__BestEngineMoveEvaluation);
+	Self.m__Statusbar.Panels[1].Text := EvaluationToStr_Long(Self.m__GameContext.GetBestEngineMoveEvaluation());
 end;
 
 procedure TMainWindow.OnMoveEvaluationCompleted();
