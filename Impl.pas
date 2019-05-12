@@ -25,7 +25,7 @@ type
 	
 	TPlayer = record
 		Name: string;
-		GetMove: procedure(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TPlayerNumber);
+		GetMove: procedure(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TPlayerNumber) of object;
 	end;
 	
 	TPlayerArray = array [1..2] of TPlayer;
@@ -66,6 +66,10 @@ type
 		end;
 		MoveCount, CurrentMoveNumber: TNumberOfSquares;
 	end;
+	
+	IGameDriver = interface
+		
+	end;
 
 	TGameContext = class
 		public m__BoardState: TBoardState;
@@ -79,9 +83,18 @@ type
 		
 		public m__GameHistory: TGameHistory;
 		public m__IsInModifyMode, m__DoBreakGame: Boolean;
+
+		private m__GameDriver: IGameDriver;
+		
+
+		public constructor Create; overload;		//disallowing to invoke TObject.Create()
+        public constructor Create(GameDriver: IGameDriver); overload;
+		public procedure GetEngineMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TPlayerNumber);
+		public procedure GetPlayerMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TPlayerNumber);
+		public procedure RunGame(Players: TPlayerArray);
 	end;
 	
-	TMainWindow = class(TForm)
+	TMainWindow = class(TForm, IGameDriver)
 		published m__DrawGrid: TDrawGrid;
 		published m__Statusbar: TStatusBar;
 		published m__Progressbar: TProgressBar;
@@ -139,7 +152,7 @@ type
 		published m__YellowPiece: TImage;
 		published m__RedPiece: TImage;
 		
-		public m__GameContext: TGameContext;
+		private m__GameContext: TGameContext;
 		
 		
 		public constructor Create(Owner: TComponent); override;
@@ -159,13 +172,22 @@ type
 		published procedure OnClick_MenuItem__colour__2nd_player__any_submenu(Sender: TObject);
 	end;
 
-var
-	MainWindow: TMainWindow;
-
 
 implementation
 {$R *.dfm}
 
+
+constructor TGameContext.Create;
+begin
+	raise Exception.Create('TGameContext.Create() inherited from TObject should not be used.');
+end;
+
+constructor TGameContext.Create(GameDriver: IGameDriver);
+begin
+	inherited Create;
+	
+	Self.m__GameDriver := GameDriver;
+end;
 
 procedure ClearBoard(var BoardState: TBoardState);
 var
@@ -332,12 +354,13 @@ begin
 	Result.IsLessOrEqual := Evaluation.IsGreaterOrEqual;
 end;
 
-procedure GetEngineMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TPlayerNumber);
+procedure TGameContext.GetEngineMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TPlayerNumber);
 var
 	I, Depth, MaxDepth: TNumberOfSquares;
 	Max, Res, MinValue, MaxValue: TEvaluation;
 	EnginePosition, ChildPosition: TPosition;
 	DoSort: Boolean;
+	MainWindow: TMainWindow;
 label
 	done;
 
@@ -407,9 +430,11 @@ label
 	end;
 
 begin
+	MainWindow := TMainWindow(Self.m__GameDriver);
+
 	MainWindow.m__Statusbar.Panels[0].Text := 'Thinking...';
 	
-	MainWindow.m__Progressbar.Max := MainWindow.m__GameContext.m__Positions[PlayerNumber].PossibleMoveCount;
+	MainWindow.m__Progressbar.Max := Self.m__Positions[PlayerNumber].PossibleMoveCount;
 	MainWindow.m__Progressbar.Position := 0;
 	
 	Move.Column := 1;
@@ -420,7 +445,7 @@ begin
 	
 	for Depth := 1 to 8 do
 		for MaxDepth := 1 to 8 do
-			MainWindow.m__GameContext.m__Evaluations.CellEvaluations[Depth, MaxDepth] := '';
+			Self.m__Evaluations.CellEvaluations[Depth, MaxDepth] := '';
 	
 	if 64 - CountCellsWithState(BoardState, 1) - CountCellsWithState(BoardState, 2) <= StrToInt(MainWindow.m__EndgameDepthLabeledEdit.Text) then
 		MaxDepth := StrToInt(MainWindow.m__EndgameDepthLabeledEdit.Text)
@@ -484,11 +509,11 @@ begin
 		begin
 			Move := EnginePosition.ChildPositions[I].Move;
 			Max := Res;
-			MainWindow.m__GameContext.m__Evaluations.Best := Move;
+			Self.m__Evaluations.Best := Move;
 			MainWindow.m__Statusbar.Panels[1].Text := EvaluationToStr_Long(Res);
 		end;
 		
-		MainWindow.m__GameContext.m__Evaluations.CellEvaluations[EnginePosition.ChildPositions[I].Move.Column, EnginePosition.ChildPositions[I].Move.Row] := EvaluationToStr_Short(Res);
+		Self.m__Evaluations.CellEvaluations[EnginePosition.ChildPositions[I].Move.Column, EnginePosition.ChildPositions[I].Move.Row] := EvaluationToStr_Short(Res);
 		MainWindow.m__DrawGrid.Repaint;
 		MainWindow.m__Progressbar.Position := MainWindow.m__Progressbar.Position + 1;
 		
@@ -520,67 +545,73 @@ begin
 		end;
 end;
 
-procedure GetPlayerMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TPlayerNumber);
+procedure TGameContext.GetPlayerMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TPlayerNumber);
 var
 	MoveNumberDummy: Byte;
+	MainWindow: TMainWindow;
 begin
+	MainWindow := TMainWindow(Self.m__GameDriver);
+
 	repeat
 		Application.ProcessMessages;		//without this window becomes unresponsive
 		
-		if MainWindow.m__GameContext.m__DoBreakGame then
+		if Self.m__DoBreakGame then
 			Exit;
-	until IsLegalMove(MainWindow.m__DrawGrid.Col + 1, MainWindow.m__DrawGrid.Row + 1, MainWindow.m__GameContext.m__Positions[PlayerNumber], MoveNumberDummy);
+	until IsLegalMove(MainWindow.m__DrawGrid.Col + 1, MainWindow.m__DrawGrid.Row + 1, Self.m__Positions[PlayerNumber], MoveNumberDummy);
 	
 	Move.Column := MainWindow.m__DrawGrid.Col + 1;
 	Move.Row := MainWindow.m__DrawGrid.Row + 1;
 end;
 
-procedure RunGame(Players: TPlayerArray);
+procedure TGameContext.RunGame(Players: TPlayerArray);
 var
 	Move: TCellAddress;
 	C1, C2: Byte;
 	i__WhoseTurn: Byte;
 	IsGameEnd: Boolean;
+	MainWindow: TMainWindow;
 begin
+	MainWindow := TMainWindow(Self.m__GameDriver);
+
 	MainWindow.m__MenuItem_position_modify.Enabled := True;
 	
-	MainWindow.m__GameContext.m__Evaluations.Last.Column := 1;
-	MainWindow.m__GameContext.m__Evaluations.Last.Row := 1;
+	Self.m__Evaluations.Last.Column := 1;
+	Self.m__Evaluations.Last.Row := 1;
 	
-	MainWindow.m__Player1PieceCountEdit.Text := IntToStr(CountCellsWithState(MainWindow.m__GameContext.m__BoardState, 1));
-	MainWindow.m__Player2PieceCountEdit.Text := IntToStr(CountCellsWithState(MainWindow.m__GameContext.m__BoardState, 2));
+	MainWindow.m__Player1PieceCountEdit.Text := IntToStr(CountCellsWithState(Self.m__BoardState, 1));
+	MainWindow.m__Player2PieceCountEdit.Text := IntToStr(CountCellsWithState(Self.m__BoardState, 2));
 	
-	AnalyzePosition(MainWindow.m__GameContext.m__BoardState, 1, MainWindow.m__GameContext.m__Positions[1]);
-	AnalyzePosition(MainWindow.m__GameContext.m__BoardState, 2, MainWindow.m__GameContext.m__Positions[2]);
+	AnalyzePosition(Self.m__BoardState, 1, Self.m__Positions[1]);
+	AnalyzePosition(Self.m__BoardState, 2, Self.m__Positions[2]);
 	
 	for C1 := 1 to 8 do
 		for C2 := 1 to 8 do
-			MainWindow.m__GameContext.m__Evaluations.CellEvaluations[C1, C2] := '';
+			Self.m__Evaluations.CellEvaluations[C1, C2] := '';
 			
 	MainWindow.m__DrawGrid.Repaint;
 	
-	MainWindow.m__Statusbar.Panels[2].Text := MainWindow.m__Player1Piece.Hint +' '+ IntToStr(MainWindow.m__GameContext.m__Positions[1].PossibleMoveCount) +' moves  '+
-			MainWindow.m__Player2Piece.Hint +' '+ IntToStr(MainWindow.m__GameContext.m__Positions[2].PossibleMoveCount) +' moves';
+	MainWindow.m__Statusbar.Panels[2].Text := MainWindow.m__Player1Piece.Hint +' '+ IntToStr(Self.m__Positions[1].PossibleMoveCount) +' moves  '+
+			MainWindow.m__Player2Piece.Hint +' '+ IntToStr(Self.m__Positions[2].PossibleMoveCount) +' moves';
 		
 	IsGameEnd := False;
 	i__WhoseTurn := 1;
 	
-	if MainWindow.m__GameContext.m__Positions[1].PossibleMoveCount = 0 then
-		if MainWindow.m__GameContext.m__Positions[2].PossibleMoveCount = 0 then
+	if Self.m__Positions[1].PossibleMoveCount = 0 then
+		if Self.m__Positions[2].PossibleMoveCount = 0 then
 			IsGameEnd := True;
 		
 	while not IsGameEnd do
 	begin
-		if MainWindow.m__GameContext.m__DoBreakGame then
+		if Self.m__DoBreakGame then
 			Exit;
 		
 		MainWindow.m__DrawGrid.Selection := TGridRect(MainWindow.m__DrawGrid.CellRect(-1, -1));
 		
-		AnalyzePosition(MainWindow.m__GameContext.m__BoardState, 1, MainWindow.m__GameContext.m__Positions[1]);
-		AnalyzePosition(MainWindow.m__GameContext.m__BoardState, 2, MainWindow.m__GameContext.m__Positions[2]);
+		AnalyzePosition(Self.m__BoardState, 1, Self.m__Positions[1]);
+		AnalyzePosition(Self.m__BoardState, 2, Self.m__Positions[2]);
 		
-		if MainWindow.m__GameContext.m__Positions[i__WhoseTurn].PossibleMoveCount = 0 then
-			if MainWindow.m__GameContext.m__Positions[3 - i__WhoseTurn].PossibleMoveCount = 0 then
+		if Self.m__Positions[i__WhoseTurn].PossibleMoveCount = 0 then
+			if Self.m__Positions[3 - i__WhoseTurn].PossibleMoveCount = 0 then
 				IsGameEnd := True
 			else
 			begin
@@ -590,34 +621,34 @@ begin
 			end;
 			
 		if not IsGameEnd then
-			Players[i__WhoseTurn].GetMove(Move, MainWindow.m__GameContext.m__BoardState, i__WhoseTurn);
+			Players[i__WhoseTurn].GetMove(Move, Self.m__BoardState, i__WhoseTurn);
 			
-		if IsLegalMove(Move.Column, Move.Row, MainWindow.m__GameContext.m__Positions[i__WhoseTurn], C1) then
+		if IsLegalMove(Move.Column, Move.Row, Self.m__Positions[i__WhoseTurn], C1) then
 		begin
-			MainWindow.m__GameContext.m__BoardState := MainWindow.m__GameContext.m__Positions[i__WhoseTurn].ChildPositions[C1].BoardState;
-			MainWindow.m__GameContext.m__Evaluations.Last := Move;
-			MainWindow.m__GameContext.m__GameHistory.MoveCount := MainWindow.m__GameContext.m__GameHistory.MoveCount + 1;
-			MainWindow.m__GameContext.m__GameHistory.CurrentMoveNumber := MainWindow.m__GameContext.m__GameHistory.CurrentMoveNumber + 1;
-			MainWindow.m__BackForwardButtons.Position := MainWindow.m__GameContext.m__GameHistory.CurrentMoveNumber;
-			MainWindow.m__GameContext.m__GameHistory.Positions[MainWindow.m__GameContext.m__GameHistory.MoveCount].BoardState := MainWindow.m__GameContext.m__BoardState;
-			MainWindow.m__GameContext.m__GameHistory.Positions[MainWindow.m__GameContext.m__GameHistory.MoveCount].i__WhoseTurn := i__WhoseTurn;
+			Self.m__BoardState := Self.m__Positions[i__WhoseTurn].ChildPositions[C1].BoardState;
+			Self.m__Evaluations.Last := Move;
+			Self.m__GameHistory.MoveCount := Self.m__GameHistory.MoveCount + 1;
+			Self.m__GameHistory.CurrentMoveNumber := Self.m__GameHistory.CurrentMoveNumber + 1;
+			MainWindow.m__BackForwardButtons.Position := Self.m__GameHistory.CurrentMoveNumber;
+			Self.m__GameHistory.Positions[Self.m__GameHistory.MoveCount].BoardState := Self.m__BoardState;
+			Self.m__GameHistory.Positions[Self.m__GameHistory.MoveCount].i__WhoseTurn := i__WhoseTurn;
 			MainWindow.m__DrawGrid.Repaint;
 		end;
 		
 		i__WhoseTurn := 3 - i__WhoseTurn;
 		
-		AnalyzePosition(MainWindow.m__GameContext.m__BoardState, 1, MainWindow.m__GameContext.m__Positions[1]);
-		AnalyzePosition(MainWindow.m__GameContext.m__BoardState, 2, MainWindow.m__GameContext.m__Positions[2]);
+		AnalyzePosition(Self.m__BoardState, 1, Self.m__Positions[1]);
+		AnalyzePosition(Self.m__BoardState, 2, Self.m__Positions[2]);
 		
-		MainWindow.m__Statusbar.Panels[2].Text := MainWindow.m__Player1Piece.Hint +' '+ IntToStr(MainWindow.m__GameContext.m__Positions[1].PossibleMoveCount) +' moves  '+
-				MainWindow.m__Player2Piece.Hint +' '+ IntToStr(MainWindow.m__GameContext.m__Positions[2].PossibleMoveCount) +' moves';
+		MainWindow.m__Statusbar.Panels[2].Text := MainWindow.m__Player1Piece.Hint +' '+ IntToStr(Self.m__Positions[1].PossibleMoveCount) +' moves  '+
+				MainWindow.m__Player2Piece.Hint +' '+ IntToStr(Self.m__Positions[2].PossibleMoveCount) +' moves';
 		
-		MainWindow.m__Player1PieceCountEdit.Text := IntToStr(CountCellsWithState(MainWindow.m__GameContext.m__BoardState, 1));
-		MainWindow.m__Player2PieceCountEdit.Text := IntToStr(CountCellsWithState(MainWindow.m__GameContext.m__BoardState, 2));
+		MainWindow.m__Player1PieceCountEdit.Text := IntToStr(CountCellsWithState(Self.m__BoardState, 1));
+		MainWindow.m__Player2PieceCountEdit.Text := IntToStr(CountCellsWithState(Self.m__BoardState, 2));
 	end;
 	
-	C1 := CountCellsWithState(MainWindow.m__GameContext.m__BoardState, 1);
-	C2 := CountCellsWithState(MainWindow.m__GameContext.m__BoardState, 2);
+	C1 := CountCellsWithState(Self.m__BoardState, 1);
+	C2 := CountCellsWithState(Self.m__BoardState, 2);
 	
 	if C1 > C2 then
 		ShowMessage('Winner is '+ Players[1].name)
@@ -633,7 +664,7 @@ constructor TMainWindow.Create(Owner: TComponent);
 begin
 	inherited Create(Owner);
 
-    Self.m__GameContext := TGameContext.Create;
+    Self.m__GameContext := TGameContext.Create(Self);
 end;
 
 destructor TMainWindow.Destroy;
@@ -868,29 +899,29 @@ begin
 	
 	if Self.m__MenuItem__players__cpu_vs_cpu.Checked or Self.m__MenuItem__players__cpu_vs_human.Checked then
 	begin
-		Self.m__GameContext.m__Players[1].GetMove := GetEngineMove;
+		Self.m__GameContext.m__Players[1].GetMove := Self.m__GameContext.GetEngineMove;
 		Self.m__GameContext.m__Players[1].Name := 'CPU';
 	end
 	else
 	begin
-		Self.m__GameContext.m__Players[1].GetMove := GetPlayerMove;
+		Self.m__GameContext.m__Players[1].GetMove := Self.m__GameContext.GetPlayerMove;
 		Self.m__GameContext.m__Players[1].Name := 'human';
 	end;
 	
 	if Self.m__MenuItem__players__2_players.Checked or Self.m__MenuItem__players__cpu_vs_human.Checked then
 	begin
-		Self.m__GameContext.m__Players[2].GetMove := GetPlayerMove;
+		Self.m__GameContext.m__Players[2].GetMove := Self.m__GameContext.GetPlayerMove;
 		Self.m__GameContext.m__Players[2].Name := 'human';
 	end
 	else
 	begin
-		Self.m__GameContext.m__Players[2].GetMove := GetEngineMove;
+		Self.m__GameContext.m__Players[2].GetMove := Self.m__GameContext.GetEngineMove;
 		Self.m__GameContext.m__Players[2].Name := 'CPU';
 	end;
 	
 	Self.m__Player1Label.Caption := Self.m__GameContext.m__Players[1].Name;
 	Self.m__Player2Label.Caption := Self.m__GameContext.m__Players[2].Name;
-	RunGame(Self.m__GameContext.m__Players);
+	Self.m__GameContext.RunGame(Self.m__GameContext.m__Players);
 	Self.m__DrawGrid.Repaint;
 end;
 
@@ -913,7 +944,7 @@ begin
 	Self.m__GameContext.m__GameHistory.MoveCount := 1;
 	Self.m__GameContext.m__GameHistory.CurrentMoveNumber := 1;
 	Self.m__BackForwardButtons.Position := Self.m__GameContext.m__GameHistory.CurrentMoveNumber;
-	RunGame(Self.m__GameContext.m__Players);
+	Self.m__GameContext.RunGame(Self.m__GameContext.m__Players);
 end;
 
 procedure TMainWindow.OnClick_MenuItem__players__any_submenu(Sender: TObject);
@@ -927,23 +958,23 @@ begin
 	
 	if Self.m__MenuItem__players__cpu_vs_cpu.Checked or Self.m__MenuItem__players__cpu_vs_human.Checked then
 	begin
-		Self.m__GameContext.m__Players[1].GetMove := GetEngineMove;
+		Self.m__GameContext.m__Players[1].GetMove := Self.m__GameContext.GetEngineMove;
 		Self.m__GameContext.m__Players[1].Name := 'CPU';
 	end
 	else
 	begin
-		Self.m__GameContext.m__Players[1].GetMove := GetPlayerMove;
+		Self.m__GameContext.m__Players[1].GetMove := Self.m__GameContext.GetPlayerMove;
 		Self.m__GameContext.m__Players[1].Name := 'human';
 	end;
 	
 	if Self.m__MenuItem__players__2_players.Checked or Self.m__MenuItem__players__cpu_vs_human.Checked then
 	begin
-		Self.m__GameContext.m__Players[2].GetMove := GetPlayerMove;
+		Self.m__GameContext.m__Players[2].GetMove := Self.m__GameContext.GetPlayerMove;
 		Self.m__GameContext.m__Players[2].Name := 'human';
 	end
 	else
 	begin
-		Self.m__GameContext.m__Players[2].GetMove := GetEngineMove;
+		Self.m__GameContext.m__Players[2].GetMove := Self.m__GameContext.GetEngineMove;
 		Self.m__GameContext.m__Players[2].Name := 'CPU';
 	end;
 	
