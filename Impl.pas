@@ -36,13 +36,11 @@ type
 		BoardState: TBoardState;
 	end;
 	
-	TChildPositionArray = array [TIntCellCount] of TChildPosition;
-	
 	TPosition = record
 		BoardState: TBoardState;
 		i__WhoseTurn: TIntOptionalPlayerNumber;
 		PossibleMoveCount: TIntCellCount;
-		ChildPositions: TChildPositionArray;
+		ChildPositions: array [TIntCellCount] of TChildPosition;
 	end;
 	
 	TEvaluation = record
