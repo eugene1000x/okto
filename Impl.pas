@@ -11,6 +11,8 @@ uses
 
 const
 	BOARD_DIMENSION = 8;
+	PLAYER_TYPE_CPU = Byte(14);
+	PLAYER_TYPE_HUMAN = Byte(15);
 
 type
 	TPlayerNumber = 1..2;
@@ -88,6 +90,11 @@ type
 		
 		procedure OnPositionEvaluationCompleted();
 		
+		(**
+		 * Called when cell has been changed in board modify mode.
+		 *)
+		procedure OnCellStateChanged();
+		
 		function GetMidgameMaxDepth(): TNumberOfSquares;
 		function GetEndgameMaxDepth(): TNumberOfSquares;
 	end;
@@ -96,7 +103,7 @@ type
 	 * Class that contains logic related to the game (algorithms, game state, etc.) and that runs the game.
 	 *)
 	TGameContext = class
-		public m__BoardState: TBoardState;
+		private m__BoardState: TBoardState;
 		public m__Positions: array [1..2] of TPosition;
 		public m__Players: TPlayerArray;
 		private m_i__WhoseTurn: Byte;
@@ -136,8 +143,26 @@ type
 		
 		public function GetBestEngineMoveEvaluation(): TEvaluation;
 		
+		public function GetCellState(Column, Row: Byte): TCellState;
+		public procedure SetCellState(Column, Row: Byte; CellState: TCellState);
+		public procedure FinishBoardModification();
+		public procedure GoBack();
+		public procedure GoForward();
+		
 		public procedure GetEngineMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TPlayerNumber);
 		public procedure GetPlayerMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TPlayerNumber);
+		
+		(**
+		 * Starts new game from standard initial position (with 4 pieces).
+		 * 
+		 * @param Player1Type Player to make first move. One of PLAYER_TYPE_* constants.
+		 * @param Player2Type Player to make second move. One of PLAYER_TYPE_* constants.
+		 *)
+		public procedure StartNewGame(Player1Type, Player2Type: Byte);
+		
+		(**
+		 * Runs game from current position on the board.
+		 *)
 		public procedure RunGame(Players: TPlayerArray);
 	end;
 	
@@ -210,6 +235,7 @@ type
 		public procedure OnPositionEvaluationChanged();
 		public procedure OnMoveEvaluationCompleted();
 		public procedure OnPositionEvaluationCompleted();
+		public procedure OnCellStateChanged();
 		public function GetMidgameMaxDepth(): TNumberOfSquares;
 		public function GetEndgameMaxDepth(): TNumberOfSquares;
 
@@ -435,6 +461,46 @@ begin
 	Result := Self.m__BestEngineMoveEvaluation;
 end;
 
+function TGameContext.GetCellState(Column, Row: Byte): TCellState;
+begin
+	Result := Self.m__BoardState[Column + 1, Row + 1];
+end;
+
+procedure TGameContext.SetCellState(Column, Row: Byte; CellState: TCellState);
+begin
+	if not Self.m__IsInModifyMode then
+		Exit();
+		
+	Self.m__BoardState[Column + 1, Row + 1] := CellState;
+	
+	Self.m__GameDriver.OnCellStateChanged();
+end;
+
+procedure TGameContext.FinishBoardModification();
+begin
+	Self.m__DoBreakGame := False;
+	Self.m__IsInModifyMode := False;
+	Self.m__GameHistory.Positions[1].BoardState := Self.m__BoardState;
+	Self.m__GameHistory.MoveCount := 1;
+	Self.m__GameHistory.CurrentMoveNumber := 1;
+end;
+
+procedure TGameContext.GoBack();
+begin
+	if Self.m__GameHistory.CurrentMoveNumber - 1 >= 1 then
+		Dec(Self.m__GameHistory.CurrentMoveNumber);
+		
+	Self.m__BoardState := Self.m__GameHistory.Positions[Self.m__GameHistory.CurrentMoveNumber].BoardState;
+end;
+
+procedure TGameContext.GoForward();
+begin
+	if Self.m__GameHistory.CurrentMoveNumber + 1 <= Self.m__GameHistory.MoveCount then
+		Inc(Self.m__GameHistory.CurrentMoveNumber);
+		
+	Self.m__BoardState := Self.m__GameHistory.Positions[Self.m__GameHistory.CurrentMoveNumber].BoardState;
+end;
+
 procedure TGameContext.GetEngineMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TPlayerNumber);
 var
 	I, Column, Row, Depth: TNumberOfSquares;
@@ -624,6 +690,46 @@ begin
 	Move.Row := MainWindow.m__DrawGrid.Row + 1;
 end;
 
+procedure TGameContext.StartNewGame(Player1Type, Player2Type: Byte);
+begin
+	ClearBoard(Self.m__BoardState);
+	InitBoard(Self.m__BoardState);
+	
+	ClearBoard(Self.m__GameHistory.Positions[1].BoardState);
+	InitBoard(Self.m__GameHistory.Positions[1].BoardState);
+	
+	Self.m__GameHistory.MoveCount := 1;
+	Self.m__GameHistory.CurrentMoveNumber := 1;
+	
+	if Player1Type = PLAYER_TYPE_HUMAN then
+	begin
+		Self.m__Players[1].GetMove := Self.GetPlayerMove;
+		Self.m__Players[1].Name := 'human';
+	end
+	else if Player1Type = PLAYER_TYPE_CPU then
+	begin
+		Self.m__Players[1].GetMove := Self.GetEngineMove;
+		Self.m__Players[1].Name := 'CPU';
+	end
+	else
+		Assert(false, 'Player1Type must be one of PLAYER_TYPE_* constants: '+ IntToStr(Player1Type));
+		
+	if Player2Type = PLAYER_TYPE_HUMAN then
+	begin
+		Self.m__Players[2].GetMove := Self.GetPlayerMove;
+		Self.m__Players[2].Name := 'human';
+	end
+	else if Player2Type = PLAYER_TYPE_CPU then
+	begin
+		Self.m__Players[2].GetMove := Self.GetEngineMove;
+		Self.m__Players[2].Name := 'CPU';
+	end
+	else
+		Assert(false, 'Player2Type must be one of PLAYER_TYPE_* constants: '+ IntToStr(Player2Type));
+	
+	Self.RunGame(Self.m__Players);
+end;
+
 procedure TGameContext.RunGame(Players: TPlayerArray);
 var
 	Move: TCellAddress;
@@ -763,6 +869,11 @@ begin
 	
 	Self.m__MidgameDepthUpDown.Enabled := True;
 	Self.m__EndgameDepthUpDown.Enabled := True;
+end;
+
+procedure TMainWindow.OnCellStateChanged();
+begin
+	Self.m__DrawGrid.Repaint();
 end;
 
 function TMainWindow.GetMidgameMaxDepth(): TNumberOfSquares;
@@ -922,14 +1033,14 @@ begin
 	Self.m__DrawGrid.Canvas.Brush.Color := clWhite;
 	Self.m__DrawGrid.Canvas.FillRect(Rect);
 	
-	case Self.m__GameContext.m__BoardState[Column + 1, Row + 1] of
+	case Self.m__GameContext.GetCellState(Column, Row) of
 		1:
 			Self.m__DrawGrid.Canvas.StretchDraw(Rect, Self.m__Player1Piece.Picture.Bitmap);
 		2:
 			Self.m__DrawGrid.Canvas.StretchDraw(Rect, Self.m__Player2Piece.Picture.Bitmap);
 	end;
 	
-	if (Self.m__GameContext.m__Evaluations.Last.Column = Column + 1) and (Self.m__GameContext.m__Evaluations.Last.Row = Row + 1) and (Self.m__GameContext.m__BoardState[Column + 1, Row + 1] > 0) then
+	if (Self.m__GameContext.m__Evaluations.Last.Column = Column + 1) and (Self.m__GameContext.m__Evaluations.Last.Row = Row + 1) and (Self.m__GameContext.GetCellState(Column, Row) > 0) then
 	begin
 		Self.m__DrawGrid.Canvas.Pen.Color := clRed;
 		Self.m__DrawGrid.Canvas.MoveTo(Rect.Left, Rect.Top);
@@ -968,75 +1079,85 @@ begin
 end;
 
 procedure TMainWindow.OnClick_DrawGrid(Sender: TObject);
+var
+	CurrentCellState, NewCellState: TCellState;
 begin
-	if not Self.m__GameContext.m__IsInModifyMode then
-		Exit();
-		
-	repeat
-		Self.m__GameContext.m__BoardState[Self.m__DrawGrid.Col + 1, Self.m__DrawGrid.Row + 1] := (Self.m__GameContext.m__BoardState[Self.m__DrawGrid.Col + 1, Self.m__DrawGrid.Row + 1] + 1) mod 3;
-	until not ((Self.m__GameContext.m__BoardState[Self.m__DrawGrid.Col + 1, Self.m__DrawGrid.Row + 1] = 0) and (Self.m__DrawGrid.Col + 1 in [4, 5]) and (Self.m__DrawGrid.Row + 1 in [4, 5]));
+	CurrentCellState := Self.m__GameContext.GetCellState(Self.m__DrawGrid.Col, Self.m__DrawGrid.Row);
+	NewCellState := CurrentCellState;
 	
-	Self.m__DrawGrid.Repaint();
+	repeat
+		NewCellState := (NewCellState + 1) mod 3;
+	until not ((NewCellState = 0) and (Self.m__DrawGrid.Col + 1 in [4, 5]) and (Self.m__DrawGrid.Row + 1 in [4, 5]));
+	
+	Self.m__GameContext.SetCellState(Self.m__DrawGrid.Col, Self.m__DrawGrid.Row, NewCellState);
 end;
 
 procedure TMainWindow.OnClick_BackForwardButtons(Sender: TObject; Button: TUDBtnType);
 begin
 	if Button = btNext then
-		if Self.m__GameContext.m__GameHistory.CurrentMoveNumber + 1 <= Self.m__GameContext.m__GameHistory.MoveCount then
-			Inc(Self.m__GameContext.m__GameHistory.CurrentMoveNumber);
+		Self.m__GameContext.GoForward();
 	
 	if Button = btPrev then
-		if Self.m__GameContext.m__GameHistory.CurrentMoveNumber - 1 >= 1 then
-			Dec(Self.m__GameContext.m__GameHistory.CurrentMoveNumber);
+		Self.m__GameContext.GoBack();
 	
 	Self.m__BackForwardButtons.Position := Self.m__GameContext.m__GameHistory.CurrentMoveNumber;
-	Self.m__GameContext.m__BoardState := Self.m__GameContext.m__GameHistory.Positions[Self.m__GameContext.m__GameHistory.CurrentMoveNumber].BoardState;
-	
 	Self.m__DrawGrid.Repaint();
 end;
 
 procedure TMainWindow.OnClick_MenuItem__new_game(Sender: TObject);
+var
+	Player1Type, Player2Type: Byte;
+	Player1Name, Player2Name: string;
 begin
-	ClearBoard(Self.m__GameContext.m__BoardState);
-	InitBoard(Self.m__GameContext.m__BoardState);
-	ClearBoard(Self.m__GameContext.m__GameHistory.Positions[1].BoardState);
-	InitBoard(Self.m__GameContext.m__GameHistory.Positions[1].BoardState);
-	
-	Self.m__GameContext.m__GameHistory.MoveCount := 1;
-	Self.m__GameContext.m__GameHistory.CurrentMoveNumber := 1;
-	
-	Self.m__BackForwardButtons.Position := Self.m__GameContext.m__GameHistory.CurrentMoveNumber;
-	
+	Self.m__BackForwardButtons.Position := 1;
 	Self.m__DrawGrid.DefaultDrawing := False;
 	
 	Self.m__Statusbar.Panels[0].Text := '';
 	Self.m__Statusbar.Panels[1].Text := '';
 	
-	if Self.m__MenuItem__players__cpu_vs_cpu.Checked or Self.m__MenuItem__players__cpu_vs_human.Checked then
+	
+	if Self.m__MenuItem__players__2_players.Checked then
 	begin
-		Self.m__GameContext.m__Players[1].GetMove := Self.m__GameContext.GetEngineMove;
-		Self.m__GameContext.m__Players[1].Name := 'CPU';
+		Player1Type := PLAYER_TYPE_HUMAN;
+		Player2Type := PLAYER_TYPE_HUMAN;
+	end
+	else if Self.m__MenuItem__players__human_vs_cpu.Checked then
+	begin
+		Player1Type := PLAYER_TYPE_HUMAN;
+		Player2Type := PLAYER_TYPE_CPU;
+	end
+	else if Self.m__MenuItem__players__cpu_vs_human.Checked then
+	begin
+		Player1Type := PLAYER_TYPE_CPU;
+		Player2Type := PLAYER_TYPE_HUMAN;
+	end
+	else if Self.m__MenuItem__players__cpu_vs_cpu.Checked then
+	begin
+		Player1Type := PLAYER_TYPE_CPU;
+		Player2Type := PLAYER_TYPE_CPU;
 	end
 	else
-	begin
-		Self.m__GameContext.m__Players[1].GetMove := Self.m__GameContext.GetPlayerMove;
-		Self.m__GameContext.m__Players[1].Name := 'human';
-	end;
+		Assert(false, 'None of menu items is checked');
 	
-	if Self.m__MenuItem__players__2_players.Checked or Self.m__MenuItem__players__cpu_vs_human.Checked then
-	begin
-		Self.m__GameContext.m__Players[2].GetMove := Self.m__GameContext.GetPlayerMove;
-		Self.m__GameContext.m__Players[2].Name := 'human';
-	end
+	if Player1Type = PLAYER_TYPE_HUMAN then
+		Player1Name := 'human'
+	else if Player1Type = PLAYER_TYPE_CPU then
+		Player1Name := 'CPU'
 	else
-	begin
-		Self.m__GameContext.m__Players[2].GetMove := Self.m__GameContext.GetEngineMove;
-		Self.m__GameContext.m__Players[2].Name := 'CPU';
-	end;
+		Assert(false, 'Player1Type must be one of PLAYER_TYPE_* constants: '+ IntToStr(Player1Type));
+		
+	if Player2Type = PLAYER_TYPE_HUMAN then
+		Player2Name := 'human'
+	else if Player2Type = PLAYER_TYPE_CPU then
+		Player2Name := 'CPU'
+	else
+		Assert(false, 'Player2Type must be one of PLAYER_TYPE_* constants: '+ IntToStr(Player2Type));
 	
-	Self.m__Player1Label.Caption := Self.m__GameContext.m__Players[1].Name;
-	Self.m__Player2Label.Caption := Self.m__GameContext.m__Players[2].Name;
-	Self.m__GameContext.RunGame(Self.m__GameContext.m__Players);
+	Self.m__Player1Label.Caption := Player1Name;//Self.m__GameContext.m__Players[1].Name;
+	Self.m__Player2Label.Caption := Player2Name;//Self.m__GameContext.m__Players[2].Name;
+	
+	Self.m__GameContext.StartNewGame(Player1Type, Player2Type);
+
 	Self.m__DrawGrid.Repaint();
 end;
 
@@ -1052,12 +1173,10 @@ procedure TMainWindow.OnClick_MenuItem_position_continue(Sender: TObject);
 begin
 	Self.m__MenuItem_position_modify.Enabled := True;
 	Self.m__MenuItem_position_continue.Enabled := False;
-	Self.m__GameContext.m__DoBreakGame := False;
-	Self.m__GameContext.m__IsInModifyMode := False;
 	Self.m__DrawGrid.Selection := TGridRect(Self.m__DrawGrid.CellRect(-1, -1));
-	Self.m__GameContext.m__GameHistory.Positions[1].BoardState := Self.m__GameContext.m__BoardState;
-	Self.m__GameContext.m__GameHistory.MoveCount := 1;
-	Self.m__GameContext.m__GameHistory.CurrentMoveNumber := 1;
+	
+	Self.m__GameContext.FinishBoardModification();
+	
 	Self.m__BackForwardButtons.Position := Self.m__GameContext.m__GameHistory.CurrentMoveNumber;
 	Self.m__GameContext.RunGame(Self.m__GameContext.m__Players);
 end;
