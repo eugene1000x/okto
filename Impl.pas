@@ -112,7 +112,7 @@ type
 		
 		private m__BestEngineMoveEvaluation: TEvaluation;
 		
-		public m__GameHistory: TGameHistory;
+		private m__GameHistory: TGameHistory;
 		public m__IsInModifyMode, m__DoBreakGame: Boolean;
 
 		private m__GameDriver: IGameDriver;
@@ -146,6 +146,7 @@ type
 		public procedure FinishBoardModification();
 		public procedure GoBack();
 		public procedure GoForward();
+		public function GetCurrentMoveNumberInHistory(): TIntCellCount;
 		
 		public procedure GetEngineMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TIntPlayerNumber);
 		public procedure GetPlayerMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TIntPlayerNumber);
@@ -500,6 +501,11 @@ begin
 		Inc(Self.m__GameHistory.CurrentMoveNumber);
 		
 	Self.m__BoardState := Self.m__GameHistory.Positions[Self.m__GameHistory.CurrentMoveNumber].BoardState;
+end;
+
+function TGameContext.GetCurrentMoveNumberInHistory(): TIntCellCount;
+begin
+	Result := Self.m__GameHistory.CurrentMoveNumber;
 end;
 
 procedure TGameContext.GetEngineMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TIntPlayerNumber);
@@ -1097,7 +1103,7 @@ begin
 	if Button = btPrev then
 		Self.m__GameContext.GoBack();
 	
-	Self.m__BackForwardButtons.Position := Self.m__GameContext.m__GameHistory.CurrentMoveNumber;
+	Self.m__BackForwardButtons.Position := Self.m__GameContext.GetCurrentMoveNumberInHistory();
 	Self.m__DrawGrid.Repaint();
 end;
 
@@ -1174,7 +1180,7 @@ begin
 	
 	Self.m__GameContext.FinishBoardModification();
 	
-	Self.m__BackForwardButtons.Position := Self.m__GameContext.m__GameHistory.CurrentMoveNumber;
+	Self.m__BackForwardButtons.Position := Self.m__GameContext.GetCurrentMoveNumberInHistory();
 	Self.m__GameContext.RunGame();
 end;
 
