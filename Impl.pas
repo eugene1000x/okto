@@ -382,20 +382,18 @@ begin
 	for I := 1 to 4 do
 		if (BoardState[G[I][1], G[I][2]] = PlayerNumber) or ((BoardState[K[I][1], K[I][2]] = 3 - PlayerNumber) and (BoardState[G[I][1], G[I][2]] = 0)) then
 			Result.PieceCount := Result.PieceCount + 100
-		else
-			if (BoardState[G[I][1], G[I][2]] = 3 - PlayerNumber) or ((BoardState[K[I][1], K[I][2]] = PlayerNumber) and (BoardState[G[I][1], G[I][2]] = 0)) then
-				Result.PieceCount := Result.PieceCount - 100;
+		else if (BoardState[G[I][1], G[I][2]] = 3 - PlayerNumber) or ((BoardState[K[I][1], K[I][2]] = PlayerNumber) and (BoardState[G[I][1], G[I][2]] = 0)) then
+			Result.PieceCount := Result.PieceCount - 100;
 end;
 
 function IsGreaterOrEqual(Evaluation1, Evaluation2: TEvaluation; Equal: Boolean): Boolean;
 begin
 	if Evaluation1.IsHeuristical = Evaluation2.IsHeuristical then
 		Result := (Evaluation1.PieceCount > Evaluation2.PieceCount) or ((Evaluation1.PieceCount = Evaluation2.PieceCount) and (Equal or ((Evaluation1.IsGreaterOrEqual) and (Evaluation2.IsGreaterOrEqual = False))))
+	else if not Evaluation1.IsHeuristical then
+		Result := Evaluation1.PieceCount >= 0
 	else
-		if not Evaluation1.IsHeuristical then
-			Result := Evaluation1.PieceCount >= 0
-		else
-			Result := Evaluation2.PieceCount < 0;
+		Result := Evaluation2.PieceCount < 0;
 end;
 
 function EvaluationToStr_Long(Evaluation: TEvaluation): string;
@@ -1068,17 +1066,16 @@ begin
 			Draw(Rect.Left, Rect.Top, Self.m__LessOrEqual.Picture.Graphic);
 			TextOut(Rect.Left + 8, Rect.Top, Text);
 		end
+	else if Copy(Text, 1, 2) = '>=' then
+		with Self.m__DrawGrid.Canvas do
+		begin
+			Delete(Text, 1, 2);
+			Pen.Color := clBlack;
+			Draw(Rect.Left, Rect.Top, Self.m__GreaterOrEqual.Picture.Graphic);
+			TextOut(Rect.Left + 8, Rect.Top, Text);
+		end
 	else
-		if Copy(Text, 1, 2) = '>=' then
-			with Self.m__DrawGrid.Canvas do
-			begin
-				Delete(Text, 1, 2);
-				Pen.Color := clBlack;
-				Draw(Rect.Left, Rect.Top, Self.m__GreaterOrEqual.Picture.Graphic);
-				TextOut(Rect.Left + 8, Rect.Top, Text);
-			end
-		else
-			Self.m__DrawGrid.Canvas.TextOut(Rect.Left, Rect.Top, Text);
+		Self.m__DrawGrid.Canvas.TextOut(Rect.Left, Rect.Top, Text);
 end;
 
 procedure TMainWindow.OnClick_DrawGrid(Sender: TObject);
