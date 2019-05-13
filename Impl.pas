@@ -260,7 +260,7 @@ implementation
 
 constructor TGameContext.Create();
 begin
-	raise Exception.Create('TGameContext.Create() inherited from TObject should not be used.');
+	Assert(False, 'TGameContext.Create() inherited from TObject should not be used.');
 end;
 
 constructor TGameContext.Create(GameDriver: IGameDriver);
