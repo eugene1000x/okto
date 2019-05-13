@@ -629,12 +629,12 @@ begin
 	MinValue.IsHeuristical := False;
 	MinValue.IsLessOrEqual := False;
 	MinValue.IsGreaterOrEqual := False;
-	MinValue.PieceCount := -64;
+	MinValue.PieceCount := -(BOARD_DIMENSION * BOARD_DIMENSION);
 	
 	MaxValue.IsHeuristical := False;
 	MaxValue.IsLessOrEqual := False;
 	MaxValue.IsGreaterOrEqual := False;
-	MaxValue.PieceCount := 64;
+	MaxValue.PieceCount := BOARD_DIMENSION * BOARD_DIMENSION;
 	
 	Self.m__BestEngineMoveEvaluation := MinValue;
 	
