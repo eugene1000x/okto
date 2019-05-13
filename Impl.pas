@@ -106,11 +106,12 @@ type
 		private m__MidgameMaxDepth, m__EndgameMaxDepth, m__MaxDepth: TIntCellCount;
 		
 		private m__Evaluations: record
-			Last, Best: TCellAddress;		//TODO: "Last" does not belong in this structure, it's last made move in the game.
+			Best: TCellAddress;
 			CellEvaluations: array [1..8, 1..8] of string;
 		end;
 		
 		private m__BestEngineMoveEvaluation: TEvaluation;
+		private m__LastMadeMove: TCellAddress;
 		
 		private m__GameHistory: TGameHistory;
 		public m__IsInModifyMode, m__DoBreakGame: Boolean;
@@ -471,7 +472,7 @@ end;
 
 function TGameContext.GetLastMove(): TCellAddress;
 begin
-	Result := Self.m__Evaluations.Last;
+	Result := Self.m__LastMadeMove;
 end;
 
 function TGameContext.GetBestMoveFoundTillNow(): TCellAddress;
@@ -766,8 +767,8 @@ begin
 
 	MainWindow.m__MenuItem_position_modify.Enabled := True;
 	
-	Self.m__Evaluations.Last.Column := 1;
-	Self.m__Evaluations.Last.Row := 1;
+	Self.m__LastMadeMove.Column := 1;
+	Self.m__LastMadeMove.Row := 1;
 	
 	MainWindow.m__Player1PieceCountEdit.Text := IntToStr(CountCellsWithState(Self.m__BoardState, 1));
 	MainWindow.m__Player2PieceCountEdit.Text := IntToStr(CountCellsWithState(Self.m__BoardState, 2));
@@ -820,7 +821,7 @@ begin
 		if IsLegalMove(Move.Column, Move.Row, Self.m__Positions[i__WhoseTurn], C1) then
 		begin
 			Self.m__BoardState := Self.m__Positions[i__WhoseTurn].ChildPositions[C1].BoardState;
-			Self.m__Evaluations.Last := Move;
+			Self.m__LastMadeMove := Move;
 			Self.m__GameHistory.MoveCount := Self.m__GameHistory.MoveCount + 1;
 			Self.m__GameHistory.CurrentMoveNumber := Self.m__GameHistory.CurrentMoveNumber + 1;
 			MainWindow.m__BackForwardButtons.Position := Self.m__GameHistory.CurrentMoveNumber;
