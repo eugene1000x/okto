@@ -29,7 +29,6 @@ type
 		GetMove: procedure(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TIntPlayerNumber) of object;
 	end;
 	
-	TPlayerArray = array [1..2] of TPlayer;		//TODO: Remove when "Players" parameter is removed from RunGame().
 	TIntCellCount = 0 .. BOARD_DIMENSION * BOARD_DIMENSION;
 	
 	TChildPosition = record
@@ -104,7 +103,7 @@ type
 	TGameContext = class
 		private m__BoardState: TBoardState;
 		public m__Positions: array [1..2] of TPosition;
-		public m__Players: TPlayerArray;
+		public m__Players: array [1..2] of TPlayer;
 		private m_i__WhoseTurn: Byte;
 		private m__MidgameMaxDepth, m__EndgameMaxDepth, m__MaxDepth: TIntCellCount;
 		
@@ -162,7 +161,7 @@ type
 		(**
 		 * Runs game from current position on the board.
 		 *)
-		public procedure RunGame(Players: TPlayerArray);
+		public procedure RunGame();
 	end;
 	
 	TMainWindow = class(TForm, IGameDriver)
@@ -726,10 +725,10 @@ begin
 	else
 		Assert(false, 'Player2Type must be one of PLAYER_TYPE_* constants: '+ IntToStr(Player2Type));
 	
-	Self.RunGame(Self.m__Players);
+	Self.RunGame();
 end;
 
-procedure TGameContext.RunGame(Players: TPlayerArray);
+procedure TGameContext.RunGame();
 var
 	Move: TCellAddress;
 	C1, C2: Byte;
@@ -781,14 +780,14 @@ begin
 				IsGameEnd := True
 			else
 			begin
-				if Players[i__WhoseTurn].Name = 'human' then
+				if Self.m__Players[i__WhoseTurn].Name = 'human' then
 					ShowMessage('pass move');
 				i__WhoseTurn := 3 - i__WhoseTurn;
 			end;
 			
 		if not IsGameEnd then
 		begin
-			Players[i__WhoseTurn].GetMove(Move, Self.m__BoardState, i__WhoseTurn);
+			Self.m__Players[i__WhoseTurn].GetMove(Move, Self.m__BoardState, i__WhoseTurn);
 			Self.m_i__WhoseTurn := i__WhoseTurn;
 		end;
 			
@@ -820,9 +819,9 @@ begin
 	C2 := CountCellsWithState(Self.m__BoardState, 2);
 	
 	if C1 > C2 then
-		ShowMessage('Winner is '+ Players[1].name)
+		ShowMessage('Winner is '+ Self.m__Players[1].name)
 	else if C2 > C1 then
-		ShowMessage('Winner is '+ Players[2].name)
+		ShowMessage('Winner is '+ Self.m__Players[2].name)
 	else
 		ShowMessage('Draw');
 			
@@ -1177,7 +1176,7 @@ begin
 	Self.m__GameContext.FinishBoardModification();
 	
 	Self.m__BackForwardButtons.Position := Self.m__GameContext.m__GameHistory.CurrentMoveNumber;
-	Self.m__GameContext.RunGame(Self.m__GameContext.m__Players);
+	Self.m__GameContext.RunGame();
 end;
 
 procedure TMainWindow.OnClick_MenuItem__players__any_submenu(Sender: TObject);
