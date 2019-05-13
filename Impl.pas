@@ -764,7 +764,7 @@ begin
 		if Self.m__DoBreakGame then
 			Exit();
 		
-		MainWindow.m__DrawGrid.Selection := TGridRect(MainWindow.m__DrawGrid.CellRect(-1, -1));
+		MainWindow.m__DrawGrid.Selection := TGridRect(MainWindow.m__DrawGrid.CellRect(-1, -1));		//TODO: Why whis typecast (in two places)?
 		
 		AnalyzePosition(Self.m__BoardState, 1, Self.m__Positions[1]);
 		AnalyzePosition(Self.m__BoardState, 2, Self.m__Positions[2]);
@@ -1165,7 +1165,7 @@ procedure TMainWindow.OnClick_MenuItem_position_continue(Sender: TObject);
 begin
 	Self.m__MenuItem_position_modify.Enabled := True;
 	Self.m__MenuItem_position_continue.Enabled := False;
-	Self.m__DrawGrid.Selection := TGridRect(Self.m__DrawGrid.CellRect(-1, -1));
+	Self.m__DrawGrid.Selection := TGridRect(Self.m__DrawGrid.CellRect(-1, -1));		//TODO: Why whis typecast (in two places)?
 	
 	Self.m__GameContext.FinishBoardModification();
 	
