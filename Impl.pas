@@ -105,8 +105,8 @@ type
 		private m_i__WhoseTurn: Byte;
 		private m__MidgameMaxDepth, m__EndgameMaxDepth, m__MaxDepth: TIntCellCount;
 		
-		public m__Evaluations: record
-			Last, Best: TCellAddress;
+		private m__Evaluations: record
+			Last, Best: TCellAddress;		//TODO: "Last" does not belong in this structure, it's last made move in the game.
 			CellEvaluations: array [1..8, 1..8] of string;
 		end;
 		
@@ -141,6 +141,14 @@ type
 		
 		public function GetBestEngineMoveEvaluation(): TEvaluation;
 		
+		(**
+		 * Returns last made move in the game.
+		 *)
+		public function GetLastMove(): TCellAddress;
+		
+		public function GetBestMoveFoundTillNow(): TCellAddress;
+		
+		public function s__GetMoveEvaluation(Column, Row: Byte): string;
 		public function GetCellState(Column, Row: Byte): TIntOptionalPlayerNumber;
 		public procedure SetCellState(Column, Row: Byte; CellState: TIntOptionalPlayerNumber);
 		public procedure FinishBoardModification();
@@ -459,6 +467,21 @@ end;
 function TGameContext.GetBestEngineMoveEvaluation(): TEvaluation;
 begin
 	Result := Self.m__BestEngineMoveEvaluation;
+end;
+
+function TGameContext.GetLastMove(): TCellAddress;
+begin
+	Result := Self.m__Evaluations.Last;
+end;
+
+function TGameContext.GetBestMoveFoundTillNow(): TCellAddress;
+begin
+	Result := Self.m__Evaluations.Best;
+end;
+
+function TGameContext.s__GetMoveEvaluation(Column, Row: Byte): string;
+begin
+	Result := Self.m__Evaluations.CellEvaluations[Column + 1, Row + 1];
 end;
 
 function TGameContext.GetCellState(Column, Row: Byte): TIntOptionalPlayerNumber;
@@ -1029,7 +1052,8 @@ end;
 
 procedure TMainWindow.OnDrawCell_DrawGrid(Sender: TObject; Column, Row: Integer; Rect: TRect; State: TGridDrawState);
 var
-	Text: string;
+	s__Evaluation: string;
+	LastMove, BestMove: TCellAddress;
 begin
 	Self.m__DrawGrid.Canvas.Brush.Color := clWhite;
 	Self.m__DrawGrid.Canvas.FillRect(Rect);
@@ -1041,7 +1065,10 @@ begin
 			Self.m__DrawGrid.Canvas.StretchDraw(Rect, Self.m__Player2Piece.Picture.Bitmap);
 	end;
 	
-	if (Self.m__GameContext.m__Evaluations.Last.Column = Column + 1) and (Self.m__GameContext.m__Evaluations.Last.Row = Row + 1) and (Self.m__GameContext.GetCellState(Column, Row) > 0) then
+	
+	LastMove := Self.m__GameContext.GetLastMove();
+	
+	if (LastMove.Column = Column + 1) and (LastMove.Row = Row + 1) and (Self.m__GameContext.GetCellState(Column, Row) > 0) then
 	begin
 		Self.m__DrawGrid.Canvas.Pen.Color := clRed;
 		Self.m__DrawGrid.Canvas.MoveTo(Rect.Left, Rect.Top);
@@ -1051,31 +1078,35 @@ begin
 		Self.m__DrawGrid.Canvas.LineTo(Rect.Left, Rect.Top);
 	end;
 	
-	if (Column + 1 = Self.m__GameContext.m__Evaluations.Best.Column) and (Row + 1 = Self.m__GameContext.m__Evaluations.Best.Row) then
+	
+	BestMove := Self.m__GameContext.GetBestMoveFoundTillNow();
+	
+	if (Column + 1 = BestMove.Column) and (Row + 1 = BestMove.Row) then
 		Self.m__DrawGrid.Canvas.Font.Color := clRed
 	else
 		Self.m__DrawGrid.Canvas.Font.Color := clBlack;
 		
-	Text := Self.m__GameContext.m__Evaluations.CellEvaluations[Column + 1, Row + 1];
+		
+	s__Evaluation := Self.m__GameContext.s__GetMoveEvaluation(Column, Row);
 	
-	if Copy(Text, 1, 2) = '<=' then
+	if Copy(s__Evaluation, 1, 2) = '<=' then
 		with Self.m__DrawGrid.Canvas do
 		begin
-			Delete(Text, 1, 2);
+			Delete(s__Evaluation, 1, 2);
 			Pen.Color := clBlack;
 			Draw(Rect.Left, Rect.Top, Self.m__LessOrEqual.Picture.Graphic);
-			TextOut(Rect.Left + 8, Rect.Top, Text);
+			TextOut(Rect.Left + 8, Rect.Top, s__Evaluation);
 		end
-	else if Copy(Text, 1, 2) = '>=' then
+	else if Copy(s__Evaluation, 1, 2) = '>=' then
 		with Self.m__DrawGrid.Canvas do
 		begin
-			Delete(Text, 1, 2);
+			Delete(s__Evaluation, 1, 2);
 			Pen.Color := clBlack;
 			Draw(Rect.Left, Rect.Top, Self.m__GreaterOrEqual.Picture.Graphic);
-			TextOut(Rect.Left + 8, Rect.Top, Text);
+			TextOut(Rect.Left + 8, Rect.Top, s__Evaluation);
 		end
 	else
-		Self.m__DrawGrid.Canvas.TextOut(Rect.Left, Rect.Top, Text);
+		Self.m__DrawGrid.Canvas.TextOut(Rect.Left, Rect.Top, s__Evaluation);
 end;
 
 procedure TMainWindow.OnClick_DrawGrid(Sender: TObject);
