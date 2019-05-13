@@ -15,35 +15,34 @@ const
 	PLAYER_TYPE_HUMAN = Byte(15);
 
 type
-	TPlayerNumber = 1..2;
-	TCellState = 0..2;
-	TWhoseTurn = 0..2;
-	TCellNumber = 1..BOARD_DIMENSION;
-	TBoardState = array [TCellNumber, TCellNumber] of TCellState;
+	TIntPlayerNumber = 1..2;
+	TIntOptionalPlayerNumber = 0..2;
+	TIntCellCoordinate = 1..BOARD_DIMENSION;
+	TBoardState = array [TIntCellCoordinate, TIntCellCoordinate] of TIntOptionalPlayerNumber;
 	
 	TCellAddress = record
-		Column, Row: TCellNumber;
+		Column, Row: TIntCellCoordinate;
 	end;
 	
 	TPlayer = record
 		Name: string;
-		GetMove: procedure(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TPlayerNumber) of object;
+		GetMove: procedure(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TIntPlayerNumber) of object;
 	end;
 	
-	TPlayerArray = array [1..2] of TPlayer;
-	TNumberOfSquares = 0 .. BOARD_DIMENSION * BOARD_DIMENSION;
+	TPlayerArray = array [1..2] of TPlayer;		//TODO: Remove when "Players" parameter is removed from RunGame().
+	TIntCellCount = 0 .. BOARD_DIMENSION * BOARD_DIMENSION;
 	
 	TChildPosition = record
 		Move: TCellAddress;
 		BoardState: TBoardState;
 	end;
 	
-	TChildPositionArray = array [TNumberOfSquares] of TChildPosition;
+	TChildPositionArray = array [TIntCellCount] of TChildPosition;
 	
 	TPosition = record
 		BoardState: TBoardState;
-		i__WhoseTurn: TWhoseTurn;
-		PossibleMoveCount: TNumberOfSquares;
+		i__WhoseTurn: TIntOptionalPlayerNumber;
+		PossibleMoveCount: TIntCellCount;
 		ChildPositions: TChildPositionArray;
 	end;
 	
@@ -62,11 +61,11 @@ type
 	end;}
 	
 	TGameHistory = record
-		Positions: array [TNumberOfSquares] of record
+		Positions: array [TIntCellCount] of record
 			BoardState: TBoardState;
-			i__WhoseTurn: TPlayerNumber;
+			i__WhoseTurn: TIntPlayerNumber;
 		end;
-		MoveCount, CurrentMoveNumber: TNumberOfSquares;
+		MoveCount, CurrentMoveNumber: TIntCellCount;
 	end;
 	
 	(**
@@ -95,8 +94,8 @@ type
 		 *)
 		procedure OnCellStateChanged();
 		
-		function GetMidgameMaxDepth(): TNumberOfSquares;
-		function GetEndgameMaxDepth(): TNumberOfSquares;
+		function GetMidgameMaxDepth(): TIntCellCount;
+		function GetEndgameMaxDepth(): TIntCellCount;
 	end;
 
 	(**
@@ -107,7 +106,7 @@ type
 		public m__Positions: array [1..2] of TPosition;
 		public m__Players: TPlayerArray;
 		private m_i__WhoseTurn: Byte;
-		private m__MidgameMaxDepth, m__EndgameMaxDepth, m__MaxDepth: TNumberOfSquares;
+		private m__MidgameMaxDepth, m__EndgameMaxDepth, m__MaxDepth: TIntCellCount;
 		
 		public m__Evaluations: record
 			Last, Best: TCellAddress;
@@ -134,7 +133,7 @@ type
 		(**
 		 * Current used max evaluation depth.
 		 *)
-		public function GetMaxDepth(): TNumberOfSquares;
+		public function GetMaxDepth(): TIntCellCount;
 		
 		(**
 		 * Number of possible moves for player whose turn now is.
@@ -143,14 +142,14 @@ type
 		
 		public function GetBestEngineMoveEvaluation(): TEvaluation;
 		
-		public function GetCellState(Column, Row: Byte): TCellState;
-		public procedure SetCellState(Column, Row: Byte; CellState: TCellState);
+		public function GetCellState(Column, Row: Byte): TIntOptionalPlayerNumber;
+		public procedure SetCellState(Column, Row: Byte; CellState: TIntOptionalPlayerNumber);
 		public procedure FinishBoardModification();
 		public procedure GoBack();
 		public procedure GoForward();
 		
-		public procedure GetEngineMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TPlayerNumber);
-		public procedure GetPlayerMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TPlayerNumber);
+		public procedure GetEngineMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TIntPlayerNumber);
+		public procedure GetPlayerMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TIntPlayerNumber);
 		
 		(**
 		 * Starts new game from standard initial position (with 4 pieces).
@@ -236,8 +235,8 @@ type
 		public procedure OnMoveEvaluationCompleted();
 		public procedure OnPositionEvaluationCompleted();
 		public procedure OnCellStateChanged();
-		public function GetMidgameMaxDepth(): TNumberOfSquares;
-		public function GetEndgameMaxDepth(): TNumberOfSquares;
+		public function GetMidgameMaxDepth(): TIntCellCount;
+		public function GetEndgameMaxDepth(): TIntCellCount;
 
 		//graphical component events		
 		published procedure OnCreate_MainWindow(Sender: TObject);
@@ -287,10 +286,10 @@ begin
 	BoardState[5, 5] := 2;
 end;
 
-procedure AnalyzePosition(BoardState: TBoardState; i__WhoseTurn: TWhoseTurn; var Position: TPosition);
+procedure AnalyzePosition(BoardState: TBoardState; i__WhoseTurn: TIntOptionalPlayerNumber; var Position: TPosition);
 var
-	Column, Row: TCellNumber;
-	ReversedCount: TNumberOfSquares;
+	Column, Row: TIntCellCoordinate;
+	ReversedCount: TIntCellCount;
 	K, L: Byte;
 	Vx, Vy: -1..1;
 begin
@@ -334,7 +333,7 @@ end;
 
 function CountCellsWithState(BoardState: TBoardState; CellState: Byte): Byte;
 var
-	Column, Row: TCellNumber;
+	Column, Row: TIntCellCoordinate;
 begin
 	Result := 0;
 	for Column := 1 to BOARD_DIMENSION do
@@ -348,7 +347,7 @@ begin
 	Result := CountCellsWithState(Field, 1) + CountCellsWithState(Field, 2) < 56;
 end;
 
-function GetHeuristicalEvaluation(BoardState: TBoardState; PlayerNumber: TPlayerNumber): TEvaluation;
+function GetHeuristicalEvaluation(BoardState: TBoardState; PlayerNumber: TIntPlayerNumber): TEvaluation;
 const
 	G: array [1..4] of array [1..2] of 1..8 = ((1, 1), (1, 8), (8, 1), (8, 8));
 const
@@ -446,7 +445,7 @@ begin
 		Self.m__MaxDepth := Self.m__MidgameMaxDepth;
 end;
 
-function TGameContext.GetMaxDepth(): TNumberOfSquares;
+function TGameContext.GetMaxDepth(): TIntCellCount;
 begin
 	Result := Self.m__MaxDepth;
 end;
@@ -461,12 +460,12 @@ begin
 	Result := Self.m__BestEngineMoveEvaluation;
 end;
 
-function TGameContext.GetCellState(Column, Row: Byte): TCellState;
+function TGameContext.GetCellState(Column, Row: Byte): TIntOptionalPlayerNumber;
 begin
 	Result := Self.m__BoardState[Column + 1, Row + 1];
 end;
 
-procedure TGameContext.SetCellState(Column, Row: Byte; CellState: TCellState);
+procedure TGameContext.SetCellState(Column, Row: Byte; CellState: TIntOptionalPlayerNumber);
 begin
 	if not Self.m__IsInModifyMode then
 		Exit();
@@ -501,9 +500,9 @@ begin
 	Self.m__BoardState := Self.m__GameHistory.Positions[Self.m__GameHistory.CurrentMoveNumber].BoardState;
 end;
 
-procedure TGameContext.GetEngineMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TPlayerNumber);
+procedure TGameContext.GetEngineMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TIntPlayerNumber);
 var
-	I, Column, Row, Depth: TNumberOfSquares;
+	I, Column, Row, Depth: TIntCellCount;
 	Res, MinValue, MaxValue: TEvaluation;
 	EnginePosition, ChildPosition: TPosition;
 	DoSort: Boolean;
@@ -512,7 +511,7 @@ label
 
 	function Evaluate(Position: TPosition; Alpha, Beta: TEvaluation): TEvaluation;
 	var
-		I: TNumberOfSquares;
+		I: TIntCellCount;
 		ChildPosition: TPosition;
 		Max: TEvaluation;
 	label
@@ -657,7 +656,7 @@ begin
 	Self.m__GameDriver.OnPositionEvaluationCompleted();
 end;
 
-function IsLegalMove(Column, Row: TCellNumber; Position: TPosition; var MoveNumber: Byte): Boolean;
+function IsLegalMove(Column, Row: TIntCellCoordinate; Position: TPosition; var MoveNumber: Byte): Boolean;
 var
 	I: Byte;
 begin
@@ -672,7 +671,7 @@ begin
 		end;
 end;
 
-procedure TGameContext.GetPlayerMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TPlayerNumber);
+procedure TGameContext.GetPlayerMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TIntPlayerNumber);
 var
 	MoveNumberDummy: Byte;
 	MainWindow: TMainWindow;
@@ -832,7 +831,7 @@ end;
 
 procedure TMainWindow.OnPositionEvaluationStarted();
 var
-	PossibleMoveCount, MaxDepth: TNumberOfSquares;
+	PossibleMoveCount, MaxDepth: TIntCellCount;
 begin
 	PossibleMoveCount := Self.m__GameContext.GetPossibleMoveCount();
 	MaxDepth := Self.m__GameContext.GetMaxDepth();
@@ -876,12 +875,12 @@ begin
 	Self.m__DrawGrid.Repaint();
 end;
 
-function TMainWindow.GetMidgameMaxDepth(): TNumberOfSquares;
+function TMainWindow.GetMidgameMaxDepth(): TIntCellCount;
 begin
 	Result := StrToInt(Self.m__MidgameDepthLabeledEdit.Text);
 end;
 
-function TMainWindow.GetEndgameMaxDepth(): TNumberOfSquares;
+function TMainWindow.GetEndgameMaxDepth(): TIntCellCount;
 begin
 	Result := StrToInt(Self.m__EndgameDepthLabeledEdit.Text);
 end;
@@ -1080,7 +1079,7 @@ end;
 
 procedure TMainWindow.OnClick_DrawGrid(Sender: TObject);
 var
-	CurrentCellState, NewCellState: TCellState;
+	CurrentCellState, NewCellState: TIntOptionalPlayerNumber;
 begin
 	CurrentCellState := Self.m__GameContext.GetCellState(Self.m__DrawGrid.Col, Self.m__DrawGrid.Row);
 	NewCellState := CurrentCellState;
