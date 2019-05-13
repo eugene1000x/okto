@@ -100,7 +100,7 @@ type
 	 *)
 	TGameContext = class
 		private m__BoardState: TBoardState;
-		public m__Positions: array [1..2] of TPosition;
+		private m__Positions: array [1..2] of TPosition;
 		public m__Players: array [1..2] of TPlayer;
 		private m_i__WhoseTurn: Byte;
 		private m__MidgameMaxDepth, m__EndgameMaxDepth, m__MaxDepth: TIntCellCount;
@@ -133,9 +133,11 @@ type
 		public function GetMaxDepth(): TIntCellCount;
 		
 		(**
-		 * Number of possible moves for player whose turn now is.
+		 * Number of possible moves for given player in the current position with his pieces.
+		 * 
+		 * @param PlayerNumber If 0, take player whose turn now is.
 		 *)
-		public function GetPossibleMoveCount(): Byte;
+		public function GetPossibleMoveCount(PlayerNumber: TIntOptionalPlayerNumber = 0): TIntCellCount;
 		
 		public function GetBestEngineMoveEvaluation(): TEvaluation;
 		
@@ -447,9 +449,12 @@ begin
 	Result := Self.m__MaxDepth;
 end;
 
-function TGameContext.GetPossibleMoveCount(): Byte;
+function TGameContext.GetPossibleMoveCount(PlayerNumber: TIntOptionalPlayerNumber = 0): TIntCellCount;
 begin
-	Result := Self.m__Positions[Self.m_i__WhoseTurn].PossibleMoveCount;
+	if PlayerNumber = 0 then
+		PlayerNumber := Self.m_i__WhoseTurn;
+	
+	Result := Self.m__Positions[PlayerNumber].PossibleMoveCount;
 end;
 
 function TGameContext.GetBestEngineMoveEvaluation(): TEvaluation;
@@ -1241,8 +1246,8 @@ begin
 		Self.m__Player1Piece.Hint := 'Yellow';
 	end;
 	
-	Self.m__Statusbar.Panels[2].Text := Self.m__Player1Piece.Hint +' '+ IntToStr(Self.m__GameContext.m__Positions[1].PossibleMoveCount) +' moves  '+
-			Self.m__Player2Piece.Hint +' '+ IntToStr(Self.m__GameContext.m__Positions[2].PossibleMoveCount) +' moves';
+	Self.m__Statusbar.Panels[2].Text := Self.m__Player1Piece.Hint +' '+ IntToStr(Self.m__GameContext.GetPossibleMoveCount(1)) +' moves  '+
+			Self.m__Player2Piece.Hint +' '+ IntToStr(Self.m__GameContext.GetPossibleMoveCount(2)) +' moves';
 	
 	Self.m__DrawGrid.Repaint();
 end;
@@ -1280,8 +1285,8 @@ begin
 		Self.m__Player2Piece.Hint := 'Yellow';
 	end;
 	
-	Self.m__Statusbar.Panels[2].Text := Self.m__Player1Piece.Hint +' '+ IntToStr(Self.m__GameContext.m__Positions[1].PossibleMoveCount) +' moves  '+
-			Self.m__Player2Piece.Hint +' '+ IntToStr(Self.m__GameContext.m__Positions[2].PossibleMoveCount) +' moves';
+	Self.m__Statusbar.Panels[2].Text := Self.m__Player1Piece.Hint +' '+ IntToStr(Self.m__GameContext.GetPossibleMoveCount(1)) +' moves  '+
+			Self.m__Player2Piece.Hint +' '+ IntToStr(Self.m__GameContext.GetPossibleMoveCount(2)) +' moves';
 	
 	Self.m__DrawGrid.Repaint();
 end;
