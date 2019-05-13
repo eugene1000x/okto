@@ -502,7 +502,6 @@ var
 	I, Column, Row, Depth: TIntCellCount;
 	Res, MinValue, MaxValue: TEvaluation;
 	EnginePosition, ChildPosition: TPosition;
-	DoSort: Boolean;
 label
 	done;
 
@@ -582,9 +581,6 @@ begin
 	
 	Move.Column := 1;
 	Move.Row := 1;
-	
-	//for Depth := 1 to 15 do
-	//	TranspositionTable[Depth].PositionCount := 0;
 	
 	Res.IsHeuristical := True;
 	Depth := 0;
