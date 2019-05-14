@@ -26,7 +26,7 @@ type
 	
 	TPlayer = record
 		Name: string;
-		GetMove: procedure(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TIntPlayerNumber) of object;
+		fn__GetMove: procedure(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TIntPlayerNumber) of object;
 	end;
 	
 	TIntCellCount = 0 .. BOARD_DIMENSION * BOARD_DIMENSION;
@@ -728,12 +728,12 @@ begin
 	
 	if Player1Type = PLAYER_TYPE_HUMAN then
 	begin
-		Self.m__Players[1].GetMove := Self.GetPlayerMove;
+		Self.m__Players[1].fn__GetMove := Self.GetPlayerMove;
 		Self.m__Players[1].Name := 'human';
 	end
 	else if Player1Type = PLAYER_TYPE_CPU then
 	begin
-		Self.m__Players[1].GetMove := Self.GetEngineMove;
+		Self.m__Players[1].fn__GetMove := Self.GetEngineMove;
 		Self.m__Players[1].Name := 'CPU';
 	end
 	else
@@ -741,12 +741,12 @@ begin
 		
 	if Player2Type = PLAYER_TYPE_HUMAN then
 	begin
-		Self.m__Players[2].GetMove := Self.GetPlayerMove;
+		Self.m__Players[2].fn__GetMove := Self.GetPlayerMove;
 		Self.m__Players[2].Name := 'human';
 	end
 	else if Player2Type = PLAYER_TYPE_CPU then
 	begin
-		Self.m__Players[2].GetMove := Self.GetEngineMove;
+		Self.m__Players[2].fn__GetMove := Self.GetEngineMove;
 		Self.m__Players[2].Name := 'CPU';
 	end
 	else
@@ -814,7 +814,7 @@ begin
 			
 		if not IsGameEnd then
 		begin
-			Self.m__Players[i__WhoseTurn].GetMove(Move, Self.m__BoardState, i__WhoseTurn);
+			Self.m__Players[i__WhoseTurn].fn__GetMove(Move, Self.m__BoardState, i__WhoseTurn);
 			Self.m_i__WhoseTurn := i__WhoseTurn;
 		end;
 			
@@ -1224,23 +1224,23 @@ begin
 	
 	if Self.m__MenuItem__players__cpu_vs_cpu.Checked or Self.m__MenuItem__players__cpu_vs_human.Checked then
 	begin
-		Self.m__GameContext.m__Players[1].GetMove := Self.m__GameContext.GetEngineMove;
+		Self.m__GameContext.m__Players[1].fn__GetMove := Self.m__GameContext.GetEngineMove;
 		Self.m__GameContext.m__Players[1].Name := 'CPU';
 	end
 	else
 	begin
-		Self.m__GameContext.m__Players[1].GetMove := Self.m__GameContext.GetPlayerMove;
+		Self.m__GameContext.m__Players[1].fn__GetMove := Self.m__GameContext.GetPlayerMove;
 		Self.m__GameContext.m__Players[1].Name := 'human';
 	end;
 	
 	if Self.m__MenuItem__players__2_players.Checked or Self.m__MenuItem__players__cpu_vs_human.Checked then
 	begin
-		Self.m__GameContext.m__Players[2].GetMove := Self.m__GameContext.GetPlayerMove;
+		Self.m__GameContext.m__Players[2].fn__GetMove := Self.m__GameContext.GetPlayerMove;
 		Self.m__GameContext.m__Players[2].Name := 'human';
 	end
 	else
 	begin
-		Self.m__GameContext.m__Players[2].GetMove := Self.m__GameContext.GetEngineMove;
+		Self.m__GameContext.m__Players[2].fn__GetMove := Self.m__GameContext.GetEngineMove;
 		Self.m__GameContext.m__Players[2].Name := 'CPU';
 	end;
 	
