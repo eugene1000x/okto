@@ -15,8 +15,13 @@ const
 	PLAYER_TYPE_HUMAN = Byte(15);
 
 type
+	(**
+	 * 1 is the player who makes first move in the game,
+	 * 2 is the player who makes second move in the game.
+	 *)
 	TIntPlayerNumber = 1..2;
 	TIntOptionalPlayerNumber = 0..2;
+	
 	TIntCellCoordinate = 1..BOARD_DIMENSION;
 	TIntCellCount = 0 .. BOARD_DIMENSION * BOARD_DIMENSION;
 	
