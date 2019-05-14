@@ -18,6 +18,8 @@ type
 	TIntPlayerNumber = 1..2;
 	TIntOptionalPlayerNumber = 0..2;
 	TIntCellCoordinate = 1..BOARD_DIMENSION;
+	TIntCellCount = 0 .. BOARD_DIMENSION * BOARD_DIMENSION;
+	
 	TBoardState = array [TIntCellCoordinate, TIntCellCoordinate] of TIntOptionalPlayerNumber;
 	
 	TCellAddress = record
@@ -28,8 +30,6 @@ type
 		Name: string;
 		fn__GetMove: procedure(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TIntPlayerNumber) of object;
 	end;
-	
-	TIntCellCount = 0 .. BOARD_DIMENSION * BOARD_DIMENSION;
 	
 	TPosition = record
 		BoardState: TBoardState;
