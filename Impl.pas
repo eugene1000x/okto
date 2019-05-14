@@ -36,8 +36,7 @@ type
 		fn__GetMove: procedure(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TIntPlayerNumber) of object;
 	end;
 	
-	TPosition = record
-		BoardState: TBoardState;
+	TAnalyzedPosition = record
 		i__WhoseTurn: TIntOptionalPlayerNumber;
 		PossibleMoveCount: TIntCellCount;
 		ChildPositions: array [TIntCellCount] of record
@@ -103,7 +102,7 @@ type
 	 *)
 	TGameContext = class
 		private m__BoardState: TBoardState;
-		private m__Positions: array [1..2] of TPosition;
+		private m__AnalyzedPositions: array [1..2] of TAnalyzedPosition;
 		public m__Players: array [1..2] of TPlayer;
 		private m_i__WhoseTurn: Byte;
 		private m__MidgameMaxDepth, m__EndgameMaxDepth, m__MaxDepth: TIntCellCount;
@@ -298,22 +297,21 @@ begin
 	BoardState[5, 5] := 2;
 end;
 
-procedure AnalyzePosition(BoardState: TBoardState; i__WhoseTurn: TIntOptionalPlayerNumber; var Position: TPosition);
+procedure AnalyzePosition(BoardState: TBoardState; i__WhoseTurn: TIntOptionalPlayerNumber; var AnalyzedPosition: TAnalyzedPosition);
 var
 	Column, Row: TIntCellCoordinate;
 	ReversedCount: TIntCellCount;
 	K, L: Byte;
 	Vx, Vy: -1..1;
 begin
-	Position.PossibleMoveCount := 0;
-	Position.BoardState := BoardState;
-	Position.i__WhoseTurn := 0;
+	AnalyzedPosition.PossibleMoveCount := 0;
+	AnalyzedPosition.i__WhoseTurn := 0;
 	
 	for Column := 1 to 8 do
 		for Row := 1 to 8 do
 		begin
 			ReversedCount := 0;
-			Position.ChildPositions[Position.PossibleMoveCount + 1].BoardState := BoardState;
+			AnalyzedPosition.ChildPositions[AnalyzedPosition.PossibleMoveCount + 1].BoardState := BoardState;
 			
 			for Vx := -1 to 1 do
 				for Vy := -1 to 1 do
@@ -328,17 +326,17 @@ begin
 							if (Column + K * Vx in [1..8]) and (Row + K * Vy in [1..8]) and (BoardState[Column + K * Vx, Row + K * Vy] = i__WhoseTurn) then
 							begin
 								for L := 0 to K - 1 do
-									Position.ChildPositions[Position.PossibleMoveCount + 1].BoardState[Column + L * Vx, Row + L * Vy] := i__WhoseTurn;
+									AnalyzedPosition.ChildPositions[AnalyzedPosition.PossibleMoveCount + 1].BoardState[Column + L * Vx, Row + L * Vy] := i__WhoseTurn;
 									
 								Inc(ReversedCount, K - 1);
 							end;
 						end;
 			if ReversedCount > 0 then
 			begin
-				Inc(Position.PossibleMoveCount);
-				Position.ChildPositions[Position.PossibleMoveCount].Move.Column := Column;
-				Position.ChildPositions[Position.PossibleMoveCount].Move.Row := Row;
-				Position.i__WhoseTurn := i__WhoseTurn;
+				Inc(AnalyzedPosition.PossibleMoveCount);
+				AnalyzedPosition.ChildPositions[AnalyzedPosition.PossibleMoveCount].Move.Column := Column;
+				AnalyzedPosition.ChildPositions[AnalyzedPosition.PossibleMoveCount].Move.Row := Row;
+				AnalyzedPosition.i__WhoseTurn := i__WhoseTurn;
 			end;
 		end;
 end;
@@ -366,17 +364,17 @@ const
 	K: array [1..4] of array [1..2] of 1..8 = ((2, 2), (2, 7), (7, 2), (7, 7));
 var
 	I: Byte;
-	Positions: array [1..2] of TPosition;
+	AnalyzedPositions: array [1..2] of TAnalyzedPosition;
 begin
 	Result.PieceCount := 0;
 	Result.IsHeuristical := True;
 	Result.IsLessOrEqual := False;
 	Result.IsGreaterOrEqual := False;
 	
-	AnalyzePosition(BoardState, PlayerNumber, Positions[PlayerNumber]);
-	AnalyzePosition(BoardState, 3 - PlayerNumber, Positions[3 - PlayerNumber]);
+	AnalyzePosition(BoardState, PlayerNumber, AnalyzedPositions[PlayerNumber]);
+	AnalyzePosition(BoardState, 3 - PlayerNumber, AnalyzedPositions[3 - PlayerNumber]);
 	
-	if (Positions[PlayerNumber].PossibleMoveCount = 0) and (Positions[3 - PlayerNumber].PossibleMoveCount = 0) then
+	if (AnalyzedPositions[PlayerNumber].PossibleMoveCount = 0) and (AnalyzedPositions[3 - PlayerNumber].PossibleMoveCount = 0) then
 	begin
 		Result.IsHeuristical := False;
 		Result.PieceCount := CountCellsWithState(BoardState, PlayerNumber) - CountCellsWithState(BoardState, 3 - PlayerNumber);
@@ -388,8 +386,8 @@ begin
 	else
 		Result.PieceCount := CountCellsWithState(BoardState, PlayerNumber) - CountCellsWithState(BoardState, 3 - PlayerNumber);
 	
-	Result.PieceCount := Result.PieceCount + Positions[PlayerNumber].PossibleMoveCount;
-	Result.PieceCount := Result.PieceCount - Positions[3 - PlayerNumber].PossibleMoveCount;
+	Result.PieceCount := Result.PieceCount + AnalyzedPositions[PlayerNumber].PossibleMoveCount;
+	Result.PieceCount := Result.PieceCount - AnalyzedPositions[3 - PlayerNumber].PossibleMoveCount;
 	
 	for I := 1 to 4 do
 		if (BoardState[G[I][1], G[I][2]] = PlayerNumber) or ((BoardState[K[I][1], K[I][2]] = 3 - PlayerNumber) and (BoardState[G[I][1], G[I][2]] = 0)) then
@@ -465,7 +463,7 @@ begin
 	if PlayerNumber = 0 then
 		PlayerNumber := Self.m_i__WhoseTurn;
 	
-	Result := Self.m__Positions[PlayerNumber].PossibleMoveCount;
+	Result := Self.m__AnalyzedPositions[PlayerNumber].PossibleMoveCount;
 end;
 
 function TGameContext.GetBestEngineMoveEvaluation(): TEvaluation;
@@ -537,14 +535,14 @@ procedure TGameContext.GetEngineMove(var Move: TCellAddress; BoardState: TBoardS
 var
 	I, Column, Row, Depth: TIntCellCount;
 	Res, MinValue, MaxValue: TEvaluation;
-	EnginePosition, ChildPosition: TPosition;
+	AnalyzedEnginePosition, AnalyzedChildPosition: TAnalyzedPosition;
 label
 	done;
 
-	function Evaluate(Position: TPosition; Alpha, Beta: TEvaluation): TEvaluation;
+	function Evaluate(BoardState: TBoardState; AnalyzedPosition: TAnalyzedPosition; Alpha, Beta: TEvaluation): TEvaluation;
 	var
 		I: TIntCellCount;
-		ChildPosition: TPosition;
+		AnalyzedChildPosition: TAnalyzedPosition;
 		Max: TEvaluation;
 	label
 		done;
@@ -554,26 +552,26 @@ label
 		
 		if Depth = Self.m__MaxDepth then
 		begin
-			Max := GetHeuristicalEvaluation(Position.BoardState, Position.i__WhoseTurn);
+			Max := GetHeuristicalEvaluation(BoardState, AnalyzedPosition.i__WhoseTurn);
 			goto done;
 		end;
 		
 		Max := MinValue;
 		
-		for I := 1 to Position.PossibleMoveCount do
+		for I := 1 to AnalyzedPosition.PossibleMoveCount do
 		begin
-			AnalyzePosition(Position.ChildPositions[I].BoardState, 3 - Position.i__WhoseTurn, ChildPosition);
+			AnalyzePosition(AnalyzedPosition.ChildPositions[I].BoardState, 3 - AnalyzedPosition.i__WhoseTurn, AnalyzedChildPosition);
 		
-			if ChildPosition.PossibleMoveCount > 0 then
-				Result := NegateEvaluation(Evaluate(ChildPosition, NegateEvaluation(Beta), NegateEvaluation(Alpha)))		// (Alpha >= Max) => (-Alpha <= -Max) => (Beta <= -Max)
+			if AnalyzedChildPosition.PossibleMoveCount > 0 then
+				Result := NegateEvaluation(Evaluate(AnalyzedPosition.ChildPositions[I].BoardState, AnalyzedChildPosition, NegateEvaluation(Beta), NegateEvaluation(Alpha)))		// (Alpha >= Max) => (-Alpha <= -Max) => (Beta <= -Max)
 			else
 			begin
-				AnalyzePosition(Position.ChildPositions[I].BoardState, Position.i__WhoseTurn, ChildPosition);
+				AnalyzePosition(AnalyzedPosition.ChildPositions[I].BoardState, AnalyzedPosition.i__WhoseTurn, AnalyzedChildPosition);
 				
-				if ChildPosition.PossibleMoveCount > 0 then
-					Result := Evaluate(ChildPosition, Alpha, Beta)
+				if AnalyzedChildPosition.PossibleMoveCount > 0 then
+					Result := Evaluate(AnalyzedPosition.ChildPositions[I].BoardState, AnalyzedChildPosition, Alpha, Beta)
 				else
-					Result := GetHeuristicalEvaluation(Position.ChildPositions[I].BoardState, Position.i__WhoseTurn);
+					Result := GetHeuristicalEvaluation(AnalyzedPosition.ChildPositions[I].BoardState, AnalyzedPosition.i__WhoseTurn);
 			end;
 			
 			if IsGreaterOrEqual(Max, Alpha, True) then
@@ -585,7 +583,7 @@ label
 				
 				if (not Max.IsLessOrEqual) and (Max.IsGreaterOrEqual or IsGreaterOrEqual(Max, Beta, True)) then
 				begin
-					if Position.PossibleMoveCount > 1 then
+					if AnalyzedPosition.PossibleMoveCount > 1 then
 					begin
 						Max.IsLessOrEqual := False;
 						Max.IsGreaterOrEqual := True;
@@ -621,11 +619,11 @@ begin
 	Res.IsHeuristical := True;
 	Depth := 0;
 	
-	AnalyzePosition(BoardState, PlayerNumber, EnginePosition);
+	AnalyzePosition(BoardState, PlayerNumber, AnalyzedEnginePosition);
 	
-	if EnginePosition.PossibleMoveCount = 1 then
+	if AnalyzedEnginePosition.PossibleMoveCount = 1 then
 	begin
-		Move := EnginePosition.ChildPositions[1].Move;
+		Move := AnalyzedEnginePosition.ChildPositions[1].Move;
 		goto done;
 	end;
 	
@@ -641,38 +639,38 @@ begin
 	
 	Self.m__BestEngineMoveEvaluation := MinValue;
 	
-	for I := 1 to EnginePosition.PossibleMoveCount do
+	for I := 1 to AnalyzedEnginePosition.PossibleMoveCount do
 	begin
-		AnalyzePosition(EnginePosition.ChildPositions[I].BoardState, 3 - PlayerNumber, ChildPosition);
+		AnalyzePosition(AnalyzedEnginePosition.ChildPositions[I].BoardState, 3 - PlayerNumber, AnalyzedChildPosition);
 		
-		if ChildPosition.PossibleMoveCount > 0 then
-			if I < EnginePosition.PossibleMoveCount then
-				Res := NegateEvaluation(Evaluate(ChildPosition, NegateEvaluation(MaxValue), NegateEvaluation(Self.m__BestEngineMoveEvaluation)))
+		if AnalyzedChildPosition.PossibleMoveCount > 0 then
+			if I < AnalyzedEnginePosition.PossibleMoveCount then
+				Res := NegateEvaluation(Evaluate(AnalyzedEnginePosition.ChildPositions[I].BoardState, AnalyzedChildPosition, NegateEvaluation(MaxValue), NegateEvaluation(Self.m__BestEngineMoveEvaluation)))
 			else
-				Res := NegateEvaluation(Evaluate(ChildPosition, NegateEvaluation(Self.m__BestEngineMoveEvaluation), NegateEvaluation(Self.m__BestEngineMoveEvaluation)))
+				Res := NegateEvaluation(Evaluate(AnalyzedEnginePosition.ChildPositions[I].BoardState, AnalyzedChildPosition, NegateEvaluation(Self.m__BestEngineMoveEvaluation), NegateEvaluation(Self.m__BestEngineMoveEvaluation)))
 		else
 		begin
-			AnalyzePosition(EnginePosition.ChildPositions[I].BoardState, PlayerNumber, ChildPosition);
+			AnalyzePosition(AnalyzedEnginePosition.ChildPositions[I].BoardState, PlayerNumber, AnalyzedChildPosition);
 			
-			if ChildPosition.PossibleMoveCount > 0 then
-				if I < EnginePosition.PossibleMoveCount then
-					Res := Evaluate(ChildPosition, Self.m__BestEngineMoveEvaluation, MaxValue)
+			if AnalyzedChildPosition.PossibleMoveCount > 0 then
+				if I < AnalyzedEnginePosition.PossibleMoveCount then
+					Res := Evaluate(AnalyzedEnginePosition.ChildPositions[I].BoardState, AnalyzedChildPosition, Self.m__BestEngineMoveEvaluation, MaxValue)
 				else
-					Res := Evaluate(ChildPosition, Self.m__BestEngineMoveEvaluation, Self.m__BestEngineMoveEvaluation)
+					Res := Evaluate(AnalyzedEnginePosition.ChildPositions[I].BoardState, AnalyzedChildPosition, Self.m__BestEngineMoveEvaluation, Self.m__BestEngineMoveEvaluation)
 			else
-				Res := GetHeuristicalEvaluation(EnginePosition.ChildPositions[I].BoardState, PlayerNumber);
+				Res := GetHeuristicalEvaluation(AnalyzedEnginePosition.ChildPositions[I].BoardState, PlayerNumber);
 		end;
 		
 		if (not Res.IsLessOrEqual) and (Res.IsGreaterOrEqual or IsGreaterOrEqual(Res, Self.m__BestEngineMoveEvaluation, True)) then
 		begin
-			Move := EnginePosition.ChildPositions[I].Move;
+			Move := AnalyzedEnginePosition.ChildPositions[I].Move;
 			Self.m__BestEngineMoveEvaluation := Res;
 			Self.m__Evaluations.Best := Move;
 			
 			Self.m__GameDriver.OnPositionEvaluationChanged();
 		end;
 		
-		Self.m__Evaluations.CellEvaluations[EnginePosition.ChildPositions[I].Move.Column, EnginePosition.ChildPositions[I].Move.Row] := EvaluationToStr_Short(Res);
+		Self.m__Evaluations.CellEvaluations[AnalyzedEnginePosition.ChildPositions[I].Move.Column, AnalyzedEnginePosition.ChildPositions[I].Move.Row] := EvaluationToStr_Short(Res);
 		
 		Self.m__GameDriver.OnMoveEvaluationCompleted();
 		
@@ -685,14 +683,14 @@ begin
 	Self.m__GameDriver.OnPositionEvaluationCompleted();
 end;
 
-function IsLegalMove(Column, Row: TIntCellCoordinate; Position: TPosition; var MoveNumber: Byte): Boolean;
+function IsLegalMove(Column, Row: TIntCellCoordinate; AnalyzedPosition: TAnalyzedPosition; var MoveNumber: Byte): Boolean;
 var
 	I: Byte;
 begin
 	Result := False;
 	
-	for I := 1 to Position.PossibleMoveCount do
-		if (Position.ChildPositions[I].Move.Column = Column) and (Position.ChildPositions[I].Move.Row = Row) then
+	for I := 1 to AnalyzedPosition.PossibleMoveCount do
+		if (AnalyzedPosition.ChildPositions[I].Move.Column = Column) and (AnalyzedPosition.ChildPositions[I].Move.Row = Row) then
 		begin
 			Result := True;
 			MoveNumber := I;
@@ -712,7 +710,7 @@ begin
 		
 		if Self.m__DoBreakGame then
 			Exit();
-	until IsLegalMove(MainWindow.m__DrawGrid.Col + 1, MainWindow.m__DrawGrid.Row + 1, Self.m__Positions[PlayerNumber], MoveNumberDummy);
+	until IsLegalMove(MainWindow.m__DrawGrid.Col + 1, MainWindow.m__DrawGrid.Row + 1, Self.m__AnalyzedPositions[PlayerNumber], MoveNumberDummy);
 	
 	Move.Column := MainWindow.m__DrawGrid.Col + 1;
 	Move.Row := MainWindow.m__DrawGrid.Row + 1;
@@ -776,8 +774,8 @@ begin
 	MainWindow.m__Player1PieceCountEdit.Text := IntToStr(CountCellsWithState(Self.m__BoardState, 1));
 	MainWindow.m__Player2PieceCountEdit.Text := IntToStr(CountCellsWithState(Self.m__BoardState, 2));
 	
-	AnalyzePosition(Self.m__BoardState, 1, Self.m__Positions[1]);
-	AnalyzePosition(Self.m__BoardState, 2, Self.m__Positions[2]);
+	AnalyzePosition(Self.m__BoardState, 1, Self.m__AnalyzedPositions[1]);
+	AnalyzePosition(Self.m__BoardState, 2, Self.m__AnalyzedPositions[2]);
 	
 	for C1 := 1 to 8 do
 		for C2 := 1 to 8 do
@@ -785,14 +783,14 @@ begin
 			
 	MainWindow.m__DrawGrid.Repaint();
 	
-	MainWindow.m__Statusbar.Panels[2].Text := MainWindow.m__Player1Piece.Hint +' '+ IntToStr(Self.m__Positions[1].PossibleMoveCount) +' moves  '+
-			MainWindow.m__Player2Piece.Hint +' '+ IntToStr(Self.m__Positions[2].PossibleMoveCount) +' moves';
+	MainWindow.m__Statusbar.Panels[2].Text := MainWindow.m__Player1Piece.Hint +' '+ IntToStr(Self.m__AnalyzedPositions[1].PossibleMoveCount) +' moves  '+
+			MainWindow.m__Player2Piece.Hint +' '+ IntToStr(Self.m__AnalyzedPositions[2].PossibleMoveCount) +' moves';
 		
 	IsGameEnd := False;
 	i__WhoseTurn := 1;
 	
-	if Self.m__Positions[1].PossibleMoveCount = 0 then
-		if Self.m__Positions[2].PossibleMoveCount = 0 then
+	if Self.m__AnalyzedPositions[1].PossibleMoveCount = 0 then
+		if Self.m__AnalyzedPositions[2].PossibleMoveCount = 0 then
 			IsGameEnd := True;
 		
 	while not IsGameEnd do
@@ -802,11 +800,11 @@ begin
 		
 		MainWindow.m__DrawGrid.Selection := TGridRect(MainWindow.m__DrawGrid.CellRect(-1, -1));		//TODO: Why whis typecast (in two places)?
 		
-		AnalyzePosition(Self.m__BoardState, 1, Self.m__Positions[1]);
-		AnalyzePosition(Self.m__BoardState, 2, Self.m__Positions[2]);
+		AnalyzePosition(Self.m__BoardState, 1, Self.m__AnalyzedPositions[1]);
+		AnalyzePosition(Self.m__BoardState, 2, Self.m__AnalyzedPositions[2]);
 		
-		if Self.m__Positions[i__WhoseTurn].PossibleMoveCount = 0 then
-			if Self.m__Positions[3 - i__WhoseTurn].PossibleMoveCount = 0 then
+		if Self.m__AnalyzedPositions[i__WhoseTurn].PossibleMoveCount = 0 then
+			if Self.m__AnalyzedPositions[3 - i__WhoseTurn].PossibleMoveCount = 0 then
 				IsGameEnd := True
 			else
 			begin
@@ -821,9 +819,9 @@ begin
 			Self.m_i__WhoseTurn := i__WhoseTurn;
 		end;
 			
-		if IsLegalMove(Move.Column, Move.Row, Self.m__Positions[i__WhoseTurn], C1) then
+		if IsLegalMove(Move.Column, Move.Row, Self.m__AnalyzedPositions[i__WhoseTurn], C1) then
 		begin
-			Self.m__BoardState := Self.m__Positions[i__WhoseTurn].ChildPositions[C1].BoardState;
+			Self.m__BoardState := Self.m__AnalyzedPositions[i__WhoseTurn].ChildPositions[C1].BoardState;
 			Self.m__LastMadeMove := Move;
 			Self.m__GameHistory.MoveCount := Self.m__GameHistory.MoveCount + 1;
 			Self.m__GameHistory.CurrentMoveNumber := Self.m__GameHistory.CurrentMoveNumber + 1;
@@ -835,11 +833,11 @@ begin
 		
 		i__WhoseTurn := 3 - i__WhoseTurn;
 		
-		AnalyzePosition(Self.m__BoardState, 1, Self.m__Positions[1]);
-		AnalyzePosition(Self.m__BoardState, 2, Self.m__Positions[2]);
+		AnalyzePosition(Self.m__BoardState, 1, Self.m__AnalyzedPositions[1]);
+		AnalyzePosition(Self.m__BoardState, 2, Self.m__AnalyzedPositions[2]);
 		
-		MainWindow.m__Statusbar.Panels[2].Text := MainWindow.m__Player1Piece.Hint +' '+ IntToStr(Self.m__Positions[1].PossibleMoveCount) +' moves  '+
-				MainWindow.m__Player2Piece.Hint +' '+ IntToStr(Self.m__Positions[2].PossibleMoveCount) +' moves';
+		MainWindow.m__Statusbar.Panels[2].Text := MainWindow.m__Player1Piece.Hint +' '+ IntToStr(Self.m__AnalyzedPositions[1].PossibleMoveCount) +' moves  '+
+				MainWindow.m__Player2Piece.Hint +' '+ IntToStr(Self.m__AnalyzedPositions[2].PossibleMoveCount) +' moves';
 		
 		MainWindow.m__Player1PieceCountEdit.Text := IntToStr(CountCellsWithState(Self.m__BoardState, 1));
 		MainWindow.m__Player2PieceCountEdit.Text := IntToStr(CountCellsWithState(Self.m__BoardState, 2));
