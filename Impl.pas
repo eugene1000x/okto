@@ -31,16 +31,14 @@ type
 	
 	TIntCellCount = 0 .. BOARD_DIMENSION * BOARD_DIMENSION;
 	
-	TChildPosition = record
-		Move: TCellAddress;
-		BoardState: TBoardState;
-	end;
-	
 	TPosition = record
 		BoardState: TBoardState;
 		i__WhoseTurn: TIntOptionalPlayerNumber;
 		PossibleMoveCount: TIntCellCount;
-		ChildPositions: array [TIntCellCount] of TChildPosition;
+		ChildPositions: array [TIntCellCount] of record
+			Move: TCellAddress;
+			BoardState: TBoardState;
+		end;
 	end;
 	
 	TEvaluation = record
