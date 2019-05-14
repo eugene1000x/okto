@@ -102,8 +102,8 @@ type
 	 *)
 	TGameContext = class
 		private m__BoardState: TBoardState;
-		private m__AnalyzedPositions: array [1..2] of TAnalyzedPosition;
-		public m__Players: array [1..2] of TPlayer;
+		private m__AnalyzedPositions: array [TIntPlayerNumber] of TAnalyzedPosition;
+		public m__Players: array [TIntPlayerNumber] of TPlayer;
 		private m_i__WhoseTurn: Byte;
 		private m__MidgameMaxDepth, m__EndgameMaxDepth, m__MaxDepth: TIntCellCount;
 		
@@ -364,7 +364,7 @@ const
 	K: array [1..4] of array [1..2] of 1..8 = ((2, 2), (2, 7), (7, 2), (7, 7));
 var
 	I: Byte;
-	AnalyzedPositions: array [1..2] of TAnalyzedPosition;
+	AnalyzedPositions: array [TIntPlayerNumber] of TAnalyzedPosition;
 begin
 	Result.PieceCount := 0;
 	Result.IsHeuristical := True;
