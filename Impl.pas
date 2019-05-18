@@ -252,6 +252,8 @@ type
 		public procedure OnCellStateChanged();
 		public function GetMidgameMaxDepth(): TIntCellCount;
 		public function GetEndgameMaxDepth(): TIntCellCount;
+		
+		private procedure UpdatePlayers(var Player1Type, Player2Type: Byte);
 
 		//graphical component events		
 		published procedure OnCreate_MainWindow(Sender: TObject);
@@ -927,6 +929,37 @@ begin
 	Result := StrToInt(Self.m__EndgameDepthLabeledEdit.Text);
 end;
 
+procedure TMainWindow.UpdatePlayers(var Player1Type, Player2Type: Byte);
+begin
+	if Self.m__MenuItem__players__2_players.Checked then
+	begin
+		Player1Type := PLAYER_TYPE_HUMAN;
+		Player2Type := PLAYER_TYPE_HUMAN;
+	end
+	else if Self.m__MenuItem__players__human_vs_cpu.Checked then
+	begin
+		Player1Type := PLAYER_TYPE_HUMAN;
+		Player2Type := PLAYER_TYPE_CPU;
+	end
+	else if Self.m__MenuItem__players__cpu_vs_human.Checked then
+	begin
+		Player1Type := PLAYER_TYPE_CPU;
+		Player2Type := PLAYER_TYPE_HUMAN;
+	end
+	else if Self.m__MenuItem__players__cpu_vs_cpu.Checked then
+	begin
+		Player1Type := PLAYER_TYPE_CPU;
+		Player2Type := PLAYER_TYPE_CPU;
+	end
+	else
+		Assert(false, 'None of menu items is checked');
+	
+	Self.m__GameContext.SetPlayers(Player1Type, Player2Type);
+	
+	Self.m__Player1Label.Caption := Self.m__GameContext.GetPlayerName(1);
+	Self.m__Player2Label.Caption := Self.m__GameContext.GetPlayerName(2);
+end;
+
 constructor TMainWindow.Create(Owner: TComponent);
 begin
 	inherited Create(Owner);
@@ -1162,35 +1195,7 @@ begin
 	Self.m__Statusbar.Panels[0].Text := '';
 	Self.m__Statusbar.Panels[1].Text := '';
 	
-	
-	if Self.m__MenuItem__players__2_players.Checked then
-	begin
-		Player1Type := PLAYER_TYPE_HUMAN;
-		Player2Type := PLAYER_TYPE_HUMAN;
-	end
-	else if Self.m__MenuItem__players__human_vs_cpu.Checked then
-	begin
-		Player1Type := PLAYER_TYPE_HUMAN;
-		Player2Type := PLAYER_TYPE_CPU;
-	end
-	else if Self.m__MenuItem__players__cpu_vs_human.Checked then
-	begin
-		Player1Type := PLAYER_TYPE_CPU;
-		Player2Type := PLAYER_TYPE_HUMAN;
-	end
-	else if Self.m__MenuItem__players__cpu_vs_cpu.Checked then
-	begin
-		Player1Type := PLAYER_TYPE_CPU;
-		Player2Type := PLAYER_TYPE_CPU;
-	end
-	else
-		Assert(false, 'None of menu items is checked');
-	
-	Self.m__GameContext.SetPlayers(Player1Type, Player2Type);
-	
-	Self.m__Player1Label.Caption := Self.m__GameContext.GetPlayerName(1);
-	Self.m__Player2Label.Caption := Self.m__GameContext.GetPlayerName(2);
-	
+	Self.UpdatePlayers(Player1Type, Player2Type);
 	Self.m__GameContext.StartNewGame(Player1Type, Player2Type);
 
 	Self.m__DrawGrid.Repaint();
@@ -1218,7 +1223,7 @@ end;
 
 procedure TMainWindow.OnClick_MenuItem__players__any_submenu(Sender: TObject);
 var
-	Player1Type, Player2Type: Byte;
+	Player1TypeDummy, Player2TypeDummy: Byte;
 begin
 	Self.m__MenuItem__players__human_vs_cpu.Checked := False;
 	Self.m__MenuItem__players__cpu_vs_cpu.Checked := False;
@@ -1227,28 +1232,7 @@ begin
 	
 	(Sender as TMenuItem).Checked := True;
 	
-	if Self.m__MenuItem__players__cpu_vs_cpu.Checked or Self.m__MenuItem__players__cpu_vs_human.Checked then
-	begin
-		Player1Type := PLAYER_TYPE_CPU;
-	end
-	else
-	begin
-		Player1Type := PLAYER_TYPE_HUMAN;
-	end;
-	
-	if Self.m__MenuItem__players__2_players.Checked or Self.m__MenuItem__players__cpu_vs_human.Checked then
-	begin
-		Player2Type := PLAYER_TYPE_HUMAN;
-	end
-	else
-	begin
-		Player2Type := PLAYER_TYPE_CPU;
-	end;
-	
-	Self.m__GameContext.SetPlayers(Player1Type, Player2Type);
-	
-	Self.m__Player1Label.Caption := Self.m__GameContext.GetPlayerName(1);
-	Self.m__Player2Label.Caption := Self.m__GameContext.GetPlayerName(2);
+	Self.UpdatePlayers(Player1TypeDummy, Player2TypeDummy);
 end;
 	
 procedure TMainWindow.OnClick_MenuItem__colour__1st_player__any_submenu(Sender: TObject);
