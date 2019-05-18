@@ -350,7 +350,7 @@ begin
 		end;
 end;
 
-function CountCellsWithState(BoardState: TBoardState; CellState: Byte): Byte;
+function CountCellsWithState(BoardState: TBoardState; CellState: TIntOptionalPlayerNumber): TIntCellCount;
 var
 	Column, Row: TIntCellCoordinate;
 begin
