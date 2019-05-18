@@ -73,6 +73,10 @@ type
 	 * notify GUI about evaluation start, game progress, etc.
 	 *)
 	IGameDriver = interface
+		procedure OnGameStarted();
+		procedure BeforeMove();
+		procedure OnMoveMade();
+		procedure OnGameEnded();
 		procedure OnPositionEvaluationStarted();
 		
 		(**
@@ -126,6 +130,15 @@ type
 		public constructor Create(); overload;		//disallowing to invoke TObject.Create()
         public constructor Create(GameDriver: IGameDriver); overload;
         
+		(**
+		 * Version without BoardState param takes the current position.
+		 *)
+		public function CountCellsWithState(CellState: TIntOptionalPlayerNumber): TIntCellCount; overload;
+		private function CountCellsWithState(BoardState: TBoardState; CellState: TIntOptionalPlayerNumber): TIntCellCount; overload;
+		
+		private function IsMidgame(BoardState: TBoardState): Boolean;
+		private function GetHeuristicalEvaluation(BoardState: TBoardState; PlayerNumber: TIntPlayerNumber): TEvaluation;
+		
         (**
          * Init (re-read) algorithm parameters for each CPU's move.
          * These may be changed during the game.
@@ -247,6 +260,10 @@ type
 		public destructor Destroy(); override;
 		
 		//IGameDriver
+		public procedure OnGameStarted();
+		public procedure BeforeMove();
+		public procedure OnMoveMade();
+		public procedure OnGameEnded();
 		public procedure OnPositionEvaluationStarted();
 		public procedure OnPositionEvaluationChanged();
 		public procedure OnMoveEvaluationCompleted();
@@ -350,7 +367,12 @@ begin
 		end;
 end;
 
-function CountCellsWithState(BoardState: TBoardState; CellState: TIntOptionalPlayerNumber): TIntCellCount;
+function TGameContext.CountCellsWithState(CellState: TIntOptionalPlayerNumber): TIntCellCount;
+begin
+	Result := Self.CountCellsWithState(Self.m__BoardState, CellState);
+end;
+
+function TGameContext.CountCellsWithState(BoardState: TBoardState; CellState: TIntOptionalPlayerNumber): TIntCellCount;
 var
 	Column, Row: TIntCellCoordinate;
 begin
@@ -361,12 +383,12 @@ begin
 				Inc(Result);
 end;
 
-function IsMidgame(BoardState: TBoardState): Boolean;
+function TGameContext.IsMidgame(BoardState: TBoardState): Boolean;
 begin
-	Result := CountCellsWithState(BoardState, 1) + CountCellsWithState(BoardState, 2) < 56;
+	Result := Self.CountCellsWithState(BoardState, 1) + Self.CountCellsWithState(BoardState, 2) < 56;
 end;
 
-function GetHeuristicalEvaluation(BoardState: TBoardState; PlayerNumber: TIntPlayerNumber): TEvaluation;
+function TGameContext.GetHeuristicalEvaluation(BoardState: TBoardState; PlayerNumber: TIntPlayerNumber): TEvaluation;
 const
 	G: array [1..4] of array [1..2] of 1..8 = ((1, 1), (1, 8), (8, 1), (8, 8));
 	K: array [1..4] of array [1..2] of 1..8 = ((2, 2), (2, 7), (7, 2), (7, 7));
@@ -385,14 +407,14 @@ begin
 	if (AnalyzedPositions[PlayerNumber].PossibleMoveCount = 0) and (AnalyzedPositions[3 - PlayerNumber].PossibleMoveCount = 0) then
 	begin
 		Result.IsHeuristical := False;
-		Result.PieceCount := CountCellsWithState(BoardState, PlayerNumber) - CountCellsWithState(BoardState, 3 - PlayerNumber);
+		Result.PieceCount := Self.CountCellsWithState(BoardState, PlayerNumber) - Self.CountCellsWithState(BoardState, 3 - PlayerNumber);
 		Exit();
 	end;
 	
-	if IsMidgame(BoardState) then
-		Result.PieceCount := CountCellsWithState(BoardState, 3 - PlayerNumber) - CountCellsWithState(BoardState, PlayerNumber)
+	if Self.IsMidgame(BoardState) then
+		Result.PieceCount := Self.CountCellsWithState(BoardState, 3 - PlayerNumber) - Self.CountCellsWithState(BoardState, PlayerNumber)
 	else
-		Result.PieceCount := CountCellsWithState(BoardState, PlayerNumber) - CountCellsWithState(BoardState, 3 - PlayerNumber);
+		Result.PieceCount := Self.CountCellsWithState(BoardState, PlayerNumber) - Self.CountCellsWithState(BoardState, 3 - PlayerNumber);
 	
 	Result.PieceCount := Result.PieceCount + AnalyzedPositions[PlayerNumber].PossibleMoveCount;
 	Result.PieceCount := Result.PieceCount - AnalyzedPositions[3 - PlayerNumber].PossibleMoveCount;
@@ -455,7 +477,7 @@ begin
 	Self.m__MidgameMaxDepth := Self.m__GameDriver.GetMidgameMaxDepth();
 	Self.m__EndgameMaxDepth := Self.m__GameDriver.GetEndgameMaxDepth();
 
-	if 64 - CountCellsWithState(Self.m__BoardState, 1) - CountCellsWithState(Self.m__BoardState, 2) <= Self.m__EndgameMaxDepth then
+	if 64 - Self.CountCellsWithState(1) - Self.CountCellsWithState(2) <= Self.m__EndgameMaxDepth then
 		Self.m__MaxDepth := Self.m__EndgameMaxDepth
 	else
 		Self.m__MaxDepth := Self.m__MidgameMaxDepth;
@@ -566,7 +588,7 @@ label
 		
 		if Depth = Self.m__MaxDepth then
 		begin
-			Max := GetHeuristicalEvaluation(BoardState, AnalyzedPosition.i__WhoseTurn);
+			Max := Self.GetHeuristicalEvaluation(BoardState, AnalyzedPosition.i__WhoseTurn);
 			goto done;
 		end;
 		
@@ -585,7 +607,7 @@ label
 				if AnalyzedChildPosition.PossibleMoveCount > 0 then
 					Result := Evaluate(AnalyzedPosition.ChildPositions[I].BoardState, AnalyzedChildPosition, Alpha, Beta)
 				else
-					Result := GetHeuristicalEvaluation(AnalyzedPosition.ChildPositions[I].BoardState, AnalyzedPosition.i__WhoseTurn);
+					Result := Self.GetHeuristicalEvaluation(AnalyzedPosition.ChildPositions[I].BoardState, AnalyzedPosition.i__WhoseTurn);
 			end;
 			
 			if IsGreaterOrEqual(Max, Alpha, True) then
@@ -672,7 +694,7 @@ begin
 				else
 					Res := Evaluate(AnalyzedEnginePosition.ChildPositions[I].BoardState, AnalyzedChildPosition, Self.m__BestEngineMoveEvaluation, Self.m__BestEngineMoveEvaluation)
 			else
-				Res := GetHeuristicalEvaluation(AnalyzedEnginePosition.ChildPositions[I].BoardState, PlayerNumber);
+				Res := Self.GetHeuristicalEvaluation(AnalyzedEnginePosition.ChildPositions[I].BoardState, PlayerNumber);
 		end;
 		
 		if (not Res.IsLessOrEqual) and (Res.IsGreaterOrEqual or IsGreaterOrEqual(Res, Self.m__BestEngineMoveEvaluation, True)) then
@@ -747,17 +769,9 @@ var
 	C1, C2: Byte;
 	i__WhoseTurn: Byte;
 	IsGameEnd: Boolean;
-	MainWindow: TMainWindow;
 begin
-	MainWindow := TMainWindow(Self.m__GameDriver);
-
-	MainWindow.m__MenuItem_position_modify.Enabled := True;
-	
 	Self.m__LastMadeMove.Column := 1;
 	Self.m__LastMadeMove.Row := 1;
-	
-	MainWindow.m__Player1PieceCountEdit.Text := IntToStr(CountCellsWithState(Self.m__BoardState, 1));
-	MainWindow.m__Player2PieceCountEdit.Text := IntToStr(CountCellsWithState(Self.m__BoardState, 2));
 	
 	AnalyzePosition(Self.m__BoardState, 1, Self.m__AnalyzedPositions[1]);
 	AnalyzePosition(Self.m__BoardState, 2, Self.m__AnalyzedPositions[2]);
@@ -766,11 +780,8 @@ begin
 		for C2 := 1 to 8 do
 			Self.m__Evaluations.CellEvaluations[C1, C2] := '';
 			
-	MainWindow.m__DrawGrid.Repaint();
+	Self.m__GameDriver.OnGameStarted();
 	
-	MainWindow.m__Statusbar.Panels[2].Text := MainWindow.m__Player1Piece.Hint +' '+ IntToStr(Self.m__AnalyzedPositions[1].PossibleMoveCount) +' moves  '+
-			MainWindow.m__Player2Piece.Hint +' '+ IntToStr(Self.m__AnalyzedPositions[2].PossibleMoveCount) +' moves';
-		
 	IsGameEnd := False;
 	i__WhoseTurn := 1;
 	
@@ -783,7 +794,7 @@ begin
 		if Self.m__DoBreakGame then
 			Exit();
 		
-		MainWindow.m__DrawGrid.Selection := TGridRect(MainWindow.m__DrawGrid.CellRect(-1, -1));		//TODO: Why whis typecast (in two places)?
+		Self.m__GameDriver.BeforeMove();
 		
 		AnalyzePosition(Self.m__BoardState, 1, Self.m__AnalyzedPositions[1]);
 		AnalyzePosition(Self.m__BoardState, 2, Self.m__AnalyzedPositions[2]);
@@ -810,10 +821,8 @@ begin
 			Self.m__LastMadeMove := Move;
 			Self.m__GameHistory.MoveCount := Self.m__GameHistory.MoveCount + 1;
 			Self.m__GameHistory.CurrentMoveNumber := Self.m__GameHistory.CurrentMoveNumber + 1;
-			MainWindow.m__BackForwardButtons.Position := Self.m__GameHistory.CurrentMoveNumber;
 			Self.m__GameHistory.Positions[Self.m__GameHistory.MoveCount].BoardState := Self.m__BoardState;
 			Self.m__GameHistory.Positions[Self.m__GameHistory.MoveCount].i__WhoseTurn := i__WhoseTurn;
-			MainWindow.m__DrawGrid.Repaint();
 		end;
 		
 		i__WhoseTurn := 3 - i__WhoseTurn;
@@ -821,15 +830,11 @@ begin
 		AnalyzePosition(Self.m__BoardState, 1, Self.m__AnalyzedPositions[1]);
 		AnalyzePosition(Self.m__BoardState, 2, Self.m__AnalyzedPositions[2]);
 		
-		MainWindow.m__Statusbar.Panels[2].Text := MainWindow.m__Player1Piece.Hint +' '+ IntToStr(Self.m__AnalyzedPositions[1].PossibleMoveCount) +' moves  '+
-				MainWindow.m__Player2Piece.Hint +' '+ IntToStr(Self.m__AnalyzedPositions[2].PossibleMoveCount) +' moves';
-		
-		MainWindow.m__Player1PieceCountEdit.Text := IntToStr(CountCellsWithState(Self.m__BoardState, 1));
-		MainWindow.m__Player2PieceCountEdit.Text := IntToStr(CountCellsWithState(Self.m__BoardState, 2));
+		Self.m__GameDriver.OnMoveMade();
 	end;
 	
-	C1 := CountCellsWithState(Self.m__BoardState, 1);
-	C2 := CountCellsWithState(Self.m__BoardState, 2);
+	C1 := Self.CountCellsWithState(1);
+	C2 := Self.CountCellsWithState(2);
 	
 	if C1 > C2 then
 		ShowMessage('Winner is '+ Self.m__Players[1].name)
@@ -838,7 +843,7 @@ begin
 	else
 		ShowMessage('Draw');
 			
-	MainWindow.m__MenuItem_position_modify.Enabled := True;
+	Self.m__GameDriver.OnGameEnded();
 end;
 
 procedure TGameContext.SetPlayers(Player1Type, Player2Type: Byte);
@@ -876,6 +881,41 @@ end;
 function TGameContext.GetPlayerName(PlayerNumber: TIntPlayerNumber): string;
 begin
 	Result := Self.m__Players[PlayerNumber].Name;
+end;
+
+procedure TMainWindow.OnGameStarted();
+begin
+	Self.m__MenuItem_position_modify.Enabled := True;
+	
+	Self.m__Player1PieceCountEdit.Text := IntToStr(Self.m__GameContext.CountCellsWithState(1));
+	Self.m__Player2PieceCountEdit.Text := IntToStr(Self.m__GameContext.CountCellsWithState(2));
+	
+	Self.m__DrawGrid.Repaint();
+	
+	Self.m__Statusbar.Panels[2].Text := Self.m__Player1Piece.Hint +' '+ IntToStr(Self.m__GameContext.GetPossibleMoveCount(1)) +' moves  '+
+			Self.m__Player2Piece.Hint +' '+ IntToStr(Self.m__GameContext.GetPossibleMoveCount(2)) +' moves';
+end;
+
+procedure TMainWindow.BeforeMove();
+begin
+	Self.m__DrawGrid.Selection := TGridRect(Self.m__DrawGrid.CellRect(-1, -1));		//TODO: Why whis typecast (in two places)?
+end;
+
+procedure TMainWindow.OnMoveMade();
+begin
+	Self.m__BackForwardButtons.Position := Self.m__GameContext.GetCurrentMoveNumberInHistory();
+	Self.m__DrawGrid.Repaint();
+		
+	Self.m__Statusbar.Panels[2].Text := Self.m__Player1Piece.Hint +' '+ IntToStr(Self.m__GameContext.GetPossibleMoveCount(1)) +' moves  '+
+			Self.m__Player2Piece.Hint +' '+ IntToStr(Self.m__GameContext.GetPossibleMoveCount(2)) +' moves';
+	
+	Self.m__Player1PieceCountEdit.Text := IntToStr(Self.m__GameContext.CountCellsWithState(1));
+	Self.m__Player2PieceCountEdit.Text := IntToStr(Self.m__GameContext.CountCellsWithState(2));
+end;
+
+procedure TMainWindow.OnGameEnded();
+begin
+	Self.m__MenuItem_position_modify.Enabled := True;
 end;
 
 procedure TMainWindow.OnPositionEvaluationStarted();
