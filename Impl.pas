@@ -96,6 +96,7 @@ type
 		
 		function GetMidgameMaxDepth(): TIntCellCount;
 		function GetEndgameMaxDepth(): TIntCellCount;
+		function GetPlayerMoveCell(): TCellAddress;
 	end;
 
 	(**
@@ -253,6 +254,7 @@ type
 		public procedure OnCellStateChanged();
 		public function GetMidgameMaxDepth(): TIntCellCount;
 		public function GetEndgameMaxDepth(): TIntCellCount;
+		public function GetPlayerMoveCell(): TCellAddress;
 		
 		private procedure UpdatePlayers(var Player1Type, Player2Type: Byte);
 
@@ -713,19 +715,15 @@ end;
 procedure TGameContext.GetPlayerMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TIntPlayerNumber);
 var
 	MoveNumberDummy: Byte;
-	MainWindow: TMainWindow;
 begin
-	MainWindow := TMainWindow(Self.m__GameDriver);
-
 	repeat
 		Application.ProcessMessages();		//without this window becomes unresponsive
 		
 		if Self.m__DoBreakGame then
 			Exit();
-	until IsLegalMove(MainWindow.m__DrawGrid.Col + 1, MainWindow.m__DrawGrid.Row + 1, Self.m__AnalyzedPositions[PlayerNumber], MoveNumberDummy);
 	
-	Move.Column := MainWindow.m__DrawGrid.Col + 1;
-	Move.Row := MainWindow.m__DrawGrid.Row + 1;
+		Move := Self.m__GameDriver.GetPlayerMoveCell();
+	until IsLegalMove(Move.Column, Move.Row, Self.m__AnalyzedPositions[PlayerNumber], MoveNumberDummy);
 end;
 
 procedure TGameContext.StartNewGame(Player1Type, Player2Type: Byte);
@@ -934,6 +932,12 @@ end;
 function TMainWindow.GetEndgameMaxDepth(): TIntCellCount;
 begin
 	Result := StrToInt(Self.m__EndgameDepthLabeledEdit.Text);
+end;
+
+function TMainWindow.GetPlayerMoveCell(): TCellAddress;
+begin
+	Result.Column := Self.m__DrawGrid.Col + 1;
+	Result.Row := Self.m__DrawGrid.Row + 1;
 end;
 
 procedure TMainWindow.UpdatePlayers(var Player1Type, Player2Type: Byte);
