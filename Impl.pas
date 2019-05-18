@@ -361,9 +361,9 @@ begin
 				Inc(Result);
 end;
 
-function IsMidgame(Field: TBoardState): Boolean;
+function IsMidgame(BoardState: TBoardState): Boolean;
 begin
-	Result := CountCellsWithState(Field, 1) + CountCellsWithState(Field, 2) < 56;
+	Result := CountCellsWithState(BoardState, 1) + CountCellsWithState(BoardState, 2) < 56;
 end;
 
 function GetHeuristicalEvaluation(BoardState: TBoardState; PlayerNumber: TIntPlayerNumber): TEvaluation;
