@@ -130,6 +130,10 @@ type
 		public constructor Create(); overload;		//disallowing to invoke TObject.Create()
 		public constructor Create(GameDriver: IGameDriver); overload;
 		
+		private procedure ClearBoard(var BoardState: TBoardState);
+		private procedure InitBoard(var BoardState: TBoardState);
+		private procedure AnalyzePosition(BoardState: TBoardState; i__WhoseTurn: TIntOptionalPlayerNumber; var AnalyzedPosition: TAnalyzedPosition);
+		
 		(**
 		 * Version without BoardState param takes the current position.
 		 *)
@@ -138,6 +142,9 @@ type
 		
 		private function IsMidgame(BoardState: TBoardState): Boolean;
 		private function GetHeuristicalEvaluation(BoardState: TBoardState; PlayerNumber: TIntPlayerNumber): TEvaluation;
+		private function IsEvaluationGreaterOrEqual(Evaluation1, Evaluation2: TEvaluation; Equal: Boolean): Boolean;
+		private function EvaluationToStr_Short(Evaluation: TEvaluation): string;
+		private function NegateEvaluation(Evaluation: TEvaluation): TEvaluation;
 		
 		(**
 		 * Init (re-read) algorithm parameters for each CPU's move.
@@ -176,6 +183,7 @@ type
 		public function GetCurrentMoveNumberInHistory(): TIntCellCount;
 		
 		private procedure GetEngineMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TIntPlayerNumber);
+		private function IsLegalMove(Column, Row: TIntCellCoordinate; AnalyzedPosition: TAnalyzedPosition; var MoveNumber: Byte): Boolean;
 		private procedure GetPlayerMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TIntPlayerNumber);
 		
 		(**
@@ -274,6 +282,7 @@ type
 		public function GetPlayerMoveCell(): TCellAddress;
 		
 		private procedure UpdatePlayers(var Player1Type, Player2Type: Byte);
+		private function EvaluationToStr_Long(Evaluation: TEvaluation): string;
 
 		//graphical component events		
 		published procedure OnCreate_MainWindow(Sender: TObject);
@@ -306,7 +315,7 @@ begin
 	Self.m__GameDriver := GameDriver;
 end;
 
-procedure ClearBoard(var BoardState: TBoardState);
+procedure TGameContext.ClearBoard(var BoardState: TBoardState);
 var
 	Column, Row: Byte;
 begin
@@ -315,7 +324,7 @@ begin
 			BoardState[Column, Row] := 0;
 end;
 
-procedure InitBoard(var BoardState: TBoardState);
+procedure TGameContext.InitBoard(var BoardState: TBoardState);
 begin
 	BoardState[4, 4] := 2;
 	BoardState[5, 4] := 1;
@@ -323,7 +332,7 @@ begin
 	BoardState[5, 5] := 2;
 end;
 
-procedure AnalyzePosition(BoardState: TBoardState; i__WhoseTurn: TIntOptionalPlayerNumber; var AnalyzedPosition: TAnalyzedPosition);
+procedure TGameContext.AnalyzePosition(BoardState: TBoardState; i__WhoseTurn: TIntOptionalPlayerNumber; var AnalyzedPosition: TAnalyzedPosition);
 var
 	Column, Row: TIntCellCoordinate;
 	ReversedCount: TIntCellCount;
@@ -401,8 +410,8 @@ begin
 	Result.IsLessOrEqual := False;
 	Result.IsGreaterOrEqual := False;
 	
-	AnalyzePosition(BoardState, PlayerNumber, AnalyzedPositions[PlayerNumber]);
-	AnalyzePosition(BoardState, 3 - PlayerNumber, AnalyzedPositions[3 - PlayerNumber]);
+	Self.AnalyzePosition(BoardState, PlayerNumber, AnalyzedPositions[PlayerNumber]);
+	Self.AnalyzePosition(BoardState, 3 - PlayerNumber, AnalyzedPositions[3 - PlayerNumber]);
 	
 	if (AnalyzedPositions[PlayerNumber].PossibleMoveCount = 0) and (AnalyzedPositions[3 - PlayerNumber].PossibleMoveCount = 0) then
 	begin
@@ -426,7 +435,7 @@ begin
 			Result.PieceCount := Result.PieceCount - 100;
 end;
 
-function IsGreaterOrEqual(Evaluation1, Evaluation2: TEvaluation; Equal: Boolean): Boolean;
+function TGameContext.IsEvaluationGreaterOrEqual(Evaluation1, Evaluation2: TEvaluation; Equal: Boolean): Boolean;
 begin
 	if Evaluation1.IsHeuristical = Evaluation2.IsHeuristical then
 		Result := (Evaluation1.PieceCount > Evaluation2.PieceCount) or ((Evaluation1.PieceCount = Evaluation2.PieceCount) and (Equal or ((Evaluation1.IsGreaterOrEqual) and (Evaluation2.IsGreaterOrEqual = False))))
@@ -436,7 +445,7 @@ begin
 		Result := Evaluation2.PieceCount < 0;
 end;
 
-function EvaluationToStr_Long(Evaluation: TEvaluation): string;
+function TMainWindow.EvaluationToStr_Long(Evaluation: TEvaluation): string;
 begin
 	Result := IntToStr(Abs(Evaluation.PieceCount));
 	
@@ -451,7 +460,7 @@ begin
 		Result := IntToStr(Evaluation.PieceCount);
 end;
 
-function EvaluationToStr_Short(Evaluation: TEvaluation): string;
+function TGameContext.EvaluationToStr_Short(Evaluation: TEvaluation): string;
 begin
 	Result := IntToStr(Evaluation.PieceCount);
 	
@@ -464,7 +473,7 @@ begin
 		Result := '>='+ Result;
 end;
 
-function NegateEvaluation(Evaluation: TEvaluation): TEvaluation;
+function TGameContext.NegateEvaluation(Evaluation: TEvaluation): TEvaluation;
 begin
 	Result := Evaluation;
 	Result.PieceCount := -Evaluation.PieceCount;
@@ -596,13 +605,13 @@ label
 		
 		for I := 1 to AnalyzedPosition.PossibleMoveCount do
 		begin
-			AnalyzePosition(AnalyzedPosition.ChildPositions[I].BoardState, 3 - AnalyzedPosition.i__WhoseTurn, AnalyzedChildPosition);
+			Self.AnalyzePosition(AnalyzedPosition.ChildPositions[I].BoardState, 3 - AnalyzedPosition.i__WhoseTurn, AnalyzedChildPosition);
 		
 			if AnalyzedChildPosition.PossibleMoveCount > 0 then
-				Result := NegateEvaluation(Evaluate(AnalyzedPosition.ChildPositions[I].BoardState, AnalyzedChildPosition, NegateEvaluation(Beta), NegateEvaluation(Alpha)))		// (Alpha >= Max) => (-Alpha <= -Max) => (Beta <= -Max)
+				Result := Self.NegateEvaluation(Evaluate(AnalyzedPosition.ChildPositions[I].BoardState, AnalyzedChildPosition, Self.NegateEvaluation(Beta), Self.NegateEvaluation(Alpha)))		// (Alpha >= Max) => (-Alpha <= -Max) => (Beta <= -Max)
 			else
 			begin
-				AnalyzePosition(AnalyzedPosition.ChildPositions[I].BoardState, AnalyzedPosition.i__WhoseTurn, AnalyzedChildPosition);
+				Self.AnalyzePosition(AnalyzedPosition.ChildPositions[I].BoardState, AnalyzedPosition.i__WhoseTurn, AnalyzedChildPosition);
 				
 				if AnalyzedChildPosition.PossibleMoveCount > 0 then
 					Result := Evaluate(AnalyzedPosition.ChildPositions[I].BoardState, AnalyzedChildPosition, Alpha, Beta)
@@ -610,14 +619,14 @@ label
 					Result := Self.GetHeuristicalEvaluation(AnalyzedPosition.ChildPositions[I].BoardState, AnalyzedPosition.i__WhoseTurn);
 			end;
 			
-			if IsGreaterOrEqual(Max, Alpha, True) then
+			if Self.IsEvaluationGreaterOrEqual(Max, Alpha, True) then
 				Alpha := Max;
 			
-			if IsGreaterOrEqual(Result, Max, False) then
+			if Self.IsEvaluationGreaterOrEqual(Result, Max, False) then
 			begin
 				Max := Result;
 				
-				if (not Max.IsLessOrEqual) and (Max.IsGreaterOrEqual or IsGreaterOrEqual(Max, Beta, True)) then
+				if (not Max.IsLessOrEqual) and (Max.IsGreaterOrEqual or Self.IsEvaluationGreaterOrEqual(Max, Beta, True)) then
 				begin
 					if AnalyzedPosition.PossibleMoveCount > 1 then
 					begin
@@ -634,7 +643,7 @@ label
 		
 		Result := Max;
 		
-		if IsGreaterOrEqual(Result, MaxValue, True) then
+		if Self.IsEvaluationGreaterOrEqual(Result, MaxValue, True) then
 			Result.IsGreaterOrEqual := False;
 			
 		Dec(Depth);
@@ -655,7 +664,7 @@ begin
 	Res.IsHeuristical := True;
 	Depth := 0;
 	
-	AnalyzePosition(BoardState, PlayerNumber, AnalyzedEnginePosition);
+	Self.AnalyzePosition(BoardState, PlayerNumber, AnalyzedEnginePosition);
 	
 	if AnalyzedEnginePosition.PossibleMoveCount = 1 then
 	begin
@@ -677,16 +686,16 @@ begin
 	
 	for I := 1 to AnalyzedEnginePosition.PossibleMoveCount do
 	begin
-		AnalyzePosition(AnalyzedEnginePosition.ChildPositions[I].BoardState, 3 - PlayerNumber, AnalyzedChildPosition);
+		Self.AnalyzePosition(AnalyzedEnginePosition.ChildPositions[I].BoardState, 3 - PlayerNumber, AnalyzedChildPosition);
 		
 		if AnalyzedChildPosition.PossibleMoveCount > 0 then
 			if I < AnalyzedEnginePosition.PossibleMoveCount then
-				Res := NegateEvaluation(Evaluate(AnalyzedEnginePosition.ChildPositions[I].BoardState, AnalyzedChildPosition, NegateEvaluation(MaxValue), NegateEvaluation(Self.m__BestEngineMoveEvaluation)))
+				Res := Self.NegateEvaluation(Evaluate(AnalyzedEnginePosition.ChildPositions[I].BoardState, AnalyzedChildPosition, Self.NegateEvaluation(MaxValue), Self.NegateEvaluation(Self.m__BestEngineMoveEvaluation)))
 			else
-				Res := NegateEvaluation(Evaluate(AnalyzedEnginePosition.ChildPositions[I].BoardState, AnalyzedChildPosition, NegateEvaluation(Self.m__BestEngineMoveEvaluation), NegateEvaluation(Self.m__BestEngineMoveEvaluation)))
+				Res := Self.NegateEvaluation(Evaluate(AnalyzedEnginePosition.ChildPositions[I].BoardState, AnalyzedChildPosition, Self.NegateEvaluation(Self.m__BestEngineMoveEvaluation), Self.NegateEvaluation(Self.m__BestEngineMoveEvaluation)))
 		else
 		begin
-			AnalyzePosition(AnalyzedEnginePosition.ChildPositions[I].BoardState, PlayerNumber, AnalyzedChildPosition);
+			Self.AnalyzePosition(AnalyzedEnginePosition.ChildPositions[I].BoardState, PlayerNumber, AnalyzedChildPosition);
 			
 			if AnalyzedChildPosition.PossibleMoveCount > 0 then
 				if I < AnalyzedEnginePosition.PossibleMoveCount then
@@ -697,7 +706,7 @@ begin
 				Res := Self.GetHeuristicalEvaluation(AnalyzedEnginePosition.ChildPositions[I].BoardState, PlayerNumber);
 		end;
 		
-		if (not Res.IsLessOrEqual) and (Res.IsGreaterOrEqual or IsGreaterOrEqual(Res, Self.m__BestEngineMoveEvaluation, True)) then
+		if (not Res.IsLessOrEqual) and (Res.IsGreaterOrEqual or Self.IsEvaluationGreaterOrEqual(Res, Self.m__BestEngineMoveEvaluation, True)) then
 		begin
 			Move := AnalyzedEnginePosition.ChildPositions[I].Move;
 			Self.m__BestEngineMoveEvaluation := Res;
@@ -706,11 +715,11 @@ begin
 			Self.m__GameDriver.OnPositionEvaluationChanged();
 		end;
 		
-		Self.m__Evaluations.CellEvaluations[AnalyzedEnginePosition.ChildPositions[I].Move.Column, AnalyzedEnginePosition.ChildPositions[I].Move.Row] := EvaluationToStr_Short(Res);
+		Self.m__Evaluations.CellEvaluations[AnalyzedEnginePosition.ChildPositions[I].Move.Column, AnalyzedEnginePosition.ChildPositions[I].Move.Row] := Self.EvaluationToStr_Short(Res);
 		
 		Self.m__GameDriver.OnMoveEvaluationCompleted();
 		
-		if IsGreaterOrEqual(Self.m__BestEngineMoveEvaluation, MaxValue, True) then
+		if Self.IsEvaluationGreaterOrEqual(Self.m__BestEngineMoveEvaluation, MaxValue, True) then
 			goto done;
 	end;
 	
@@ -719,7 +728,7 @@ begin
 	Self.m__GameDriver.OnPositionEvaluationCompleted();
 end;
 
-function IsLegalMove(Column, Row: TIntCellCoordinate; AnalyzedPosition: TAnalyzedPosition; var MoveNumber: Byte): Boolean;
+function TGameContext.IsLegalMove(Column, Row: TIntCellCoordinate; AnalyzedPosition: TAnalyzedPosition; var MoveNumber: Byte): Boolean;
 var
 	I: Byte;
 begin
@@ -745,16 +754,16 @@ begin
 			Exit();
 	
 		Move := Self.m__GameDriver.GetPlayerMoveCell();
-	until IsLegalMove(Move.Column, Move.Row, Self.m__AnalyzedPositions[PlayerNumber], MoveNumberDummy);
+	until Self.IsLegalMove(Move.Column, Move.Row, Self.m__AnalyzedPositions[PlayerNumber], MoveNumberDummy);
 end;
 
 procedure TGameContext.StartNewGame(Player1Type, Player2Type: Byte);
 begin
-	ClearBoard(Self.m__BoardState);
-	InitBoard(Self.m__BoardState);
+	Self.ClearBoard(Self.m__BoardState);
+	Self.InitBoard(Self.m__BoardState);
 	
-	ClearBoard(Self.m__GameHistory.Positions[1].BoardState);
-	InitBoard(Self.m__GameHistory.Positions[1].BoardState);
+	Self.ClearBoard(Self.m__GameHistory.Positions[1].BoardState);
+	Self.InitBoard(Self.m__GameHistory.Positions[1].BoardState);
 	
 	Self.m__GameHistory.MoveCount := 1;
 	Self.m__GameHistory.CurrentMoveNumber := 1;
@@ -773,8 +782,8 @@ begin
 	Self.m__LastMadeMove.Column := 1;
 	Self.m__LastMadeMove.Row := 1;
 	
-	AnalyzePosition(Self.m__BoardState, 1, Self.m__AnalyzedPositions[1]);
-	AnalyzePosition(Self.m__BoardState, 2, Self.m__AnalyzedPositions[2]);
+	Self.AnalyzePosition(Self.m__BoardState, 1, Self.m__AnalyzedPositions[1]);
+	Self.AnalyzePosition(Self.m__BoardState, 2, Self.m__AnalyzedPositions[2]);
 	
 	for C1 := 1 to 8 do
 		for C2 := 1 to 8 do
@@ -796,8 +805,8 @@ begin
 		
 		Self.m__GameDriver.BeforeMove();
 		
-		AnalyzePosition(Self.m__BoardState, 1, Self.m__AnalyzedPositions[1]);
-		AnalyzePosition(Self.m__BoardState, 2, Self.m__AnalyzedPositions[2]);
+		Self.AnalyzePosition(Self.m__BoardState, 1, Self.m__AnalyzedPositions[1]);
+		Self.AnalyzePosition(Self.m__BoardState, 2, Self.m__AnalyzedPositions[2]);
 		
 		if Self.m__AnalyzedPositions[i__WhoseTurn].PossibleMoveCount = 0 then
 			if Self.m__AnalyzedPositions[3 - i__WhoseTurn].PossibleMoveCount = 0 then
@@ -815,7 +824,7 @@ begin
 			Self.m_i__WhoseTurn := i__WhoseTurn;
 		end;
 			
-		if IsLegalMove(Move.Column, Move.Row, Self.m__AnalyzedPositions[i__WhoseTurn], C1) then
+		if Self.IsLegalMove(Move.Column, Move.Row, Self.m__AnalyzedPositions[i__WhoseTurn], C1) then
 		begin
 			Self.m__BoardState := Self.m__AnalyzedPositions[i__WhoseTurn].ChildPositions[C1].BoardState;
 			Self.m__LastMadeMove := Move;
@@ -827,8 +836,8 @@ begin
 		
 		i__WhoseTurn := 3 - i__WhoseTurn;
 		
-		AnalyzePosition(Self.m__BoardState, 1, Self.m__AnalyzedPositions[1]);
-		AnalyzePosition(Self.m__BoardState, 2, Self.m__AnalyzedPositions[2]);
+		Self.AnalyzePosition(Self.m__BoardState, 1, Self.m__AnalyzedPositions[1]);
+		Self.AnalyzePosition(Self.m__BoardState, 2, Self.m__AnalyzedPositions[2]);
 		
 		Self.m__GameDriver.OnMoveMade();
 	end;
@@ -941,7 +950,7 @@ end;
 
 procedure TMainWindow.OnPositionEvaluationChanged();
 begin
-	Self.m__Statusbar.Panels[1].Text := EvaluationToStr_Long(Self.m__GameContext.GetBestEngineMoveEvaluation());
+	Self.m__Statusbar.Panels[1].Text := Self.EvaluationToStr_Long(Self.m__GameContext.GetBestEngineMoveEvaluation());
 end;
 
 procedure TMainWindow.OnMoveEvaluationCompleted();
