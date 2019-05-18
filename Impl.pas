@@ -117,7 +117,7 @@ type
 		private m__LastMadeMove: TCellAddress;
 		
 		private m__GameHistory: TGameHistory;
-		public m__IsInModifyMode, m__DoBreakGame: Boolean;
+		private m__IsInModifyMode, m__DoBreakGame: Boolean;
 
 		private m__GameDriver: IGameDriver;
 		
@@ -155,6 +155,7 @@ type
 		public function s__GetMoveEvaluation(Column, Row: Byte): string;
 		public function GetCellState(Column, Row: Byte): TIntOptionalPlayerNumber;
 		public procedure SetCellState(Column, Row: Byte; CellState: TIntOptionalPlayerNumber);
+		public procedure StartBoardModification();
 		public procedure FinishBoardModification();
 		public procedure GoBack();
 		public procedure GoForward();
@@ -504,6 +505,12 @@ begin
 	Self.m__BoardState[Column + 1, Row + 1] := CellState;
 	
 	Self.m__GameDriver.OnCellStateChanged();
+end;
+
+procedure TGameContext.StartBoardModification();
+begin
+	Self.m__DoBreakGame := True;
+	Self.m__IsInModifyMode := True;
 end;
 
 procedure TGameContext.FinishBoardModification();
@@ -1029,9 +1036,6 @@ begin
 		Self.m__Player2Piece.Hint := 'Yellow';
 	end;
 	
-	Self.m__GameContext.m__DoBreakGame := False;
-	Self.m__GameContext.m__IsInModifyMode := False;
-	
 	Self.m__ColumnLabel.Top := 0;
 	Self.m__Row1Label.Left := 5;
 	Self.m__Row2Label.Left := 5;
@@ -1205,8 +1209,8 @@ procedure TMainWindow.OnClick_MenuItem_position_modify(Sender: TObject);
 begin
 	Self.m__MenuItem_position_modify.Enabled := False;
 	Self.m__MenuItem_position_continue.Enabled := True;
-	Self.m__GameContext.m__DoBreakGame := True;
-	Self.m__GameContext.m__IsInModifyMode := True;
+	
+	Self.m__GameContext.StartBoardModification();
 end;
 
 procedure TMainWindow.OnClick_MenuItem_position_continue(Sender: TObject);
