@@ -34,6 +34,7 @@ type
 	TPlayer = record
 		Name: string;
 		fn__GetMove: procedure(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TIntPlayerNumber) of object;
+		PlayerType: Byte;		//one of PLAYER_TYPE_* constants
 	end;
 	
 	TAnalyzedPosition = record
@@ -103,7 +104,7 @@ type
 	TGameContext = class
 		private m__BoardState: TBoardState;
 		private m__AnalyzedPositions: array [TIntPlayerNumber] of TAnalyzedPosition;
-		public m__Players: array [TIntPlayerNumber] of TPlayer;
+		private m__Players: array [TIntPlayerNumber] of TPlayer;
 		private m_i__WhoseTurn: Byte;
 		private m__MidgameMaxDepth, m__EndgameMaxDepth, m__MaxDepth: TIntCellCount;
 		
@@ -174,6 +175,9 @@ type
 		 * Runs game from current position on the board.
 		 *)
 		public procedure RunGame();
+		
+		public procedure SetPlayers(Player1Type, Player2Type: Byte);
+		public function GetPlayerName(PlayerNumber: TIntPlayerNumber): string;
 	end;
 	
 	TMainWindow = class(TForm, IGameDriver)
@@ -726,32 +730,7 @@ begin
 	Self.m__GameHistory.MoveCount := 1;
 	Self.m__GameHistory.CurrentMoveNumber := 1;
 	
-	if Player1Type = PLAYER_TYPE_HUMAN then
-	begin
-		Self.m__Players[1].fn__GetMove := Self.GetPlayerMove;
-		Self.m__Players[1].Name := 'human';
-	end
-	else if Player1Type = PLAYER_TYPE_CPU then
-	begin
-		Self.m__Players[1].fn__GetMove := Self.GetEngineMove;
-		Self.m__Players[1].Name := 'CPU';
-	end
-	else
-		Assert(false, 'Player1Type must be one of PLAYER_TYPE_* constants: '+ IntToStr(Player1Type));
-		
-	if Player2Type = PLAYER_TYPE_HUMAN then
-	begin
-		Self.m__Players[2].fn__GetMove := Self.GetPlayerMove;
-		Self.m__Players[2].Name := 'human';
-	end
-	else if Player2Type = PLAYER_TYPE_CPU then
-	begin
-		Self.m__Players[2].fn__GetMove := Self.GetEngineMove;
-		Self.m__Players[2].Name := 'CPU';
-	end
-	else
-		Assert(false, 'Player2Type must be one of PLAYER_TYPE_* constants: '+ IntToStr(Player2Type));
-	
+	Self.SetPlayers(Player1Type, Player2Type);
 	Self.RunGame();
 end;
 
@@ -853,6 +832,43 @@ begin
 		ShowMessage('Draw');
 			
 	MainWindow.m__MenuItem_position_modify.Enabled := True;
+end;
+
+procedure TGameContext.SetPlayers(Player1Type, Player2Type: Byte);
+begin
+	Self.m__Players[1].PlayerType := Player1Type;
+	Self.m__Players[2].PlayerType := Player2Type;
+
+	if Player1Type = PLAYER_TYPE_CPU then
+	begin
+		Self.m__Players[1].fn__GetMove := Self.GetEngineMove;
+		Self.m__Players[1].Name := 'CPU';
+	end
+	else if Player1Type = PLAYER_TYPE_HUMAN then
+	begin
+		Self.m__Players[1].fn__GetMove := Self.GetPlayerMove;
+		Self.m__Players[1].Name := 'human';
+	end
+	else
+		Assert(False, 'Player1Type must be one of PLAYER_TYPE_* constants: '+ IntToStr(Player1Type));
+	
+	if Player2Type = PLAYER_TYPE_CPU then
+	begin
+		Self.m__Players[2].fn__GetMove := Self.GetEngineMove;
+		Self.m__Players[2].Name := 'CPU';
+	end
+	else if Player2Type = PLAYER_TYPE_HUMAN then
+	begin
+		Self.m__Players[2].fn__GetMove := Self.GetPlayerMove;
+		Self.m__Players[2].Name := 'human';
+	end
+	else
+		Assert(False, 'Player2Type must be one of PLAYER_TYPE_* constants: '+ IntToStr(Player2Type));
+end;
+
+function TGameContext.GetPlayerName(PlayerNumber: TIntPlayerNumber): string;
+begin
+	Result := Self.m__Players[PlayerNumber].Name;
 end;
 
 procedure TMainWindow.OnPositionEvaluationStarted();
@@ -1139,7 +1155,6 @@ end;
 procedure TMainWindow.OnClick_MenuItem__new_game(Sender: TObject);
 var
 	Player1Type, Player2Type: Byte;
-	Player1Name, Player2Name: string;
 begin
 	Self.m__BackForwardButtons.Position := 1;
 	Self.m__DrawGrid.DefaultDrawing := False;
@@ -1171,22 +1186,10 @@ begin
 	else
 		Assert(false, 'None of menu items is checked');
 	
-	if Player1Type = PLAYER_TYPE_HUMAN then
-		Player1Name := 'human'
-	else if Player1Type = PLAYER_TYPE_CPU then
-		Player1Name := 'CPU'
-	else
-		Assert(false, 'Player1Type must be one of PLAYER_TYPE_* constants: '+ IntToStr(Player1Type));
-		
-	if Player2Type = PLAYER_TYPE_HUMAN then
-		Player2Name := 'human'
-	else if Player2Type = PLAYER_TYPE_CPU then
-		Player2Name := 'CPU'
-	else
-		Assert(false, 'Player2Type must be one of PLAYER_TYPE_* constants: '+ IntToStr(Player2Type));
+	Self.m__GameContext.SetPlayers(Player1Type, Player2Type);
 	
-	Self.m__Player1Label.Caption := Player1Name;//Self.m__GameContext.m__Players[1].Name;
-	Self.m__Player2Label.Caption := Player2Name;//Self.m__GameContext.m__Players[2].Name;
+	Self.m__Player1Label.Caption := Self.m__GameContext.GetPlayerName(1);
+	Self.m__Player2Label.Caption := Self.m__GameContext.GetPlayerName(2);
 	
 	Self.m__GameContext.StartNewGame(Player1Type, Player2Type);
 
@@ -1214,6 +1217,8 @@ begin
 end;
 
 procedure TMainWindow.OnClick_MenuItem__players__any_submenu(Sender: TObject);
+var
+	Player1Type, Player2Type: Byte;
 begin
 	Self.m__MenuItem__players__human_vs_cpu.Checked := False;
 	Self.m__MenuItem__players__cpu_vs_cpu.Checked := False;
@@ -1224,28 +1229,26 @@ begin
 	
 	if Self.m__MenuItem__players__cpu_vs_cpu.Checked or Self.m__MenuItem__players__cpu_vs_human.Checked then
 	begin
-		Self.m__GameContext.m__Players[1].fn__GetMove := Self.m__GameContext.GetEngineMove;
-		Self.m__GameContext.m__Players[1].Name := 'CPU';
+		Player1Type := PLAYER_TYPE_CPU;
 	end
 	else
 	begin
-		Self.m__GameContext.m__Players[1].fn__GetMove := Self.m__GameContext.GetPlayerMove;
-		Self.m__GameContext.m__Players[1].Name := 'human';
+		Player1Type := PLAYER_TYPE_HUMAN;
 	end;
 	
 	if Self.m__MenuItem__players__2_players.Checked or Self.m__MenuItem__players__cpu_vs_human.Checked then
 	begin
-		Self.m__GameContext.m__Players[2].fn__GetMove := Self.m__GameContext.GetPlayerMove;
-		Self.m__GameContext.m__Players[2].Name := 'human';
+		Player2Type := PLAYER_TYPE_HUMAN;
 	end
 	else
 	begin
-		Self.m__GameContext.m__Players[2].fn__GetMove := Self.m__GameContext.GetEngineMove;
-		Self.m__GameContext.m__Players[2].Name := 'CPU';
+		Player2Type := PLAYER_TYPE_CPU;
 	end;
 	
-	Self.m__Player1Label.Caption := Self.m__GameContext.m__Players[1].Name;
-	Self.m__Player2Label.Caption := Self.m__GameContext.m__Players[2].Name;
+	Self.m__GameContext.SetPlayers(Player1Type, Player2Type);
+	
+	Self.m__Player1Label.Caption := Self.m__GameContext.GetPlayerName(1);
+	Self.m__Player2Label.Caption := Self.m__GameContext.GetPlayerName(2);
 end;
 	
 procedure TMainWindow.OnClick_MenuItem__colour__1st_player__any_submenu(Sender: TObject);
