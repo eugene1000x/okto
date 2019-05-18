@@ -846,9 +846,9 @@ begin
 	C2 := Self.CountCellsWithState(2);
 	
 	if C1 > C2 then
-		ShowMessage('Winner is '+ Self.m__Players[1].name)
+		ShowMessage('Winner is '+ Self.m__Players[1].Name)
 	else if C2 > C1 then
-		ShowMessage('Winner is '+ Self.m__Players[2].name)
+		ShowMessage('Winner is '+ Self.m__Players[2].Name)
 	else
 		ShowMessage('Draw');
 			
