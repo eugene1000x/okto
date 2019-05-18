@@ -813,7 +813,7 @@ begin
 				IsGameEnd := True
 			else
 			begin
-				if Self.m__Players[i__WhoseTurn].Name = 'human' then
+				if Self.m__Players[i__WhoseTurn].PlayerType = PLAYER_TYPE_HUMAN then
 					ShowMessage('pass move');
 				i__WhoseTurn := 3 - i__WhoseTurn;
 			end;
