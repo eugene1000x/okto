@@ -128,8 +128,8 @@ type
 		
 
 		public constructor Create(); overload;		//disallowing to invoke TObject.Create()
-        public constructor Create(GameDriver: IGameDriver); overload;
-        
+		public constructor Create(GameDriver: IGameDriver); overload;
+		
 		(**
 		 * Version without BoardState param takes the current position.
 		 *)
@@ -139,11 +139,11 @@ type
 		private function IsMidgame(BoardState: TBoardState): Boolean;
 		private function GetHeuristicalEvaluation(BoardState: TBoardState; PlayerNumber: TIntPlayerNumber): TEvaluation;
 		
-        (**
-         * Init (re-read) algorithm parameters for each CPU's move.
-         * These may be changed during the game.
-         *)
-        private procedure InitParameters();
+		(**
+		 * Init (re-read) algorithm parameters for each CPU's move.
+		 * These may be changed during the game.
+		 *)
+		private procedure InitParameters();
 
 		(**
 		 * Current used max evaluation depth.
@@ -1015,7 +1015,7 @@ constructor TMainWindow.Create(Owner: TComponent);
 begin
 	inherited Create(Owner);
 
-    Self.m__GameContext := TGameContext.Create(Self);
+	Self.m__GameContext := TGameContext.Create(Self);
 end;
 
 destructor TMainWindow.Destroy();
