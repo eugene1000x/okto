@@ -175,8 +175,8 @@ type
 		public procedure GoForward();
 		public function GetCurrentMoveNumberInHistory(): TIntCellCount;
 		
-		public procedure GetEngineMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TIntPlayerNumber);
-		public procedure GetPlayerMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TIntPlayerNumber);
+		private procedure GetEngineMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TIntPlayerNumber);
+		private procedure GetPlayerMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TIntPlayerNumber);
 		
 		(**
 		 * Starts new game from standard initial position (with 4 pieces).
