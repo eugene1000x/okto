@@ -445,21 +445,6 @@ begin
 		Result := Evaluation2.PieceCount < 0;
 end;
 
-function TMainWindow.EvaluationToStr_Long(Evaluation: TEvaluation): string;
-begin
-	Result := IntToStr(Abs(Evaluation.PieceCount));
-	
-	if not Evaluation.IsHeuristical then
-		if Evaluation.PieceCount > 0 then
-			Result := 'Win by '+ Result
-		else if Evaluation.PieceCount < 0 then
-			Result := 'Loss by '+ Result
-		else
-			Result := 'Draw'
-	else
-		Result := IntToStr(Evaluation.PieceCount);
-end;
-
 function TGameContext.EvaluationToStr_Short(Evaluation: TEvaluation): string;
 begin
 	Result := IntToStr(Evaluation.PieceCount);
@@ -892,6 +877,20 @@ begin
 	Result := Self.m__Players[PlayerNumber].Name;
 end;
 
+constructor TMainWindow.Create(Owner: TComponent);
+begin
+	inherited Create(Owner);
+
+	Self.m__GameContext := TGameContext.Create(Self);
+end;
+
+destructor TMainWindow.Destroy();
+begin
+	Self.m__GameContext.Free();
+	
+	inherited Destroy();
+end;
+
 procedure TMainWindow.OnGameStarted();
 begin
 	Self.m__MenuItem_position_modify.Enabled := True;
@@ -1020,18 +1019,19 @@ begin
 	Self.m__Player2Label.Caption := Self.m__GameContext.GetPlayerName(2);
 end;
 
-constructor TMainWindow.Create(Owner: TComponent);
+function TMainWindow.EvaluationToStr_Long(Evaluation: TEvaluation): string;
 begin
-	inherited Create(Owner);
-
-	Self.m__GameContext := TGameContext.Create(Self);
-end;
-
-destructor TMainWindow.Destroy();
-begin
-	Self.m__GameContext.Free();
+	Result := IntToStr(Abs(Evaluation.PieceCount));
 	
-	inherited Destroy();
+	if not Evaluation.IsHeuristical then
+		if Evaluation.PieceCount > 0 then
+			Result := 'Win by '+ Result
+		else if Evaluation.PieceCount < 0 then
+			Result := 'Loss by '+ Result
+		else
+			Result := 'Draw'
+	else
+		Result := IntToStr(Evaluation.PieceCount);
 end;
 
 procedure TMainWindow.OnCreate_MainWindow(Sender: TObject);
