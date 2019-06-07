@@ -69,7 +69,7 @@ type
 	end;
 	
 	(**
-	 * Interface that GameContext uses to get parameters for the game, to
+	 * Interface that TGameContext uses to get parameters for the game, to
 	 * notify GUI about evaluation start, game progress, etc.
 	 *)
 	IGameDriver = interface
