@@ -1,1 +1,17 @@
+
 /unversioned/
+/*.exe
+
+
+# delphi-specific files
+# http://docwiki.embarcadero.com/RADStudio/Tokyo/en/File_Extensions_of_Files_Generated_by_RAD_Studio
+# https://delphi.fandom.com/wiki/Delphi_File_Extensions
+
+*.identcache
+*.dcu
+*.dproj.local
+*.tvsconfig
+*.stat
+
+#Binary. Resource File. Binary file associated with a project containing resource definitions, such as strings, icons, images etc.This file will be recreated by the IDE when loading a project but the icon will get lost in that process. Therefore you should either keep it in source control or find another way to create it.
+#*.res
