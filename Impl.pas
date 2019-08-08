@@ -107,24 +107,24 @@ type
 	 * Class that contains logic related to the game (algorithms, game state, etc.) and that runs the game.
 	 *)
 	TGameContext = class
-		private m__BoardState: TBoardState;
-		private m__AnalyzedPositions: array [TIntPlayerNumber] of TAnalyzedPosition;
-		private m__Players: array [TIntPlayerNumber] of TPlayer;
-		private m_i__WhoseTurn: Byte;
-		private m__MidgameMaxDepth, m__EndgameMaxDepth, m__MaxDepth: TIntCellCount;
+		private BoardState: TBoardState;
+		private AnalyzedPositions: array [TIntPlayerNumber] of TAnalyzedPosition;
+		private Players: array [TIntPlayerNumber] of TPlayer;
+		private i__WhoseTurn: Byte;
+		private MidgameMaxDepth, EndgameMaxDepth, MaxDepth: TIntCellCount;
 		
-		private m__Evaluations: record
+		private Evaluations: record
 			Best: TCellAddress;
 			CellEvaluations: array [1..8, 1..8] of string;
 		end;
 		
-		private m__BestEngineMoveEvaluation: TEvaluation;
-		private m__LastMadeMove: TCellAddress;
+		private BestEngineMoveEvaluation: TEvaluation;
+		private LastMadeMove: TCellAddress;
 		
-		private m__GameHistory: TGameHistory;
-		private m__IsInModifyMode, m__DoBreakGame: Boolean;
+		private GameHistory: TGameHistory;
+		private IsInModifyMode, DoBreakGame: Boolean;
 
-		private m__GameDriver: IGameDriver;
+		private GameDriver: IGameDriver;
 		
 
 		public constructor Create(); overload;		//disallowing to invoke TObject.Create()
@@ -204,64 +204,64 @@ type
 	end;
 	
 	TMainWindow = class(TForm, IGameDriver)
-		published m__DrawGrid: TDrawGrid;
-		published m__Statusbar: TStatusBar;
-		published m__Progressbar: TProgressBar;
-		published m__BackForwardButtons: TUpDown;
+		published DrawGrid: TDrawGrid;
+		published Statusbar: TStatusBar;
+		published Progressbar: TProgressBar;
+		published BackForwardButtons: TUpDown;
 
-		published m__MainMenu: TMainMenu;
-		published m__MenuItem__new_game: TMenuItem;
-		published m__MenuItem_position: TMenuItem;
-		published m__MenuItem_position_modify: TMenuItem;
-		published m__MenuItem_position_continue: TMenuItem;
-		published m__MenuItem_players: TMenuItem;
-		published m__MenuItem__players__2_players: TMenuItem;
-		published m__MenuItem__players__human_vs_cpu: TMenuItem;
-		published m__MenuItem__players__cpu_vs_human: TMenuItem;
-		published m__MenuItem__players__cpu_vs_cpu: TMenuItem;
-		published m__MenuItem_colour: TMenuItem;
-		published m__MenuItem__colour__1st_player: TMenuItem;
-		published m__MenuItem__colour__1st_player__blue: TMenuItem;
-		published m__MenuItem__colour__1st_player__green: TMenuItem;
-		published m__MenuItem__colour__1st_player__red: TMenuItem;
-		published m__MenuItem__colour__1st_player__yellow: TMenuItem;
-		published m__MenuItem__colour__2nd_player: TMenuItem;
-		published m__MenuItem__colour__2nd_player__blue: TMenuItem;
-		published m__MenuItem__colour__2nd_player__green: TMenuItem;
-		published m__MenuItem__colour__2nd_player__red: TMenuItem;
-		published m__MenuItem__colour__2nd_player__yellow: TMenuItem;
+		published MainMenu: TMainMenu;
+		published MenuItem__new_game: TMenuItem;
+		published MenuItem_position: TMenuItem;
+		published MenuItem_position_modify: TMenuItem;
+		published MenuItem_position_continue: TMenuItem;
+		published MenuItem_players: TMenuItem;
+		published MenuItem__players__2_players: TMenuItem;
+		published MenuItem__players__human_vs_cpu: TMenuItem;
+		published MenuItem__players__cpu_vs_human: TMenuItem;
+		published MenuItem__players__cpu_vs_cpu: TMenuItem;
+		published MenuItem_colour: TMenuItem;
+		published MenuItem__colour__1st_player: TMenuItem;
+		published MenuItem__colour__1st_player__blue: TMenuItem;
+		published MenuItem__colour__1st_player__green: TMenuItem;
+		published MenuItem__colour__1st_player__red: TMenuItem;
+		published MenuItem__colour__1st_player__yellow: TMenuItem;
+		published MenuItem__colour__2nd_player: TMenuItem;
+		published MenuItem__colour__2nd_player__blue: TMenuItem;
+		published MenuItem__colour__2nd_player__green: TMenuItem;
+		published MenuItem__colour__2nd_player__red: TMenuItem;
+		published MenuItem__colour__2nd_player__yellow: TMenuItem;
 
-		published m__Player1Piece: TImage;
-		published m__Player2Piece: TImage;
-		published m__Player1PieceCountEdit: TEdit;
-		published m__Player2PieceCountEdit: TEdit;
-		published m__Player1Label: TLabel;
-		published m__Player2Label: TLabel;
+		published Player1Piece: TImage;
+		published Player2Piece: TImage;
+		published Player1PieceCountEdit: TEdit;
+		published Player2PieceCountEdit: TEdit;
+		published Player1Label: TLabel;
+		published Player2Label: TLabel;
 
-		published m__ColumnLabel: TLabel;
-		published m__Row1Label: TLabel;
-		published m__Row2Label: TLabel;
-		published m__Row3Label: TLabel;
-		published m__Row4Label: TLabel;
-		published m__Row5Label: TLabel;
-		published m__Row6Label: TLabel;
-		published m__Row7Label: TLabel;
-		published m__Row8Label: TLabel;
+		published ColumnLabel: TLabel;
+		published Row1Label: TLabel;
+		published Row2Label: TLabel;
+		published Row3Label: TLabel;
+		published Row4Label: TLabel;
+		published Row5Label: TLabel;
+		published Row6Label: TLabel;
+		published Row7Label: TLabel;
+		published Row8Label: TLabel;
 
-		published m__LessOrEqual: TImage;
-		published m__GreaterOrEqual: TImage;
+		published LessOrEqual: TImage;
+		published GreaterOrEqual: TImage;
 
-		published m__MidgameDepthUpDown: TUpDown;
-		published m__EndgameDepthUpDown: TUpDown;
-		published m__MidgameDepthLabeledEdit: TLabeledEdit;
-		published m__EndgameDepthLabeledEdit: TLabeledEdit;
+		published MidgameDepthUpDown: TUpDown;
+		published EndgameDepthUpDown: TUpDown;
+		published MidgameDepthLabeledEdit: TLabeledEdit;
+		published EndgameDepthLabeledEdit: TLabeledEdit;
 
-		published m__GreenPiece: TImage;
-		published m__BluePiece: TImage;
-		published m__YellowPiece: TImage;
-		published m__RedPiece: TImage;
+		published GreenPiece: TImage;
+		published BluePiece: TImage;
+		published YellowPiece: TImage;
+		published RedPiece: TImage;
 		
-		private m__GameContext: TGameContext;
+		private GameContext: TGameContext;
 		
 		
 		public constructor Create(Owner: TComponent); override;
@@ -312,7 +312,7 @@ constructor TGameContext.Create(GameDriver: IGameDriver);
 begin
 	inherited Create();
 	
-	Self.m__GameDriver := GameDriver;
+	Self.GameDriver := GameDriver;
 end;
 
 procedure TGameContext.ClearBoard(var BoardState: TBoardState);
@@ -378,7 +378,7 @@ end;
 
 function TGameContext.CountCellsWithState(CellState: TIntOptionalPlayerNumber): TIntCellCount;
 begin
-	Result := Self.CountCellsWithState(Self.m__BoardState, CellState);
+	Result := Self.CountCellsWithState(Self.BoardState, CellState);
 end;
 
 function TGameContext.CountCellsWithState(BoardState: TBoardState; CellState: TIntOptionalPlayerNumber): TIntCellCount;
@@ -468,97 +468,97 @@ end;
 
 procedure TGameContext.InitParameters();
 begin
-	Self.m__MidgameMaxDepth := Self.m__GameDriver.GetMidgameMaxDepth();
-	Self.m__EndgameMaxDepth := Self.m__GameDriver.GetEndgameMaxDepth();
+	Self.MidgameMaxDepth := Self.GameDriver.GetMidgameMaxDepth();
+	Self.EndgameMaxDepth := Self.GameDriver.GetEndgameMaxDepth();
 
-	if 64 - Self.CountCellsWithState(1) - Self.CountCellsWithState(2) <= Self.m__EndgameMaxDepth then
-		Self.m__MaxDepth := Self.m__EndgameMaxDepth
+	if 64 - Self.CountCellsWithState(1) - Self.CountCellsWithState(2) <= Self.EndgameMaxDepth then
+		Self.MaxDepth := Self.EndgameMaxDepth
 	else
-		Self.m__MaxDepth := Self.m__MidgameMaxDepth;
+		Self.MaxDepth := Self.MidgameMaxDepth;
 end;
 
 function TGameContext.GetMaxDepth(): TIntCellCount;
 begin
-	Result := Self.m__MaxDepth;
+	Result := Self.MaxDepth;
 end;
 
 function TGameContext.GetPossibleMoveCount(PlayerNumber: TIntOptionalPlayerNumber = 0): TIntCellCount;
 begin
 	if PlayerNumber = 0 then
-		PlayerNumber := Self.m_i__WhoseTurn;
+		PlayerNumber := Self.i__WhoseTurn;
 	
-	Result := Self.m__AnalyzedPositions[PlayerNumber].PossibleMoveCount;
+	Result := Self.AnalyzedPositions[PlayerNumber].PossibleMoveCount;
 end;
 
 function TGameContext.GetBestEngineMoveEvaluation(): TEvaluation;
 begin
-	Result := Self.m__BestEngineMoveEvaluation;
+	Result := Self.BestEngineMoveEvaluation;
 end;
 
 function TGameContext.GetLastMove(): TCellAddress;
 begin
-	Result := Self.m__LastMadeMove;
+	Result := Self.LastMadeMove;
 end;
 
 function TGameContext.GetBestMoveFoundTillNow(): TCellAddress;
 begin
-	Result := Self.m__Evaluations.Best;
+	Result := Self.Evaluations.Best;
 end;
 
 function TGameContext.s__GetMoveEvaluation(Column, Row: Byte): string;
 begin
-	Result := Self.m__Evaluations.CellEvaluations[Column + 1, Row + 1];
+	Result := Self.Evaluations.CellEvaluations[Column + 1, Row + 1];
 end;
 
 function TGameContext.GetCellState(Column, Row: Byte): TIntOptionalPlayerNumber;
 begin
-	Result := Self.m__BoardState[Column + 1, Row + 1];
+	Result := Self.BoardState[Column + 1, Row + 1];
 end;
 
 procedure TGameContext.SetCellState(Column, Row: Byte; CellState: TIntOptionalPlayerNumber);
 begin
-	if not Self.m__IsInModifyMode then
+	if not Self.IsInModifyMode then
 		Exit();
 		
-	Self.m__BoardState[Column + 1, Row + 1] := CellState;
+	Self.BoardState[Column + 1, Row + 1] := CellState;
 	
-	Self.m__GameDriver.OnCellStateChanged();
+	Self.GameDriver.OnCellStateChanged();
 end;
 
 procedure TGameContext.StartBoardModification();
 begin
-	Self.m__DoBreakGame := True;
-	Self.m__IsInModifyMode := True;
+	Self.DoBreakGame := True;
+	Self.IsInModifyMode := True;
 end;
 
 procedure TGameContext.FinishBoardModification();
 begin
-	Self.m__DoBreakGame := False;
-	Self.m__IsInModifyMode := False;
-	Self.m__GameHistory.Positions[1].BoardState := Self.m__BoardState;
-	Self.m__GameHistory.MoveCount := 1;
-	Self.m__GameHistory.CurrentMoveNumber := 1;
+	Self.DoBreakGame := False;
+	Self.IsInModifyMode := False;
+	Self.GameHistory.Positions[1].BoardState := Self.BoardState;
+	Self.GameHistory.MoveCount := 1;
+	Self.GameHistory.CurrentMoveNumber := 1;
 end;
 
 procedure TGameContext.GoBack();
 begin
-	if Self.m__GameHistory.CurrentMoveNumber - 1 >= 1 then
-		Dec(Self.m__GameHistory.CurrentMoveNumber);
+	if Self.GameHistory.CurrentMoveNumber - 1 >= 1 then
+		Dec(Self.GameHistory.CurrentMoveNumber);
 		
-	Self.m__BoardState := Self.m__GameHistory.Positions[Self.m__GameHistory.CurrentMoveNumber].BoardState;
+	Self.BoardState := Self.GameHistory.Positions[Self.GameHistory.CurrentMoveNumber].BoardState;
 end;
 
 procedure TGameContext.GoForward();
 begin
-	if Self.m__GameHistory.CurrentMoveNumber + 1 <= Self.m__GameHistory.MoveCount then
-		Inc(Self.m__GameHistory.CurrentMoveNumber);
+	if Self.GameHistory.CurrentMoveNumber + 1 <= Self.GameHistory.MoveCount then
+		Inc(Self.GameHistory.CurrentMoveNumber);
 		
-	Self.m__BoardState := Self.m__GameHistory.Positions[Self.m__GameHistory.CurrentMoveNumber].BoardState;
+	Self.BoardState := Self.GameHistory.Positions[Self.GameHistory.CurrentMoveNumber].BoardState;
 end;
 
 function TGameContext.GetCurrentMoveNumberInHistory(): TIntCellCount;
 begin
-	Result := Self.m__GameHistory.CurrentMoveNumber;
+	Result := Self.GameHistory.CurrentMoveNumber;
 end;
 
 procedure TGameContext.GetEngineMove(var Move: TCellAddress; BoardState: TBoardState; PlayerNumber: TIntPlayerNumber);
@@ -580,7 +580,7 @@ label
 		Application.ProcessMessages();		//without this window becomes unresponsive
 		Inc(Depth);
 		
-		if Depth = Self.m__MaxDepth then
+		if Depth = Self.MaxDepth then
 		begin
 			Max := Self.GetHeuristicalEvaluation(BoardState, AnalyzedPosition.i__WhoseTurn);
 			goto done;
@@ -639,9 +639,9 @@ begin
 	
 	for Column := 1 to 8 do
 		for Row := 1 to 8 do
-			Self.m__Evaluations.CellEvaluations[Column, Row] := '';
+			Self.Evaluations.CellEvaluations[Column, Row] := '';
 	
-	Self.m__GameDriver.OnPositionEvaluationStarted();
+	Self.GameDriver.OnPositionEvaluationStarted();
 	
 	Move.Column := 1;
 	Move.Row := 1;
@@ -667,7 +667,7 @@ begin
 	MaxValue.IsGreaterOrEqual := False;
 	MaxValue.PieceCount := BOARD_DIMENSION * BOARD_DIMENSION;
 	
-	Self.m__BestEngineMoveEvaluation := MinValue;
+	Self.BestEngineMoveEvaluation := MinValue;
 	
 	for I := 1 to AnalyzedEnginePosition.PossibleMoveCount do
 	begin
@@ -675,42 +675,42 @@ begin
 		
 		if AnalyzedChildPosition.PossibleMoveCount > 0 then
 			if I < AnalyzedEnginePosition.PossibleMoveCount then
-				Res := Self.NegateEvaluation(Evaluate(AnalyzedEnginePosition.ChildPositions[I].BoardState, AnalyzedChildPosition, Self.NegateEvaluation(MaxValue), Self.NegateEvaluation(Self.m__BestEngineMoveEvaluation)))
+				Res := Self.NegateEvaluation(Evaluate(AnalyzedEnginePosition.ChildPositions[I].BoardState, AnalyzedChildPosition, Self.NegateEvaluation(MaxValue), Self.NegateEvaluation(Self.BestEngineMoveEvaluation)))
 			else
-				Res := Self.NegateEvaluation(Evaluate(AnalyzedEnginePosition.ChildPositions[I].BoardState, AnalyzedChildPosition, Self.NegateEvaluation(Self.m__BestEngineMoveEvaluation), Self.NegateEvaluation(Self.m__BestEngineMoveEvaluation)))
+				Res := Self.NegateEvaluation(Evaluate(AnalyzedEnginePosition.ChildPositions[I].BoardState, AnalyzedChildPosition, Self.NegateEvaluation(Self.BestEngineMoveEvaluation), Self.NegateEvaluation(Self.BestEngineMoveEvaluation)))
 		else
 		begin
 			Self.AnalyzePosition(AnalyzedEnginePosition.ChildPositions[I].BoardState, PlayerNumber, AnalyzedChildPosition);
 			
 			if AnalyzedChildPosition.PossibleMoveCount > 0 then
 				if I < AnalyzedEnginePosition.PossibleMoveCount then
-					Res := Evaluate(AnalyzedEnginePosition.ChildPositions[I].BoardState, AnalyzedChildPosition, Self.m__BestEngineMoveEvaluation, MaxValue)
+					Res := Evaluate(AnalyzedEnginePosition.ChildPositions[I].BoardState, AnalyzedChildPosition, Self.BestEngineMoveEvaluation, MaxValue)
 				else
-					Res := Evaluate(AnalyzedEnginePosition.ChildPositions[I].BoardState, AnalyzedChildPosition, Self.m__BestEngineMoveEvaluation, Self.m__BestEngineMoveEvaluation)
+					Res := Evaluate(AnalyzedEnginePosition.ChildPositions[I].BoardState, AnalyzedChildPosition, Self.BestEngineMoveEvaluation, Self.BestEngineMoveEvaluation)
 			else
 				Res := Self.GetHeuristicalEvaluation(AnalyzedEnginePosition.ChildPositions[I].BoardState, PlayerNumber);
 		end;
 		
-		if (not Res.IsLessOrEqual) and (Res.IsGreaterOrEqual or Self.IsEvaluationGreaterOrEqual(Res, Self.m__BestEngineMoveEvaluation, True)) then
+		if (not Res.IsLessOrEqual) and (Res.IsGreaterOrEqual or Self.IsEvaluationGreaterOrEqual(Res, Self.BestEngineMoveEvaluation, True)) then
 		begin
 			Move := AnalyzedEnginePosition.ChildPositions[I].Move;
-			Self.m__BestEngineMoveEvaluation := Res;
-			Self.m__Evaluations.Best := Move;
+			Self.BestEngineMoveEvaluation := Res;
+			Self.Evaluations.Best := Move;
 			
-			Self.m__GameDriver.OnPositionEvaluationChanged();
+			Self.GameDriver.OnPositionEvaluationChanged();
 		end;
 		
-		Self.m__Evaluations.CellEvaluations[AnalyzedEnginePosition.ChildPositions[I].Move.Column, AnalyzedEnginePosition.ChildPositions[I].Move.Row] := Self.EvaluationToStr_Short(Res);
+		Self.Evaluations.CellEvaluations[AnalyzedEnginePosition.ChildPositions[I].Move.Column, AnalyzedEnginePosition.ChildPositions[I].Move.Row] := Self.EvaluationToStr_Short(Res);
 		
-		Self.m__GameDriver.OnMoveEvaluationCompleted();
+		Self.GameDriver.OnMoveEvaluationCompleted();
 		
-		if Self.IsEvaluationGreaterOrEqual(Self.m__BestEngineMoveEvaluation, MaxValue, True) then
+		if Self.IsEvaluationGreaterOrEqual(Self.BestEngineMoveEvaluation, MaxValue, True) then
 			goto done;
 	end;
 	
 	done:
 	
-	Self.m__GameDriver.OnPositionEvaluationCompleted();
+	Self.GameDriver.OnPositionEvaluationCompleted();
 end;
 
 function TGameContext.IsLegalMove(Column, Row: TIntCellCoordinate; AnalyzedPosition: TAnalyzedPosition; var MoveNumber: Byte): Boolean;
@@ -735,23 +735,23 @@ begin
 	repeat
 		Application.ProcessMessages();		//without this window becomes unresponsive
 		
-		if Self.m__DoBreakGame then
+		if Self.DoBreakGame then
 			Exit();
 	
-		Move := Self.m__GameDriver.GetPlayerMoveCell();
-	until Self.IsLegalMove(Move.Column, Move.Row, Self.m__AnalyzedPositions[PlayerNumber], MoveNumberDummy);
+		Move := Self.GameDriver.GetPlayerMoveCell();
+	until Self.IsLegalMove(Move.Column, Move.Row, Self.AnalyzedPositions[PlayerNumber], MoveNumberDummy);
 end;
 
 procedure TGameContext.StartNewGame(Player1Type, Player2Type: Byte);
 begin
-	Self.ClearBoard(Self.m__BoardState);
-	Self.InitBoard(Self.m__BoardState);
+	Self.ClearBoard(Self.BoardState);
+	Self.InitBoard(Self.BoardState);
 	
-	Self.ClearBoard(Self.m__GameHistory.Positions[1].BoardState);
-	Self.InitBoard(Self.m__GameHistory.Positions[1].BoardState);
+	Self.ClearBoard(Self.GameHistory.Positions[1].BoardState);
+	Self.InitBoard(Self.GameHistory.Positions[1].BoardState);
 	
-	Self.m__GameHistory.MoveCount := 1;
-	Self.m__GameHistory.CurrentMoveNumber := 1;
+	Self.GameHistory.MoveCount := 1;
+	Self.GameHistory.CurrentMoveNumber := 1;
 	
 	Self.SetPlayers(Player1Type, Player2Type);
 	Self.RunGame();
@@ -764,109 +764,109 @@ var
 	i__WhoseTurn: Byte;
 	IsGameEnd: Boolean;
 begin
-	Self.m__LastMadeMove.Column := 1;
-	Self.m__LastMadeMove.Row := 1;
+	Self.LastMadeMove.Column := 1;
+	Self.LastMadeMove.Row := 1;
 	
-	Self.AnalyzePosition(Self.m__BoardState, 1, Self.m__AnalyzedPositions[1]);
-	Self.AnalyzePosition(Self.m__BoardState, 2, Self.m__AnalyzedPositions[2]);
+	Self.AnalyzePosition(Self.BoardState, 1, Self.AnalyzedPositions[1]);
+	Self.AnalyzePosition(Self.BoardState, 2, Self.AnalyzedPositions[2]);
 	
 	for C1 := 1 to 8 do
 		for C2 := 1 to 8 do
-			Self.m__Evaluations.CellEvaluations[C1, C2] := '';
+			Self.Evaluations.CellEvaluations[C1, C2] := '';
 			
-	Self.m__GameDriver.OnGameStarted();
+	Self.GameDriver.OnGameStarted();
 	
 	IsGameEnd := False;
 	i__WhoseTurn := 1;
 	
-	if Self.m__AnalyzedPositions[1].PossibleMoveCount = 0 then
-		if Self.m__AnalyzedPositions[2].PossibleMoveCount = 0 then
+	if Self.AnalyzedPositions[1].PossibleMoveCount = 0 then
+		if Self.AnalyzedPositions[2].PossibleMoveCount = 0 then
 			IsGameEnd := True;
 		
 	while not IsGameEnd do
 	begin
-		if Self.m__DoBreakGame then
+		if Self.DoBreakGame then
 			Exit();
 		
-		Self.m__GameDriver.BeforeMove();
+		Self.GameDriver.BeforeMove();
 		
-		Self.AnalyzePosition(Self.m__BoardState, 1, Self.m__AnalyzedPositions[1]);
-		Self.AnalyzePosition(Self.m__BoardState, 2, Self.m__AnalyzedPositions[2]);
+		Self.AnalyzePosition(Self.BoardState, 1, Self.AnalyzedPositions[1]);
+		Self.AnalyzePosition(Self.BoardState, 2, Self.AnalyzedPositions[2]);
 		
-		if Self.m__AnalyzedPositions[i__WhoseTurn].PossibleMoveCount = 0 then
-			if Self.m__AnalyzedPositions[3 - i__WhoseTurn].PossibleMoveCount = 0 then
+		if Self.AnalyzedPositions[i__WhoseTurn].PossibleMoveCount = 0 then
+			if Self.AnalyzedPositions[3 - i__WhoseTurn].PossibleMoveCount = 0 then
 				IsGameEnd := True
 			else
 			begin
-				if Self.m__Players[i__WhoseTurn].PlayerType = PLAYER_TYPE_HUMAN then
+				if Self.Players[i__WhoseTurn].PlayerType = PLAYER_TYPE_HUMAN then
 					ShowMessage('pass move');
 				i__WhoseTurn := 3 - i__WhoseTurn;
 			end;
 			
 		if not IsGameEnd then
 		begin
-			Self.m__Players[i__WhoseTurn].fn__GetMove(Move, Self.m__BoardState, i__WhoseTurn);
-			Self.m_i__WhoseTurn := i__WhoseTurn;
+			Self.Players[i__WhoseTurn].fn__GetMove(Move, Self.BoardState, i__WhoseTurn);
+			Self.i__WhoseTurn := i__WhoseTurn;
 		end;
 			
-		if Self.IsLegalMove(Move.Column, Move.Row, Self.m__AnalyzedPositions[i__WhoseTurn], C1) then
+		if Self.IsLegalMove(Move.Column, Move.Row, Self.AnalyzedPositions[i__WhoseTurn], C1) then
 		begin
-			Self.m__BoardState := Self.m__AnalyzedPositions[i__WhoseTurn].ChildPositions[C1].BoardState;
-			Self.m__LastMadeMove := Move;
-			Self.m__GameHistory.MoveCount := Self.m__GameHistory.MoveCount + 1;
-			Self.m__GameHistory.CurrentMoveNumber := Self.m__GameHistory.CurrentMoveNumber + 1;
-			Self.m__GameHistory.Positions[Self.m__GameHistory.MoveCount].BoardState := Self.m__BoardState;
-			Self.m__GameHistory.Positions[Self.m__GameHistory.MoveCount].i__WhoseTurn := i__WhoseTurn;
+			Self.BoardState := Self.AnalyzedPositions[i__WhoseTurn].ChildPositions[C1].BoardState;
+			Self.LastMadeMove := Move;
+			Self.GameHistory.MoveCount := Self.GameHistory.MoveCount + 1;
+			Self.GameHistory.CurrentMoveNumber := Self.GameHistory.CurrentMoveNumber + 1;
+			Self.GameHistory.Positions[Self.GameHistory.MoveCount].BoardState := Self.BoardState;
+			Self.GameHistory.Positions[Self.GameHistory.MoveCount].i__WhoseTurn := i__WhoseTurn;
 		end;
 		
 		i__WhoseTurn := 3 - i__WhoseTurn;
 		
-		Self.AnalyzePosition(Self.m__BoardState, 1, Self.m__AnalyzedPositions[1]);
-		Self.AnalyzePosition(Self.m__BoardState, 2, Self.m__AnalyzedPositions[2]);
+		Self.AnalyzePosition(Self.BoardState, 1, Self.AnalyzedPositions[1]);
+		Self.AnalyzePosition(Self.BoardState, 2, Self.AnalyzedPositions[2]);
 		
-		Self.m__GameDriver.OnMoveMade();
+		Self.GameDriver.OnMoveMade();
 	end;
 	
 	C1 := Self.CountCellsWithState(1);
 	C2 := Self.CountCellsWithState(2);
 	
 	if C1 > C2 then
-		ShowMessage('Winner is '+ Self.m__Players[1].Name)
+		ShowMessage('Winner is '+ Self.Players[1].Name)
 	else if C2 > C1 then
-		ShowMessage('Winner is '+ Self.m__Players[2].Name)
+		ShowMessage('Winner is '+ Self.Players[2].Name)
 	else
 		ShowMessage('Draw');
 			
-	Self.m__GameDriver.OnGameEnded();
+	Self.GameDriver.OnGameEnded();
 end;
 
 procedure TGameContext.SetPlayers(Player1Type, Player2Type: Byte);
 begin
-	Self.m__Players[1].PlayerType := Player1Type;
-	Self.m__Players[2].PlayerType := Player2Type;
+	Self.Players[1].PlayerType := Player1Type;
+	Self.Players[2].PlayerType := Player2Type;
 
 	if Player1Type = PLAYER_TYPE_CPU then
 	begin
-		Self.m__Players[1].fn__GetMove := Self.GetEngineMove;
-		Self.m__Players[1].Name := 'CPU';
+		Self.Players[1].fn__GetMove := Self.GetEngineMove;
+		Self.Players[1].Name := 'CPU';
 	end
 	else if Player1Type = PLAYER_TYPE_HUMAN then
 	begin
-		Self.m__Players[1].fn__GetMove := Self.GetPlayerMove;
-		Self.m__Players[1].Name := 'human';
+		Self.Players[1].fn__GetMove := Self.GetPlayerMove;
+		Self.Players[1].Name := 'human';
 	end
 	else
 		Assert(False, 'Player1Type must be one of PLAYER_TYPE_* constants: '+ IntToStr(Player1Type));
 	
 	if Player2Type = PLAYER_TYPE_CPU then
 	begin
-		Self.m__Players[2].fn__GetMove := Self.GetEngineMove;
-		Self.m__Players[2].Name := 'CPU';
+		Self.Players[2].fn__GetMove := Self.GetEngineMove;
+		Self.Players[2].Name := 'CPU';
 	end
 	else if Player2Type = PLAYER_TYPE_HUMAN then
 	begin
-		Self.m__Players[2].fn__GetMove := Self.GetPlayerMove;
-		Self.m__Players[2].Name := 'human';
+		Self.Players[2].fn__GetMove := Self.GetPlayerMove;
+		Self.Players[2].Name := 'human';
 	end
 	else
 		Assert(False, 'Player2Type must be one of PLAYER_TYPE_* constants: '+ IntToStr(Player2Type));
@@ -874,138 +874,138 @@ end;
 
 function TGameContext.GetPlayerName(PlayerNumber: TIntPlayerNumber): string;
 begin
-	Result := Self.m__Players[PlayerNumber].Name;
+	Result := Self.Players[PlayerNumber].Name;
 end;
 
 constructor TMainWindow.Create(Owner: TComponent);
 begin
 	inherited Create(Owner);
 
-	Self.m__GameContext := TGameContext.Create(Self);
+	Self.GameContext := TGameContext.Create(Self);
 end;
 
 destructor TMainWindow.Destroy();
 begin
-	Self.m__GameContext.Free();
+	Self.GameContext.Free();
 	
 	inherited Destroy();
 end;
 
 procedure TMainWindow.OnGameStarted();
 begin
-	Self.m__MenuItem_position_modify.Enabled := True;
+	Self.MenuItem_position_modify.Enabled := True;
 	
-	Self.m__Player1PieceCountEdit.Text := IntToStr(Self.m__GameContext.CountCellsWithState(1));
-	Self.m__Player2PieceCountEdit.Text := IntToStr(Self.m__GameContext.CountCellsWithState(2));
+	Self.Player1PieceCountEdit.Text := IntToStr(Self.GameContext.CountCellsWithState(1));
+	Self.Player2PieceCountEdit.Text := IntToStr(Self.GameContext.CountCellsWithState(2));
 	
-	Self.m__DrawGrid.Repaint();
+	Self.DrawGrid.Repaint();
 	
-	Self.m__Statusbar.Panels[2].Text := Self.m__Player1Piece.Hint +' '+ IntToStr(Self.m__GameContext.GetPossibleMoveCount(1)) +' moves  '+
-			Self.m__Player2Piece.Hint +' '+ IntToStr(Self.m__GameContext.GetPossibleMoveCount(2)) +' moves';
+	Self.Statusbar.Panels[2].Text := Self.Player1Piece.Hint +' '+ IntToStr(Self.GameContext.GetPossibleMoveCount(1)) +' moves  '+
+			Self.Player2Piece.Hint +' '+ IntToStr(Self.GameContext.GetPossibleMoveCount(2)) +' moves';
 end;
 
 procedure TMainWindow.BeforeMove();
 begin
-	Self.m__DrawGrid.Selection := TGridRect(Self.m__DrawGrid.CellRect(-1, -1));		//TODO: Why whis typecast (in two places)?
+	Self.DrawGrid.Selection := TGridRect(Self.DrawGrid.CellRect(-1, -1));		//TODO: Why whis typecast (in two places)?
 end;
 
 procedure TMainWindow.OnMoveMade();
 begin
-	Self.m__BackForwardButtons.Position := Self.m__GameContext.GetCurrentMoveNumberInHistory();
-	Self.m__DrawGrid.Repaint();
+	Self.BackForwardButtons.Position := Self.GameContext.GetCurrentMoveNumberInHistory();
+	Self.DrawGrid.Repaint();
 		
-	Self.m__Statusbar.Panels[2].Text := Self.m__Player1Piece.Hint +' '+ IntToStr(Self.m__GameContext.GetPossibleMoveCount(1)) +' moves  '+
-			Self.m__Player2Piece.Hint +' '+ IntToStr(Self.m__GameContext.GetPossibleMoveCount(2)) +' moves';
+	Self.Statusbar.Panels[2].Text := Self.Player1Piece.Hint +' '+ IntToStr(Self.GameContext.GetPossibleMoveCount(1)) +' moves  '+
+			Self.Player2Piece.Hint +' '+ IntToStr(Self.GameContext.GetPossibleMoveCount(2)) +' moves';
 	
-	Self.m__Player1PieceCountEdit.Text := IntToStr(Self.m__GameContext.CountCellsWithState(1));
-	Self.m__Player2PieceCountEdit.Text := IntToStr(Self.m__GameContext.CountCellsWithState(2));
+	Self.Player1PieceCountEdit.Text := IntToStr(Self.GameContext.CountCellsWithState(1));
+	Self.Player2PieceCountEdit.Text := IntToStr(Self.GameContext.CountCellsWithState(2));
 end;
 
 procedure TMainWindow.OnGameEnded();
 begin
-	Self.m__MenuItem_position_modify.Enabled := True;
+	Self.MenuItem_position_modify.Enabled := True;
 end;
 
 procedure TMainWindow.OnPositionEvaluationStarted();
 var
 	PossibleMoveCount, MaxDepth: TIntCellCount;
 begin
-	PossibleMoveCount := Self.m__GameContext.GetPossibleMoveCount();
-	MaxDepth := Self.m__GameContext.GetMaxDepth();
+	PossibleMoveCount := Self.GameContext.GetPossibleMoveCount();
+	MaxDepth := Self.GameContext.GetMaxDepth();
 		
-	Self.m__Statusbar.Panels[0].Text := 'Thinking...';
-	Self.m__Statusbar.Panels[3].Text := 'Depth='+ IntToStr(MaxDepth);
+	Self.Statusbar.Panels[0].Text := 'Thinking...';
+	Self.Statusbar.Panels[3].Text := 'Depth='+ IntToStr(MaxDepth);
 	
-	Self.m__Progressbar.Max := PossibleMoveCount;
-	Self.m__Progressbar.Position := 0;
+	Self.Progressbar.Max := PossibleMoveCount;
+	Self.Progressbar.Position := 0;
 	
-	Self.m__MenuItem_position_modify.Enabled := False;
+	Self.MenuItem_position_modify.Enabled := False;
 	
-	Self.m__MidgameDepthUpDown.Enabled := False;
-	Self.m__EndgameDepthUpDown.Enabled := False;
+	Self.MidgameDepthUpDown.Enabled := False;
+	Self.EndgameDepthUpDown.Enabled := False;
 	
-	Self.m__DrawGrid.Repaint();
+	Self.DrawGrid.Repaint();
 end;
 
 procedure TMainWindow.OnPositionEvaluationChanged();
 begin
-	Self.m__Statusbar.Panels[1].Text := Self.EvaluationToStr_Long(Self.m__GameContext.GetBestEngineMoveEvaluation());
+	Self.Statusbar.Panels[1].Text := Self.EvaluationToStr_Long(Self.GameContext.GetBestEngineMoveEvaluation());
 end;
 
 procedure TMainWindow.OnMoveEvaluationCompleted();
 begin
-	Self.m__DrawGrid.Repaint();
-	Self.m__Progressbar.Position := Self.m__Progressbar.Position + 1;
+	Self.DrawGrid.Repaint();
+	Self.Progressbar.Position := Self.Progressbar.Position + 1;
 end;
 
 procedure TMainWindow.OnPositionEvaluationCompleted();
 begin
-	Self.m__Statusbar.Panels[0].Text := 'Ready';
-	Self.m__MenuItem_position_modify.Enabled := True;
+	Self.Statusbar.Panels[0].Text := 'Ready';
+	Self.MenuItem_position_modify.Enabled := True;
 	
-	Self.m__MidgameDepthUpDown.Enabled := True;
-	Self.m__EndgameDepthUpDown.Enabled := True;
+	Self.MidgameDepthUpDown.Enabled := True;
+	Self.EndgameDepthUpDown.Enabled := True;
 end;
 
 procedure TMainWindow.OnCellStateChanged();
 begin
-	Self.m__DrawGrid.Repaint();
+	Self.DrawGrid.Repaint();
 end;
 
 function TMainWindow.GetMidgameMaxDepth(): TIntCellCount;
 begin
-	Result := StrToInt(Self.m__MidgameDepthLabeledEdit.Text);
+	Result := StrToInt(Self.MidgameDepthLabeledEdit.Text);
 end;
 
 function TMainWindow.GetEndgameMaxDepth(): TIntCellCount;
 begin
-	Result := StrToInt(Self.m__EndgameDepthLabeledEdit.Text);
+	Result := StrToInt(Self.EndgameDepthLabeledEdit.Text);
 end;
 
 function TMainWindow.GetPlayerMoveCell(): TCellAddress;
 begin
-	Result.Column := Self.m__DrawGrid.Col + 1;
-	Result.Row := Self.m__DrawGrid.Row + 1;
+	Result.Column := Self.DrawGrid.Col + 1;
+	Result.Row := Self.DrawGrid.Row + 1;
 end;
 
 procedure TMainWindow.UpdatePlayers(var Player1Type, Player2Type: Byte);
 begin
-	if Self.m__MenuItem__players__2_players.Checked then
+	if Self.MenuItem__players__2_players.Checked then
 	begin
 		Player1Type := PLAYER_TYPE_HUMAN;
 		Player2Type := PLAYER_TYPE_HUMAN;
 	end
-	else if Self.m__MenuItem__players__human_vs_cpu.Checked then
+	else if Self.MenuItem__players__human_vs_cpu.Checked then
 	begin
 		Player1Type := PLAYER_TYPE_HUMAN;
 		Player2Type := PLAYER_TYPE_CPU;
 	end
-	else if Self.m__MenuItem__players__cpu_vs_human.Checked then
+	else if Self.MenuItem__players__cpu_vs_human.Checked then
 	begin
 		Player1Type := PLAYER_TYPE_CPU;
 		Player2Type := PLAYER_TYPE_HUMAN;
 	end
-	else if Self.m__MenuItem__players__cpu_vs_cpu.Checked then
+	else if Self.MenuItem__players__cpu_vs_cpu.Checked then
 	begin
 		Player1Type := PLAYER_TYPE_CPU;
 		Player2Type := PLAYER_TYPE_CPU;
@@ -1013,10 +1013,10 @@ begin
 	else
 		Assert(false, 'None of menu items is checked');
 	
-	Self.m__GameContext.SetPlayers(Player1Type, Player2Type);
+	Self.GameContext.SetPlayers(Player1Type, Player2Type);
 	
-	Self.m__Player1Label.Caption := Self.m__GameContext.GetPlayerName(1);
-	Self.m__Player2Label.Caption := Self.m__GameContext.GetPlayerName(2);
+	Self.Player1Label.Caption := Self.GameContext.GetPlayerName(1);
+	Self.Player2Label.Caption := Self.GameContext.GetPlayerName(2);
 end;
 
 function TMainWindow.EvaluationToStr_Long(Evaluation: TEvaluation): string;
@@ -1036,120 +1036,120 @@ end;
 
 procedure TMainWindow.OnCreate_MainWindow(Sender: TObject);
 begin
-	Self.m__MenuItem__players__human_vs_cpu.Checked := True;
-	Self.m__MenuItem__players__cpu_vs_cpu.Checked := False;
-	Self.m__MenuItem__players__cpu_vs_human.Checked := False;
-	Self.m__MenuItem__players__2_players.Checked := False;
+	Self.MenuItem__players__human_vs_cpu.Checked := True;
+	Self.MenuItem__players__cpu_vs_cpu.Checked := False;
+	Self.MenuItem__players__cpu_vs_human.Checked := False;
+	Self.MenuItem__players__2_players.Checked := False;
 	
-	if Self.m__MenuItem__colour__1st_player__blue.Checked then
+	if Self.MenuItem__colour__1st_player__blue.Checked then
 	begin
-		Self.m__Player1Piece.Picture := Self.m__BluePiece.Picture;
-		Self.m__Player1Piece.Hint := 'Blue';
+		Self.Player1Piece.Picture := Self.BluePiece.Picture;
+		Self.Player1Piece.Hint := 'Blue';
 	end;
 	
-	if Self.m__MenuItem__colour__1st_player__green.Checked then
+	if Self.MenuItem__colour__1st_player__green.Checked then
 	begin
-		Self.m__Player1Piece.Picture := Self.m__GreenPiece.Picture;
-		Self.m__Player1Piece.Hint := 'Green';
+		Self.Player1Piece.Picture := Self.GreenPiece.Picture;
+		Self.Player1Piece.Hint := 'Green';
 	end;
 	
-	if Self.m__MenuItem__colour__1st_player__red.Checked then
+	if Self.MenuItem__colour__1st_player__red.Checked then
 	begin
-		Self.m__Player1Piece.Picture := Self.m__RedPiece.Picture;
-		Self.m__Player1Piece.Hint := 'Red';
+		Self.Player1Piece.Picture := Self.RedPiece.Picture;
+		Self.Player1Piece.Hint := 'Red';
 	end;
 	
-	if Self.m__MenuItem__colour__1st_player__yellow.Checked then
+	if Self.MenuItem__colour__1st_player__yellow.Checked then
 	begin
-		Self.m__Player1Piece.Picture := Self.m__YellowPiece.Picture;
-		Self.m__Player1Piece.Hint := 'Yellow';
+		Self.Player1Piece.Picture := Self.YellowPiece.Picture;
+		Self.Player1Piece.Hint := 'Yellow';
 	end;
 	
-	if Self.m__MenuItem__colour__2nd_player__blue.Checked then
+	if Self.MenuItem__colour__2nd_player__blue.Checked then
 	begin
-		Self.m__Player2Piece.Picture := Self.m__BluePiece.Picture;
-		Self.m__Player2Piece.Hint := 'Blue';
+		Self.Player2Piece.Picture := Self.BluePiece.Picture;
+		Self.Player2Piece.Hint := 'Blue';
 	end;
 	
-	if Self.m__MenuItem__colour__2nd_player__green.Checked then
+	if Self.MenuItem__colour__2nd_player__green.Checked then
 	begin
-		Self.m__Player2Piece.Picture := Self.m__GreenPiece.Picture;
-		Self.m__Player2Piece.Hint := 'Green';
+		Self.Player2Piece.Picture := Self.GreenPiece.Picture;
+		Self.Player2Piece.Hint := 'Green';
 	end;
 	
-	if Self.m__MenuItem__colour__2nd_player__red.Checked then
+	if Self.MenuItem__colour__2nd_player__red.Checked then
 	begin
-		Self.m__Player2Piece.Picture := Self.m__RedPiece.Picture;
-		Self.m__Player2Piece.Hint := 'Red';
+		Self.Player2Piece.Picture := Self.RedPiece.Picture;
+		Self.Player2Piece.Hint := 'Red';
 	end;
 	
-	if Self.m__MenuItem__colour__2nd_player__yellow.Checked then
+	if Self.MenuItem__colour__2nd_player__yellow.Checked then
 	begin
-		Self.m__Player2Piece.Picture := Self.m__YellowPiece.Picture;
-		Self.m__Player2Piece.Hint := 'Yellow';
+		Self.Player2Piece.Picture := Self.YellowPiece.Picture;
+		Self.Player2Piece.Hint := 'Yellow';
 	end;
 	
-	Self.m__ColumnLabel.Top := 0;
-	Self.m__Row1Label.Left := 5;
-	Self.m__Row2Label.Left := 5;
-	Self.m__Row3Label.Left := 5;
-	Self.m__Row4Label.Left := 5;
-	Self.m__Row5Label.Left := 5;
-	Self.m__Row6Label.Left := 5;
-	Self.m__Row7Label.Left := 5;
-	Self.m__Row8Label.Left := 5;
+	Self.ColumnLabel.Top := 0;
+	Self.Row1Label.Left := 5;
+	Self.Row2Label.Left := 5;
+	Self.Row3Label.Left := 5;
+	Self.Row4Label.Left := 5;
+	Self.Row5Label.Left := 5;
+	Self.Row6Label.Left := 5;
+	Self.Row7Label.Left := 5;
+	Self.Row8Label.Left := 5;
 	
-	Self.m__DrawGrid.Height := Self.m__DrawGrid.GridLineWidth + Self.m__DrawGrid.RowCount * (Self.m__DrawGrid.DefaultRowHeight + Self.m__DrawGrid.GridLineWidth) + 2;
-	Self.m__DrawGrid.Width := Self.m__DrawGrid.GridLineWidth + Self.m__DrawGrid.ColCount * (Self.m__DrawGrid.DefaultColWidth + Self.m__DrawGrid.GridLineWidth) + 2;
-	Self.m__DrawGrid.Top := Self.m__ColumnLabel.Height + Self.m__ColumnLabel.Top;
-	Self.m__DrawGrid.Left := Self.m__Row1Label.Left + Self.m__Row1Label.Width + 5;
+	Self.DrawGrid.Height := Self.DrawGrid.GridLineWidth + Self.DrawGrid.RowCount * (Self.DrawGrid.DefaultRowHeight + Self.DrawGrid.GridLineWidth) + 2;
+	Self.DrawGrid.Width := Self.DrawGrid.GridLineWidth + Self.DrawGrid.ColCount * (Self.DrawGrid.DefaultColWidth + Self.DrawGrid.GridLineWidth) + 2;
+	Self.DrawGrid.Top := Self.ColumnLabel.Height + Self.ColumnLabel.Top;
+	Self.DrawGrid.Left := Self.Row1Label.Left + Self.Row1Label.Width + 5;
 	
-	Self.m__ColumnLabel.Left := Self.m__DrawGrid.Left;
-	Self.m__Row1Label.Top := Self.m__DrawGrid.Top + 1 + 15 - 6;
-	Self.m__Row2Label.Top := Self.m__Row1Label.Top + 31;
-	Self.m__Row3Label.Top := Self.m__Row2Label.Top + 31;
-	Self.m__Row4Label.Top := Self.m__Row3Label.Top + 31;
-	Self.m__Row5Label.Top := Self.m__Row4Label.Top + 31;
-	Self.m__Row6Label.Top := Self.m__Row5Label.Top + 31;
-	Self.m__Row7Label.Top := Self.m__Row6Label.Top + 31;
-	Self.m__Row8Label.Top := Self.m__Row7Label.Top + 31;
+	Self.ColumnLabel.Left := Self.DrawGrid.Left;
+	Self.Row1Label.Top := Self.DrawGrid.Top + 1 + 15 - 6;
+	Self.Row2Label.Top := Self.Row1Label.Top + 31;
+	Self.Row3Label.Top := Self.Row2Label.Top + 31;
+	Self.Row4Label.Top := Self.Row3Label.Top + 31;
+	Self.Row5Label.Top := Self.Row4Label.Top + 31;
+	Self.Row6Label.Top := Self.Row5Label.Top + 31;
+	Self.Row7Label.Top := Self.Row6Label.Top + 31;
+	Self.Row8Label.Top := Self.Row7Label.Top + 31;
 	
-	Self.m__Player1Piece.Left := Self.m__DrawGrid.Left + Self.m__DrawGrid.Width + 60;
-	Self.m__Player1Piece.Top := 10;
-	Self.m__Player1Piece.Width := Self.m__Player1Piece.Picture.Width;
-	Self.m__Player1Piece.Height := Self.m__Player1Piece.Picture.Height;
-	Self.m__Player2Piece.Left := Self.m__Player1Piece.Left;
-	Self.m__Player2Piece.Top := Self.m__Player1Piece.Top + Self.m__Player1Piece.Height + 20;
-	Self.m__Player2Piece.Width := Self.m__Player1Piece.Picture.Width;
-	Self.m__Player2Piece.Height := Self.m__Player1Piece.Picture.Height;
+	Self.Player1Piece.Left := Self.DrawGrid.Left + Self.DrawGrid.Width + 60;
+	Self.Player1Piece.Top := 10;
+	Self.Player1Piece.Width := Self.Player1Piece.Picture.Width;
+	Self.Player1Piece.Height := Self.Player1Piece.Picture.Height;
+	Self.Player2Piece.Left := Self.Player1Piece.Left;
+	Self.Player2Piece.Top := Self.Player1Piece.Top + Self.Player1Piece.Height + 20;
+	Self.Player2Piece.Width := Self.Player1Piece.Picture.Width;
+	Self.Player2Piece.Height := Self.Player1Piece.Picture.Height;
 	
-	Self.m__Player1PieceCountEdit.Width := 20;
-	Self.m__Player2PieceCountEdit.Width := Self.m__Player1PieceCountEdit.Width;
-	Self.m__Player1PieceCountEdit.Height := 15;
-	Self.m__Player2PieceCountEdit.Height := Self.m__Player1PieceCountEdit.Height;
-	Self.m__Player1PieceCountEdit.Left := Self.m__Player1Piece.Left - Self.m__Player1PieceCountEdit.Width - 35;
-	Self.m__Player1PieceCountEdit.Top := Self.m__Player1Piece.Top + Self.m__Player1Piece.Height - Self.m__Player1PieceCountEdit.Height;
-	Self.m__Player2PieceCountEdit.Left := Self.m__Player1PieceCountEdit.Left;
-	Self.m__Player2PieceCountEdit.Top := Self.m__Player2Piece.Top + Self.m__Player2Piece.Height - Self.m__Player2PieceCountEdit.Height;
+	Self.Player1PieceCountEdit.Width := 20;
+	Self.Player2PieceCountEdit.Width := Self.Player1PieceCountEdit.Width;
+	Self.Player1PieceCountEdit.Height := 15;
+	Self.Player2PieceCountEdit.Height := Self.Player1PieceCountEdit.Height;
+	Self.Player1PieceCountEdit.Left := Self.Player1Piece.Left - Self.Player1PieceCountEdit.Width - 35;
+	Self.Player1PieceCountEdit.Top := Self.Player1Piece.Top + Self.Player1Piece.Height - Self.Player1PieceCountEdit.Height;
+	Self.Player2PieceCountEdit.Left := Self.Player1PieceCountEdit.Left;
+	Self.Player2PieceCountEdit.Top := Self.Player2Piece.Top + Self.Player2Piece.Height - Self.Player2PieceCountEdit.Height;
 	
-	Self.m__Player1Label.Left := Self.m__Player1PieceCountEdit.Left - 3;
-	Self.m__Player1Label.Top := Self.m__Player1Piece.Top;
-	Self.m__Player2Label.Left := Self.m__Player2PieceCountEdit.Left - 3;
-	Self.m__Player2Label.Top := Self.m__Player2Piece.Top;
+	Self.Player1Label.Left := Self.Player1PieceCountEdit.Left - 3;
+	Self.Player1Label.Top := Self.Player1Piece.Top;
+	Self.Player2Label.Left := Self.Player2PieceCountEdit.Left - 3;
+	Self.Player2Label.Top := Self.Player2Piece.Top;
 	
-	Self.ClientHeight := Self.m__DrawGrid.Height + Self.m__Statusbar.Height + Self.m__ColumnLabel.Height + Self.m__BackForwardButtons.Height;
-	Self.ClientWidth := Self.m__DrawGrid.Width + Self.m__Row1Label.Width + 110 + 5 + 5;
+	Self.ClientHeight := Self.DrawGrid.Height + Self.Statusbar.Height + Self.ColumnLabel.Height + Self.BackForwardButtons.Height;
+	Self.ClientWidth := Self.DrawGrid.Width + Self.Row1Label.Width + 110 + 5 + 5;
 	
-	Self.m__Progressbar.Left := Self.m__DrawGrid.Left + Self.m__DrawGrid.Width + 5;
-	Self.m__Progressbar.Width := Self.ClientWidth - Self.m__DrawGrid.Width - Self.m__Row1Label.Width - 20;
+	Self.Progressbar.Left := Self.DrawGrid.Left + Self.DrawGrid.Width + 5;
+	Self.Progressbar.Width := Self.ClientWidth - Self.DrawGrid.Width - Self.Row1Label.Width - 20;
 	
-	Self.m__MidgameDepthLabeledEdit.Left := Self.m__Progressbar.Left;
-	Self.m__EndgameDepthLabeledEdit.Left := Self.m__MidgameDepthLabeledEdit.left;
+	Self.MidgameDepthLabeledEdit.Left := Self.Progressbar.Left;
+	Self.EndgameDepthLabeledEdit.Left := Self.MidgameDepthLabeledEdit.left;
 	
-	Self.m__BackForwardButtons.Top := Self.m__DrawGrid.Top + Self.m__DrawGrid.Height;
+	Self.BackForwardButtons.Top := Self.DrawGrid.Top + Self.DrawGrid.Height;
 	
 	Self.Show();
-	Self.OnClick_MenuItem__new_game(Self.m__MenuItem__new_game);
+	Self.OnClick_MenuItem__new_game(Self.MenuItem__new_game);
 end;
 
 procedure TMainWindow.OnClose_MainWindow(Sender: TObject; var Action: TCloseAction);
@@ -1162,130 +1162,130 @@ var
 	s__Evaluation: string;
 	LastMove, BestMove: TCellAddress;
 begin
-	Self.m__DrawGrid.Canvas.Brush.Color := clWhite;
-	Self.m__DrawGrid.Canvas.FillRect(Rect);
+	Self.DrawGrid.Canvas.Brush.Color := clWhite;
+	Self.DrawGrid.Canvas.FillRect(Rect);
 	
-	case Self.m__GameContext.GetCellState(Column, Row) of
+	case Self.GameContext.GetCellState(Column, Row) of
 		1:
-			Self.m__DrawGrid.Canvas.StretchDraw(Rect, Self.m__Player1Piece.Picture.Bitmap);
+			Self.DrawGrid.Canvas.StretchDraw(Rect, Self.Player1Piece.Picture.Bitmap);
 		2:
-			Self.m__DrawGrid.Canvas.StretchDraw(Rect, Self.m__Player2Piece.Picture.Bitmap);
+			Self.DrawGrid.Canvas.StretchDraw(Rect, Self.Player2Piece.Picture.Bitmap);
 	end;
 	
 	
-	LastMove := Self.m__GameContext.GetLastMove();
+	LastMove := Self.GameContext.GetLastMove();
 	
-	if (LastMove.Column = Column + 1) and (LastMove.Row = Row + 1) and (Self.m__GameContext.GetCellState(Column, Row) > 0) then
+	if (LastMove.Column = Column + 1) and (LastMove.Row = Row + 1) and (Self.GameContext.GetCellState(Column, Row) > 0) then
 	begin
-		Self.m__DrawGrid.Canvas.Pen.Color := clRed;
-		Self.m__DrawGrid.Canvas.MoveTo(Rect.Left, Rect.Top);
-		Self.m__DrawGrid.Canvas.LineTo(Rect.Right, Rect.Top);
-		Self.m__DrawGrid.Canvas.LineTo(Rect.Right, Rect.Bottom);
-		Self.m__DrawGrid.Canvas.LineTo(Rect.Left, Rect.Bottom);
-		Self.m__DrawGrid.Canvas.LineTo(Rect.Left, Rect.Top);
+		Self.DrawGrid.Canvas.Pen.Color := clRed;
+		Self.DrawGrid.Canvas.MoveTo(Rect.Left, Rect.Top);
+		Self.DrawGrid.Canvas.LineTo(Rect.Right, Rect.Top);
+		Self.DrawGrid.Canvas.LineTo(Rect.Right, Rect.Bottom);
+		Self.DrawGrid.Canvas.LineTo(Rect.Left, Rect.Bottom);
+		Self.DrawGrid.Canvas.LineTo(Rect.Left, Rect.Top);
 	end;
 	
 	
-	BestMove := Self.m__GameContext.GetBestMoveFoundTillNow();
+	BestMove := Self.GameContext.GetBestMoveFoundTillNow();
 	
 	if (Column + 1 = BestMove.Column) and (Row + 1 = BestMove.Row) then
-		Self.m__DrawGrid.Canvas.Font.Color := clRed
+		Self.DrawGrid.Canvas.Font.Color := clRed
 	else
-		Self.m__DrawGrid.Canvas.Font.Color := clBlack;
+		Self.DrawGrid.Canvas.Font.Color := clBlack;
 		
 		
-	s__Evaluation := Self.m__GameContext.s__GetMoveEvaluation(Column, Row);
+	s__Evaluation := Self.GameContext.s__GetMoveEvaluation(Column, Row);
 	
 	if Copy(s__Evaluation, 1, 2) = '<=' then
-		with Self.m__DrawGrid.Canvas do
+		with Self.DrawGrid.Canvas do
 		begin
 			Delete(s__Evaluation, 1, 2);
 			Pen.Color := clBlack;
-			Draw(Rect.Left, Rect.Top, Self.m__LessOrEqual.Picture.Graphic);
+			Draw(Rect.Left, Rect.Top, Self.LessOrEqual.Picture.Graphic);
 			TextOut(Rect.Left + 8, Rect.Top, s__Evaluation);
 		end
 	else if Copy(s__Evaluation, 1, 2) = '>=' then
-		with Self.m__DrawGrid.Canvas do
+		with Self.DrawGrid.Canvas do
 		begin
 			Delete(s__Evaluation, 1, 2);
 			Pen.Color := clBlack;
-			Draw(Rect.Left, Rect.Top, Self.m__GreaterOrEqual.Picture.Graphic);
+			Draw(Rect.Left, Rect.Top, Self.GreaterOrEqual.Picture.Graphic);
 			TextOut(Rect.Left + 8, Rect.Top, s__Evaluation);
 		end
 	else
-		Self.m__DrawGrid.Canvas.TextOut(Rect.Left, Rect.Top, s__Evaluation);
+		Self.DrawGrid.Canvas.TextOut(Rect.Left, Rect.Top, s__Evaluation);
 end;
 
 procedure TMainWindow.OnClick_DrawGrid(Sender: TObject);
 var
 	CurrentCellState, NewCellState: TIntOptionalPlayerNumber;
 begin
-	CurrentCellState := Self.m__GameContext.GetCellState(Self.m__DrawGrid.Col, Self.m__DrawGrid.Row);
+	CurrentCellState := Self.GameContext.GetCellState(Self.DrawGrid.Col, Self.DrawGrid.Row);
 	NewCellState := CurrentCellState;
 	
 	repeat
 		NewCellState := (NewCellState + 1) mod 3;
-	until not ((NewCellState = 0) and (Self.m__DrawGrid.Col + 1 in [4, 5]) and (Self.m__DrawGrid.Row + 1 in [4, 5]));
+	until not ((NewCellState = 0) and (Self.DrawGrid.Col + 1 in [4, 5]) and (Self.DrawGrid.Row + 1 in [4, 5]));
 	
-	Self.m__GameContext.SetCellState(Self.m__DrawGrid.Col, Self.m__DrawGrid.Row, NewCellState);
+	Self.GameContext.SetCellState(Self.DrawGrid.Col, Self.DrawGrid.Row, NewCellState);
 end;
 
 procedure TMainWindow.OnClick_BackForwardButtons(Sender: TObject; Button: TUDBtnType);
 begin
 	if Button = btNext then
-		Self.m__GameContext.GoForward();
+		Self.GameContext.GoForward();
 	
 	if Button = btPrev then
-		Self.m__GameContext.GoBack();
+		Self.GameContext.GoBack();
 	
-	Self.m__BackForwardButtons.Position := Self.m__GameContext.GetCurrentMoveNumberInHistory();
-	Self.m__DrawGrid.Repaint();
+	Self.BackForwardButtons.Position := Self.GameContext.GetCurrentMoveNumberInHistory();
+	Self.DrawGrid.Repaint();
 end;
 
 procedure TMainWindow.OnClick_MenuItem__new_game(Sender: TObject);
 var
 	Player1Type, Player2Type: Byte;
 begin
-	Self.m__BackForwardButtons.Position := 1;
-	Self.m__DrawGrid.DefaultDrawing := False;
+	Self.BackForwardButtons.Position := 1;
+	Self.DrawGrid.DefaultDrawing := False;
 	
-	Self.m__Statusbar.Panels[0].Text := '';
-	Self.m__Statusbar.Panels[1].Text := '';
+	Self.Statusbar.Panels[0].Text := '';
+	Self.Statusbar.Panels[1].Text := '';
 	
 	Self.UpdatePlayers(Player1Type, Player2Type);
-	Self.m__GameContext.StartNewGame(Player1Type, Player2Type);
+	Self.GameContext.StartNewGame(Player1Type, Player2Type);
 
-	Self.m__DrawGrid.Repaint();
+	Self.DrawGrid.Repaint();
 end;
 
 procedure TMainWindow.OnClick_MenuItem_position_modify(Sender: TObject);
 begin
-	Self.m__MenuItem_position_modify.Enabled := False;
-	Self.m__MenuItem_position_continue.Enabled := True;
+	Self.MenuItem_position_modify.Enabled := False;
+	Self.MenuItem_position_continue.Enabled := True;
 	
-	Self.m__GameContext.StartBoardModification();
+	Self.GameContext.StartBoardModification();
 end;
 
 procedure TMainWindow.OnClick_MenuItem_position_continue(Sender: TObject);
 begin
-	Self.m__MenuItem_position_modify.Enabled := True;
-	Self.m__MenuItem_position_continue.Enabled := False;
-	Self.m__DrawGrid.Selection := TGridRect(Self.m__DrawGrid.CellRect(-1, -1));		//TODO: Why whis typecast (in two places)?
+	Self.MenuItem_position_modify.Enabled := True;
+	Self.MenuItem_position_continue.Enabled := False;
+	Self.DrawGrid.Selection := TGridRect(Self.DrawGrid.CellRect(-1, -1));		//TODO: Why whis typecast (in two places)?
 	
-	Self.m__GameContext.FinishBoardModification();
+	Self.GameContext.FinishBoardModification();
 	
-	Self.m__BackForwardButtons.Position := Self.m__GameContext.GetCurrentMoveNumberInHistory();
-	Self.m__GameContext.RunGame();
+	Self.BackForwardButtons.Position := Self.GameContext.GetCurrentMoveNumberInHistory();
+	Self.GameContext.RunGame();
 end;
 
 procedure TMainWindow.OnClick_MenuItem__players__any_submenu(Sender: TObject);
 var
 	Player1TypeDummy, Player2TypeDummy: Byte;
 begin
-	Self.m__MenuItem__players__human_vs_cpu.Checked := False;
-	Self.m__MenuItem__players__cpu_vs_cpu.Checked := False;
-	Self.m__MenuItem__players__cpu_vs_human.Checked := False;
-	Self.m__MenuItem__players__2_players.Checked := False;
+	Self.MenuItem__players__human_vs_cpu.Checked := False;
+	Self.MenuItem__players__cpu_vs_cpu.Checked := False;
+	Self.MenuItem__players__cpu_vs_human.Checked := False;
+	Self.MenuItem__players__2_players.Checked := False;
 	
 	(Sender as TMenuItem).Checked := True;
 	
@@ -1294,80 +1294,80 @@ end;
 	
 procedure TMainWindow.OnClick_MenuItem__colour__1st_player__any_submenu(Sender: TObject);
 begin
-	Self.m__MenuItem__colour__1st_player__blue.Checked := False;
-	Self.m__MenuItem__colour__1st_player__green.Checked := False;
-	Self.m__MenuItem__colour__1st_player__red.Checked := False;
-	Self.m__MenuItem__colour__1st_player__yellow.Checked := False;
+	Self.MenuItem__colour__1st_player__blue.Checked := False;
+	Self.MenuItem__colour__1st_player__green.Checked := False;
+	Self.MenuItem__colour__1st_player__red.Checked := False;
+	Self.MenuItem__colour__1st_player__yellow.Checked := False;
 	
 	(Sender as TMenuItem).Checked := True;
 	
-	if Self.m__MenuItem__colour__1st_player__blue.Checked then
+	if Self.MenuItem__colour__1st_player__blue.Checked then
 	begin
-		Self.m__Player1Piece.Picture := Self.m__BluePiece.Picture;
-		Self.m__Player1Piece.Hint := 'Blue';
+		Self.Player1Piece.Picture := Self.BluePiece.Picture;
+		Self.Player1Piece.Hint := 'Blue';
 	end;
 	
-	if Self.m__MenuItem__colour__1st_player__green.Checked then
+	if Self.MenuItem__colour__1st_player__green.Checked then
 	begin
-		Self.m__Player1Piece.Picture := Self.m__GreenPiece.Picture;
-		Self.m__Player1Piece.Hint := 'Green';
+		Self.Player1Piece.Picture := Self.GreenPiece.Picture;
+		Self.Player1Piece.Hint := 'Green';
 	end;
 	
-	if Self.m__MenuItem__colour__1st_player__red.Checked then
+	if Self.MenuItem__colour__1st_player__red.Checked then
 	begin
-		Self.m__Player1Piece.Picture := Self.m__RedPiece.Picture;
-		Self.m__Player1Piece.Hint := 'Red';
+		Self.Player1Piece.Picture := Self.RedPiece.Picture;
+		Self.Player1Piece.Hint := 'Red';
 	end;
 	
-	if Self.m__MenuItem__colour__1st_player__yellow.Checked then
+	if Self.MenuItem__colour__1st_player__yellow.Checked then
 	begin
-		Self.m__Player1Piece.Picture := Self.m__YellowPiece.Picture;
-		Self.m__Player1Piece.Hint := 'Yellow';
+		Self.Player1Piece.Picture := Self.YellowPiece.Picture;
+		Self.Player1Piece.Hint := 'Yellow';
 	end;
 	
-	Self.m__Statusbar.Panels[2].Text := Self.m__Player1Piece.Hint +' '+ IntToStr(Self.m__GameContext.GetPossibleMoveCount(1)) +' moves  '+
-			Self.m__Player2Piece.Hint +' '+ IntToStr(Self.m__GameContext.GetPossibleMoveCount(2)) +' moves';
+	Self.Statusbar.Panels[2].Text := Self.Player1Piece.Hint +' '+ IntToStr(Self.GameContext.GetPossibleMoveCount(1)) +' moves  '+
+			Self.Player2Piece.Hint +' '+ IntToStr(Self.GameContext.GetPossibleMoveCount(2)) +' moves';
 	
-	Self.m__DrawGrid.Repaint();
+	Self.DrawGrid.Repaint();
 end;
 
 procedure TMainWindow.OnClick_MenuItem__colour__2nd_player__any_submenu(Sender: TObject);
 begin
-	Self.m__MenuItem__colour__2nd_player__blue.Checked := False;
-	Self.m__MenuItem__colour__2nd_player__green.Checked := False;
-	Self.m__MenuItem__colour__2nd_player__red.Checked := False;
-	Self.m__MenuItem__colour__2nd_player__yellow.Checked := False;
+	Self.MenuItem__colour__2nd_player__blue.Checked := False;
+	Self.MenuItem__colour__2nd_player__green.Checked := False;
+	Self.MenuItem__colour__2nd_player__red.Checked := False;
+	Self.MenuItem__colour__2nd_player__yellow.Checked := False;
 	
 	(Sender as TMenuItem).Checked := True;
 	
-	if Self.m__MenuItem__colour__2nd_player__blue.Checked then
+	if Self.MenuItem__colour__2nd_player__blue.Checked then
 	begin
-		Self.m__Player2Piece.Picture := Self.m__BluePiece.Picture;
-		Self.m__Player2Piece.Hint := 'Blue';
+		Self.Player2Piece.Picture := Self.BluePiece.Picture;
+		Self.Player2Piece.Hint := 'Blue';
 	end;
 	
-	if Self.m__MenuItem__colour__2nd_player__green.Checked then
+	if Self.MenuItem__colour__2nd_player__green.Checked then
 	begin
-		Self.m__Player2Piece.Picture := Self.m__GreenPiece.Picture;
-		Self.m__Player2Piece.Hint := 'Green';
+		Self.Player2Piece.Picture := Self.GreenPiece.Picture;
+		Self.Player2Piece.Hint := 'Green';
 	end;
 	
-	if Self.m__MenuItem__colour__2nd_player__red.Checked then
+	if Self.MenuItem__colour__2nd_player__red.Checked then
 	begin
-		Self.m__Player2Piece.Picture := Self.m__RedPiece.Picture;
-		Self.m__Player2Piece.Hint := 'Red';
+		Self.Player2Piece.Picture := Self.RedPiece.Picture;
+		Self.Player2Piece.Hint := 'Red';
 	end;
 	
-	if Self.m__MenuItem__colour__2nd_player__yellow.Checked then
+	if Self.MenuItem__colour__2nd_player__yellow.Checked then
 	begin
-		Self.m__Player2Piece.Picture := Self.m__YellowPiece.Picture;
-		Self.m__Player2Piece.Hint := 'Yellow';
+		Self.Player2Piece.Picture := Self.YellowPiece.Picture;
+		Self.Player2Piece.Hint := 'Yellow';
 	end;
 	
-	Self.m__Statusbar.Panels[2].Text := Self.m__Player1Piece.Hint +' '+ IntToStr(Self.m__GameContext.GetPossibleMoveCount(1)) +' moves  '+
-			Self.m__Player2Piece.Hint +' '+ IntToStr(Self.m__GameContext.GetPossibleMoveCount(2)) +' moves';
+	Self.Statusbar.Panels[2].Text := Self.Player1Piece.Hint +' '+ IntToStr(Self.GameContext.GetPossibleMoveCount(1)) +' moves  '+
+			Self.Player2Piece.Hint +' '+ IntToStr(Self.GameContext.GetPossibleMoveCount(2)) +' moves';
 	
-	Self.m__DrawGrid.Repaint();
+	Self.DrawGrid.Repaint();
 end;
 
 end.
